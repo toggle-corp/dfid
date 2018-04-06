@@ -1,0 +1,105 @@
+@import 'colors';
+@import 'dimens';
+@import 'utils';
+
+$font-family-sans-serif: 'Source Sans Pro', sans-serif;
+$font-family-monospace: 'Oxygen Mono', monospace;
+$font-family-icons: 'Ionicons';
+
+* {
+    box-sizing: border-box;
+
+    ::-webkit-scrollbar-track {
+        background-color: $color-background-scrollbar;
+    }
+
+    ::-webkit-scrollbar {
+        background-color: $color-background-scrollbar;
+        width: $width-scrollbar;
+        height: $width-scrollbar;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: $color-foreground-scrollbar;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: $color-text;
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-default;
+    font-weight: $font-weight-default;
+
+    a {
+        outline: none;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        margin: 0;
+        text-transform: uppercase;
+        font-weight: $font-weight-light;
+    }
+
+    :global {
+        .navbar {
+            position: relative;
+            z-index: 1;
+            height: $height-navbar;
+        }
+
+        .dfid-main-content {
+            @include background-color($color-background);
+            position: relative;
+            padding: $spacing-small-alt;
+            height: calc(100vh - #{$height-navbar});
+            perspective: 1000px;
+            overflow-y: auto;
+        }
+
+        .no-nav + .dfid-main-content {
+            padding: 0;
+            height: 100vh;
+        }
+    }
+}
+
+:global {
+    .modal-shown {
+        // scss-lint:disable IdSelector
+        #root {
+            filter: brightness(50%);
+            pointer-events: none;
+            user-select: none;
+        }
+    }
+}
+
+%main-content {
+    // @frozenhelium
+    @include background-color($color-background-alt);
+    transform-origin: bottom;
+    animation: slide-in $duration-slow ease forwards;
+    border: $width-separator-thin solid $color-separator-alt;
+    height: 100%;
+}
+
+@keyframes slide-in {
+    from {
+        transform: rotateX(1deg);
+        opacity: .5;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
+}

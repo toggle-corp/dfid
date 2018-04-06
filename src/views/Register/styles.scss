@@ -1,0 +1,74 @@
+@import '../../stylesheets/base';
+
+$color-text-on-primary: get-text-color($color-primary);
+
+.register {
+    @extend %main-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    .dfid-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: $spacing-extra-large;
+
+        .heading {
+            color: inherit;
+
+            small {
+                text-transform: none;
+            }
+        }
+    }
+
+    .register-form-container {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        width: $width-register-form;
+
+        .register-success {
+            @include background-color($color-foreground);
+            width: 100%;
+            text-align: center;
+        }
+
+        .register-form {
+            @include background-color($color-foreground);
+            padding: $spacing-small $spacing-large $spacing-large;
+            width: 100%;
+
+            .action-buttons {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+
+                .forgot-password-link {
+                    color: $color-text-label;
+                    font-size: $font-size-extra-small;
+                }
+            }
+        }
+
+        .login-link-container {
+            display: flex;
+            flex-basis: 100%;
+            align-items: center;
+            justify-content: center;
+            margin-top: $spacing-extra-small;
+            padding: $spacing-large;
+
+            p {
+                margin: $spacing-small;
+            }
+
+            .login-link {
+                color: $color-accent;
+            }
+        }
+    }
+}
