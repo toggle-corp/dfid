@@ -23,3 +23,13 @@ yarn-error.log*
 # Ignore css.d.ts
 *css.d.ts
 vendor/
+
+*~
+:w
+"
+\
+]
+*.swp
+geofiles/
+
+.env
