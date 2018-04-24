@@ -53,14 +53,25 @@ export const routes: Map<RouteSetting> = {
         links: allLinks,
     },
 
+    province: {
+        order: 6,
+        type: ROUTE.public,
+        path: '/dashboard/:provinceId',
+        loader: () => import('../../views/Dashboard'),
+        links: allLinks,
+    },
+
+
     // NOTE: 404 page should always be at the end
     notFound: {
-        order: 6,
+        order: 7,
         type: ROUTE.public,
         path: undefined,
         loader: () => import('../../views/NotFound'),
         links: allLinks,
     },
+
+
 };
 
 export const routesOrder: string[] = mapObjectToArray<RouteSetting, { key: string, order: number }>(
