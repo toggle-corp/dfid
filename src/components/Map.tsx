@@ -1,23 +1,36 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import mapboxgl from 'mapbox-gl';
 
+type Selections = (string|number)[];
 
-const propTypes = {
-    className: PropTypes.string,
-    geojson: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    idKey: PropTypes.string,
-    labelKey: PropTypes.string,
+type Geojson = string;
+
+interface MapMouseEvent extends mapboxgl.MapMouseEvent {
+    features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
+}
+
+interface OwnProps {
+    className: string;
+    geojson: Geojson;
+    idKey: string;
+    labelKey: string;
     // eslint-disable-next-line react/no-unused-prop-types
-    colorMapping: PropTypes.objectOf(PropTypes.string),
+    colorMapping?: {
+        [key: string]: string;
+    };
     // eslint-disable-next-line react/no-unused-prop-types
-    strokeColor: PropTypes.string,
+    strokeColor?: string;
 
-    selections: PropTypes.arrayOf(PropTypes.any),
-    onClick: PropTypes.func,
+    selections?: Selections;
+    onClick?(key: string): void;
+}
 
-    synchronizer: PropTypes.object, // eslint-disable-line react/forbid-prop-types
-};
+type Props = OwnProps;
+
+interface States {
+    map: mapboxgl.Map;
+}
+
 const defaultProps = {
     className: '',
     geojson: undefined,
@@ -30,11 +43,12 @@ const defaultProps = {
 
     selections: [],
     onClick: undefined,
-
-    synchronizer: undefined,
 };
 
-const getInFilter = (key, values) => {
+const getInFilter = (key: string, values?: Selections) => {
+    if (!values) {
+        return;
+    }
     if (values.length === 0) {
         return ['in', key, ''];
     }
@@ -43,16 +57,17 @@ const getInFilter = (key, values) => {
 };
 
 
-export default class Map extends React.PureComponent {
-    static propTypes = propTypes;
+export default class Map extends React.PureComponent<Props, States> {
+    mounted: boolean;
+    layers: string[];
+    sources: string[];
+    mapElement: HTMLElement;
+
     static defaultProps = defaultProps;
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
-        this.state = {
-            map: undefined,
-        };
         this.layers = [];
         this.sources = [];
     }
@@ -60,8 +75,11 @@ export default class Map extends React.PureComponent {
     componentDidMount() {
         this.mounted = true;
 
+        const { REACT_APP_MAPBOX_ACCESS_TOKEN: token } = process.env;
         // Add the mapbox map
-        mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+        if (token) {
+            mapboxgl.accessToken = token;
+        }
         const map = new mapboxgl.Map({
             center: [50, 10],
             container: this.mapElement,
@@ -79,18 +97,12 @@ export default class Map extends React.PureComponent {
             }
         });
 
-        setTimeout(() => {
-            map.resize();
-        }, 200);
+        setTimeout(() => { map.resize(); }, 200);
 
         this.initializeMap(map);
-
-        if (this.props.synchronizer) {
-            this.props.synchronizer.register(this);
-        }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: Props) {
         if (this.props.geojson !== nextProps.geojson) {
             this.loadMapLayers(nextProps);
             return;
@@ -103,7 +115,7 @@ export default class Map extends React.PureComponent {
             map.setPaintProperty('geojson-fill', 'fill-color', {
                 property: idKey,
                 type: 'categorical',
-                stops: Object.entries(colorMapping),
+                stops: Object.entries(colorMapping || Map.defaultProps.colorMapping),
                 default: '#088',
             });
         }
@@ -122,11 +134,6 @@ export default class Map extends React.PureComponent {
         if (map) {
             this.destroyMapLayers();
             map.remove();
-            this.setState({ map: undefined });
-        }
-
-        if (this.props.synchronizer) {
-            this.props.synchronizer.unregister(this);
         }
     }
 
@@ -139,7 +146,7 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
-    handleMouseOver = (id) => {
+    handleMouseOver = (id: string) => {
         const { map } = this.state;
         const { idKey } = this.props;
         if (!map) {
@@ -160,15 +167,15 @@ export default class Map extends React.PureComponent {
     }
 
     /* eslint-disable no-param-reassign */
-    initializeMap = (map) => {
-        const { idKey, labelKey, synchronizer } = this.props;
+    initializeMap = (map: mapboxgl.Map) => {
+        const { idKey, labelKey } = this.props;
 
         const popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false,
         });
 
-        map.on('zoom', (e) => {
+        map.on('zoom', (e: MapMouseEvent) => {
             if (e.originalEvent) {
                 popup.setLngLat(map.unproject([
                     e.originalEvent.offsetX,
@@ -177,19 +184,13 @@ export default class Map extends React.PureComponent {
             }
         });
 
-        let lastFeature;
-        map.on('mouseenter', 'geojson-fill', (e) => {
+        map.on('mouseenter', 'geojson-fill', (e: MapMouseEvent) => {
             const feature = e.features[0];
             popup.setHTML(feature.properties[labelKey])
                 .addTo(map);
-
-            if (synchronizer) {
-                lastFeature = feature;
-                synchronizer.onMouseOver(this, feature.properties[idKey]);
-            }
         });
 
-        map.on('mousemove', 'geojson-fill', (e) => {
+        map.on('mousemove', 'geojson-fill', (e: MapMouseEvent) => {
             const feature = e.features[0];
             map.setFilter('geojson-hover', ['==', idKey, feature.properties[idKey]]);
             map.getCanvas().style.cursor = 'pointer';
@@ -198,12 +199,6 @@ export default class Map extends React.PureComponent {
                 e.point.x,
                 e.point.y - 8,
             ])).setHTML(feature.properties[labelKey]);
-
-            if (synchronizer && lastFeature !== feature) {
-                synchronizer.onMouseOut(this, lastFeature.properties[idKey]);
-                lastFeature = feature;
-                synchronizer.onMouseOver(this, feature.properties[idKey]);
-            }
         });
 
         map.on('mouseleave', 'geojson-fill', () => {
@@ -211,13 +206,9 @@ export default class Map extends React.PureComponent {
             map.getCanvas().style.cursor = '';
 
             popup.remove();
-
-            if (synchronizer && lastFeature) {
-                synchronizer.onMouseOut(this, lastFeature.properties[idKey]);
-            }
         });
 
-        map.on('click', 'geojson-fill', (e) => {
+        map.on('click', 'geojson-fill', (e: MapMouseEvent) => {
             if (this.props.onClick) {
                 const feature = e.features[0];
                 this.props.onClick(feature.properties[idKey]);
@@ -234,19 +225,16 @@ export default class Map extends React.PureComponent {
         this.sources = [];
     }
 
-    loadMapLayers(props) {
+    loadMapLayers(props: Props) {
         const { map } = this.state;
-        const { geojson, idKey, colorMapping, selections, strokeColor, synchronizer } = props;
+        const {
+            colorMapping,
+            geojson, idKey, selections,
+            strokeColor,
+        } = props;
 
         if (!map || !geojson) {
             return;
-        }
-
-        if (synchronizer) {
-            synchronizer.removeAllElements(this);
-            geojson.features.forEach((f) => {
-                synchronizer.addElement(this, f.properties[idKey], f.properties);
-            });
         }
 
         map.fitBounds(
@@ -264,11 +252,11 @@ export default class Map extends React.PureComponent {
             this.destroyMapLayers();
         }
 
-        const basePaint = {
+        const basePaint: mapboxgl.FillPaint = {
             'fill-color': {
                 property: idKey,
                 type: 'categorical',
-                stops: Object.entries(colorMapping),
+                stops: Object.entries(colorMapping || Map.defaultProps.colorMapping),
                 default: '#088',
             },
             'fill-opacity': 0.8,
@@ -286,6 +274,7 @@ export default class Map extends React.PureComponent {
             source: 'geojson',
             paint: basePaint,
         });
+
         map.addLayer({
             id: 'geojson-stroke',
             type: 'line',
@@ -318,7 +307,13 @@ export default class Map extends React.PureComponent {
             filter: getInFilter(idKey, selections),
         });
 
-        this.layers = [...this.layers, 'geojson-stroke', 'geojson-fill', 'geojson-hover', 'geojson-selected'];
+        this.layers = [
+            ...this.layers,
+            'geojson-stroke',
+            'geojson-fill',
+            'geojson-hover',
+            'geojson-selected',
+        ];
     }
 
     render() {
@@ -327,7 +322,7 @@ export default class Map extends React.PureComponent {
         return (
             <div
                 className={className}
-                ref={(el) => { this.mapElement = el; }}
+                ref={(el: HTMLDivElement) => { this.mapElement = el; }}
             />
         );
     }
