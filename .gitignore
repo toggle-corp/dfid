@@ -31,3 +31,5 @@ vendor/
 ]
 *.swp
 geofiles/
+
+.env

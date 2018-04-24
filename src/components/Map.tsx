@@ -28,7 +28,7 @@ interface OwnProps {
 type Props = OwnProps;
 
 interface States {
-    map: mapboxgl.Map;
+    map?: mapboxgl.Map;
 }
 
 const defaultProps = {
@@ -61,7 +61,7 @@ export default class Map extends React.PureComponent<Props, States> {
     mounted: boolean;
     layers: string[];
     sources: string[];
-    mapElement: HTMLElement;
+    mapElement: HTMLDivElement;
 
     static defaultProps = defaultProps;
 
@@ -70,6 +70,7 @@ export default class Map extends React.PureComponent<Props, States> {
 
         this.layers = [];
         this.sources = [];
+        this.state = {};
     }
 
     componentDidMount() {
@@ -219,8 +220,10 @@ export default class Map extends React.PureComponent<Props, States> {
 
     destroyMapLayers() {
         const { map } = this.state;
-        this.layers.forEach(layer => map.removeLayer(layer));
-        this.sources.forEach(source => map.removeSource(source));
+        if (map) {
+            this.layers.forEach(layer => map.removeLayer(layer));
+            this.sources.forEach(source => map.removeSource(source));
+        }
         this.layers = [];
         this.sources = [];
     }
