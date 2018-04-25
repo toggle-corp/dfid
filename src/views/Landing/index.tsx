@@ -19,6 +19,8 @@ import province5Image from '../../resources/img/province5.png';
 import province6Image from '../../resources/img/province6.png';
 import province7Image from '../../resources/img/province7.png';
 import logo from '../../resources/img/logo.png';
+import budgetIcon from '../../resources/img/budget.png';
+import projectIcon from '../../resources/img/project.png';
 
 interface Props {}
 
@@ -34,6 +36,7 @@ interface Data {
 interface Item {
     label: string;
     value: number;
+    icon?: string;
 }
 
 export default class Landing extends React.PureComponent {
@@ -112,6 +115,10 @@ export default class Landing extends React.PureComponent {
 
         return (
             <div className={styles.item}>
+                <img
+                    className={styles.icon}
+                    src={data.icon}
+                />
                 <div className={styles.label}>
                     {data.label || '-'}
                 </div>
@@ -133,8 +140,8 @@ export default class Landing extends React.PureComponent {
         } = this.provincesData[id] || this.defaultData;
 
         const provinceDetailItemList = [
-            { label: 'Active DFID projects', value: noOfActiveProjects },
-            { label: 'Total budget (FY 2017/18)', value: totalBudget },
+            { label: 'Active DFID projects', value: noOfActiveProjects, icon: projectIcon },
+            { label: 'Total budget (FY 2017/18)', value: totalBudget, icon: budgetIcon },
         ];
 
         console.log(image);

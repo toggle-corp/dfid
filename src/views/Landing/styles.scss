@@ -112,7 +112,7 @@
                     > .title {
                         padding: $spacing-small $spacing-medium;
                         color: $color-accent;
-                        font-size: $font-size-large;
+                        font-size: $font-size-large-alt;
                     }
 
                     > .content {
@@ -121,6 +121,11 @@
 
                         .item {
                             display: table-row;
+
+                            .icon {
+                                padding-left: $spacing-medium;
+                                height: $font-size-large;
+                            }
 
                             .label {
                                 display: table-cell;
