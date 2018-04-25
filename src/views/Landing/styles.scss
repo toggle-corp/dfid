@@ -2,127 +2,160 @@
 
 .landing {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     width: 100%;
-    height: 100%;
 
-    .pheader {
+    .left {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: $spacing-medium;
-    }
+        flex-basis: 70%;
+        flex-direction: column;
+        background-color: $color-foreground;
 
-    .provinces {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        border-bottom: $width-separator-thin solid $color-separator;
-        width: 100%;
-        height: 50%;
+        .overview {
+            .logo {
+                display: block;
+                align-self: flex-start;
+                padding: $spacing-large;
+                height: 144px;
+            }
 
-        .province {
-            @include shadow-small;
-            display: flex;
-            flex-direction: column;
-            transition: .2s all ease-in-out;
-            margin: $spacing-medium;
-            border: $width-separator-thin solid $color-separator;
-            background: $color-accent;
-            padding: $spacing-large;
-            width: 20%;
-            color: $color-text-on-dark;
-
-            .name {
+            .content {
                 display: flex;
-                margin-bottom: $spacing-small;
-                font-weight: $font-weight-bold;
-            }
-
-            .population,
-            .poverty,
-            .projects,
-            .budget {
-                display: flex;
-                transition: .2s all ease-in-out;
-                opacity: 0;
-                padding: $spacing-super-small;
-                text-transform: capitalize;
-                font-size: $font-size-large;
-                font-weight: $font-weight-medium;
-            }
-
-            &:hover {
-                transform: scale(1.03); 
-                cursor: pointer;
-
-                .population,
-                .poverty,
-                .projects,
-                .budget {
-                    opacity: 1;
-                }
-            }
-
-        }
-    }
-
-    .bottom {
-        display: flex;
-        flex-grow: 1;
-        width: 100%;
-        height: 40%;
-
-        .dfiddata {
-            display: flex;
-            flex-basis: 25%;
-            flex-direction: column;
-            border-right: $width-separator-thin solid $color-separator;
-            padding: $spacing-medium;
-
-            h2 {
-                text-align: center;
-            }
-
-            .info {
-                display: flex;
+                align-content: center;
+                align-items: center;
+                flex-grow: 1;
                 flex-wrap: wrap;
+                justify-content: center;
 
-                .box {
-                    @include shadow-small;
-                    display: flex;
-                    flex-basis: 40%;
-                    flex-wrap: wrap;
-                    margin: $spacing-large;
-                    border: $width-separator-thin solid $color-separator;
-                    padding: $spacing-medium;
+                .item {
+                    flex-basis: calc(calc(100% / 3) - #{2 * $spacing-extra-large}); 
+                    margin: $spacing-extra-large;
+                    border: $width-separator-thin solid $color-accent;
+                    padding: $spacing-extra-large;
 
-                    span {
-                        width: 100%;
-                        font-size: $font-size-super-large-alt;
+                    .label {
+                        color: $color-text-label;
+                        font-size: $font-size-large;
                         font-weight: $font-weight-bold;
                     }
 
-                    p {
-                        margin: 0;
-                        font-size: $font-size-medium-alt;
+                    .value {
+                        color: $color-accent;
+                        font-size: $font-size-ultra-large-alt;
+                        font-weight: $font-weight-light;
                     }
                 }
             }
         }
 
-        .about {
+        .bottom-content {
             display: flex;
-            flex-basis: 35%;
-            border-right: $width-separator-thin solid $color-separator;
+            background-color: $color-background-alt;
+            padding: $spacing-medium 0;
+
+            .about {
+                flex-basis: 50%;
+                border-right: $width-separator-thin solid $color-separator;
+
+                .title {
+                    padding: $spacing-medium;
+                }
+
+                .content {
+                    padding: $spacing-medium;
+                    line-height: 1.5;
+                }
+            }
+
+            .explore {
+                flex-basis: 50%;
+
+                .title {
+                    padding: $spacing-medium;
+                }
+
+                .content {
+                    padding: 0 $spacing-medium;
+                }
+            }
+        }
+    }
+
+    .right {
+        flex-basis: 30%;
+        background-color: $color-foreground-alt;
+
+        >.title {
+            border-bottom: $width-separator-thin solid $color-accent;
             padding: $spacing-medium;
         }
 
-        .dataset {
-            display: flex;
-            flex-basis: 30%;
-            padding: $spacing-medium;
+        >.content {
+            .province {
+                display: flex;
+                align-items: center;
+                border-bottom: $width-separator-thin solid $color-separator;
+                text-transform: none;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, .06);
+                }
+
+                .image {
+                    flex-shrink: 0;
+                    width: 144px;
+                }
+
+                >.content {
+                    flex-grow: 1;
+
+                    > .title {
+                        padding: $spacing-small $spacing-medium;
+                        color: $color-accent;
+                        font-size: $font-size-large;
+                    }
+
+                    > .content {
+                        display: table;
+                        padding: $spacing-small 0;
+
+                        .item {
+                            display: table-row;
+
+                            .label {
+                                display: table-cell;
+                                padding: $spacing-extra-small $spacing-medium;
+                            }
+
+                            .value {
+                                display: table-cell;
+                                padding: $spacing-extra-small $spacing-medium;
+                                font-size: $font-size-large;
+                                font-weight: $font-weight-bold;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .footer {
+        flex-basis: 100%;
+        background-color: #414141;
+        padding: 0 $spacing-medium;
+        height: 164px;
+        color: $color-text-on-dark;
+        display: flex;
+        align-items: center;
+
+        .title {
+            font-size: $font-size-super-large;
+            padding: $spacing-large;
         }
 
+        .link {
+            padding: $spacing-medium;
+        }
     }
 }

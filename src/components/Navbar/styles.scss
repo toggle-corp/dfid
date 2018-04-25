@@ -75,13 +75,12 @@ $color-text-on-primary: get-text-color($color-primary);
         font-weight: $font-weight-bold;
 
         &:hover {
-            color: $color-accent;
+            color: $color-text-on-navbar;
         }
 
         &.active {
-            border-bottom-color: $color-accent;
-            color: $color-accent;
-            // color: $color-text-on-navbar;
+            border-bottom-color: $color-text-on-navbar;
+            color: $color-text-on-navbar;
         }
     }
 
