@@ -13,16 +13,26 @@ import styles from './styles.scss';
 
 interface Props {}
 
+interface DfidData {
+    provincesCovered: number;
+    districtReached: number;
+    municipalitiesCovered: number;
+    totalProjects: number;
+    totalSectors: number;
+    totalBudget: number;
+}
+
 export default class Landing extends React.PureComponent {
     provinces: number[];
-    provincesData: {};
-    defaultProvince: object;
+    provincesData: object;
+    dfidData: DfidData;
+    defaultData: object;
 
     constructor(props: Props) {
         super(props);
 
         this.provinces = [1, 2, 3, 4, 5, 6, 7];
-        this.defaultProvince = {};
+        this.defaultData = {};
         this.provincesData = {
             1:  {
                 id: 1,
@@ -46,6 +56,14 @@ export default class Landing extends React.PureComponent {
             },
             7: {},
         };
+        this.dfidData = {
+            provincesCovered: 7,
+            districtReached: 77,
+            municipalitiesCovered:756,
+            totalProjects: 12,
+            totalSectors: 11,
+            totalBudget: 235235234,
+        };
     }
 
     getLinkForProvince = (id: number) => (
@@ -59,7 +77,7 @@ export default class Landing extends React.PureComponent {
             noOfActiveProjects,
             totalBudget,
             povertyRate,
-        } = this.provincesData[id] || this.defaultProvince;
+        } = this.provincesData[id] || this.defaultData;
 
         return (
            <Link
@@ -87,6 +105,48 @@ export default class Landing extends React.PureComponent {
         );
     }
 
+    renderDfidInfo = () => {
+        const {
+            provincesCovered,
+            districtReached,
+            municipalitiesCovered,
+            totalProjects,
+            totalSectors,
+            totalBudget,
+        } = this.dfidData;
+
+        return (
+            <div
+                className={styles.info}
+            >
+                <div className={styles.box}>
+                    <span>{provincesCovered}</span>
+                        <p>Provinces Covered</p>
+                </div>
+                <div className={styles.box}>
+                    <span>{districtReached}</span>
+                        <p>District Reached</p>
+                </div>
+                <div className={styles.box}>
+                    <span>{municipalitiesCovered}</span>
+                       <p>Municipalities Covered</p>
+                </div>
+                <div className={styles.box}>
+                    <span>{totalProjects}</span>
+                        <p>Total Projects</p>
+                </div>
+                <div className={styles.box}>
+                    <span>{totalSectors}</span>
+                        <p>Sectors Covered</p>
+                </div>
+                <div className={styles.box}>
+                    <span>{totalBudget}</span>
+                        <p>Total Budget</p>
+                </div>
+            </div>
+        );
+    }
+
     render() {
         return (
             <div className={styles.landing}>
@@ -102,7 +162,10 @@ export default class Landing extends React.PureComponent {
                 </div>
                 <div className={styles.bottom}>
                     <div className={styles.dfiddata}>
-                        DFID
+                        <h2>DFID in Nepal</h2>
+                        {
+                            this.renderDfidInfo()
+                        }
                     </div>
                     <div className={styles.about}>
                         About
