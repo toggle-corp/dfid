@@ -25,7 +25,8 @@
             @include shadow-small;
             display: flex;
             flex-direction: column;
-            margin: $spacing-large;
+            transition: .2s all ease-in-out;
+            margin: $spacing-medium;
             border: $width-separator-thin solid $color-separator;
             background: $color-accent;
             padding: $spacing-large;
@@ -34,6 +35,8 @@
 
             .name {
                 display: flex;
+                margin-bottom: $spacing-small;
+                font-weight: $font-weight-bold;
             }
 
             .population,
@@ -41,6 +44,8 @@
             .projects,
             .budget {
                 display: flex;
+                transition: .2s all ease-in-out;
+                opacity: 0;
                 padding: $spacing-super-small;
                 text-transform: capitalize;
                 font-size: $font-size-large;
@@ -49,9 +54,16 @@
 
             &:hover {
                 transform: scale(1.03); 
-                transform: 1s ease-in-out;
                 cursor: pointer;
+
+                .population,
+                .poverty,
+                .projects,
+                .budget {
+                    opacity: 1;
+                }
             }
+
         }
     }
 
@@ -77,6 +89,7 @@
                 flex-wrap: wrap;
 
                 .box {
+                    @include shadow-small;
                     display: flex;
                     flex-basis: 40%;
                     flex-wrap: wrap;

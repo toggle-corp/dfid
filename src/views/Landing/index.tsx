@@ -86,7 +86,7 @@ export default class Landing extends React.PureComponent {
                 className={styles.province}
            >
                 <h2 className={styles.name}>
-                   <p>{name}</p>
+                   <span>{name}</span>
                 </h2>
                 <div className={styles.population}>
                     <span>Total Population: {totalPopulation}</span>
@@ -151,7 +151,7 @@ export default class Landing extends React.PureComponent {
         return (
             <div className={styles.landing}>
                 <div className={styles.pheader}>
-                   <h2>DFID Nepal in Provinces</h2>
+                   <h2>Provinces Overview</h2>
                 </div>
                 <div className={styles.provinces}>
                     {
@@ -168,10 +168,10 @@ export default class Landing extends React.PureComponent {
                         }
                     </div>
                     <div className={styles.about}>
-                        About
+                        <h2>About</h2>
                     </div>
                     <div className={styles.dataset}>
-                        Dataset
+                        <h2>Dataset</h2>
                     </div>
 
                 </div>
