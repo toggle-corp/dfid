@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactSVG from 'react-svg';
 import {
     withRouter,
     Link,
@@ -15,8 +14,6 @@ import {
     hideNavbar,
 } from '../../constants';
 import { CloakSettings } from '../../constants/routes/interface';
-
-import logo from '../../resources/img/Dfid.svg';
 
 import NavMenu from './NavMenu';
 import NavDrop from './NavDrop';
@@ -123,11 +120,6 @@ class Navbar extends React.PureComponent<Props, State> {
                     to={reverseRoute(pathNames.landing, {})}
                     className={styles.brand}
                 >
-                    <ReactSVG
-                        wrapperClassName={styles.iconWrapper}
-                        className={styles.icon}
-                        path={logo}
-                    />
                     <div className={styles.brand}>
                         DFID
                     </div>

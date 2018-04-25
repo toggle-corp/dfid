@@ -31,7 +31,7 @@ $color-primary-light: #1676d3;
 $color-primary-dark: #4ce49c;
 $color-primary: get-color($color-primary-light, $color-primary-dark);
 
-$color-accent-light: #008975;
+$color-accent-light: #005ea5;
 $color-accent-dark: #d3a116;
 $color-accent: get-color($color-accent-light, $color-accent-dark);
 
@@ -99,7 +99,7 @@ $color-background-row-light-alt: #eee;
 $color-background-row-dark-alt: #484848;
 $color-background-row-alt: get-color($color-background-row-light-alt, $color-background-row-dark-alt);
 
-$color-navbar-light: #fff;
+$color-navbar-light: #005ea5;
 $color-navbar-dark: #414141;
 $color-navbar: get-color($color-navbar-light, $color-navbar-dark);
 
