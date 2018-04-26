@@ -1,9 +1,9 @@
 import React from 'react';
 import mapboxgl from 'mapbox-gl';
+import turf from 'turf';
 
 type Selections = (string|number)[];
-
-type Geojson = string;
+export type GeoJSON = any;
 
 interface MapMouseEvent extends mapboxgl.MapMouseEvent {
     features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
@@ -11,7 +11,7 @@ interface MapMouseEvent extends mapboxgl.MapMouseEvent {
 
 interface OwnProps {
     className: string;
-    geojson: Geojson;
+    geojson: GeoJSON;
     idKey: string;
     labelKey: string;
     // eslint-disable-next-line react/no-unused-prop-types
@@ -37,7 +37,7 @@ const defaultProps = {
     idKey: '',
     labelKey: '',
     colorMapping: {
-        undefined: '#088',
+        undefined: '#1676d3',
     },
     strokeColor: '#fff',
 
@@ -117,7 +117,7 @@ export default class Map extends React.PureComponent<Props, States> {
                 property: idKey,
                 type: 'categorical',
                 stops: Object.entries(colorMapping || Map.defaultProps.colorMapping),
-                default: '#088',
+                default: '#1676d3',
             });
         }
 
@@ -169,8 +169,6 @@ export default class Map extends React.PureComponent<Props, States> {
 
     /* eslint-disable no-param-reassign */
     initializeMap = (map: mapboxgl.Map) => {
-        const { idKey, labelKey } = this.props;
-
         const popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false,
@@ -186,12 +184,14 @@ export default class Map extends React.PureComponent<Props, States> {
         });
 
         map.on('mouseenter', 'geojson-fill', (e: MapMouseEvent) => {
+            const { labelKey } = this.props;
             const feature = e.features[0];
             popup.setHTML(feature.properties[labelKey])
                 .addTo(map);
         });
 
         map.on('mousemove', 'geojson-fill', (e: MapMouseEvent) => {
+            const { idKey, labelKey } = this.props;
             const feature = e.features[0];
             map.setFilter('geojson-hover', ['==', idKey, feature.properties[idKey]]);
             map.getCanvas().style.cursor = 'pointer';
@@ -203,6 +203,7 @@ export default class Map extends React.PureComponent<Props, States> {
         });
 
         map.on('mouseleave', 'geojson-fill', () => {
+            const { idKey } = this.props;
             map.setFilter('geojson-hover', ['==', idKey, '']);
             map.getCanvas().style.cursor = '';
 
@@ -210,6 +211,7 @@ export default class Map extends React.PureComponent<Props, States> {
         });
 
         map.on('click', 'geojson-fill', (e: MapMouseEvent) => {
+            const { idKey } = this.props;
             if (this.props.onClick) {
                 const feature = e.features[0];
                 this.props.onClick(feature.properties[idKey]);
@@ -240,16 +242,7 @@ export default class Map extends React.PureComponent<Props, States> {
             return;
         }
 
-        map.fitBounds(
-            [[
-                80.06014251708984,
-                26.347515106201286,
-            ], [
-                88.20392608642595,
-                30.447021484375057,
-            ]],
-            { padding: 48 },
-        );
+        this.flyToBounds(geojson);
 
         if (this.sources.length > 0 || this.layers.length > 0) {
             this.destroyMapLayers();
@@ -260,7 +253,7 @@ export default class Map extends React.PureComponent<Props, States> {
                 property: idKey,
                 type: 'categorical',
                 stops: Object.entries(colorMapping || Map.defaultProps.colorMapping),
-                default: '#088',
+                default: '#1676d3',
             },
             'fill-opacity': 0.8,
         };
@@ -277,24 +270,14 @@ export default class Map extends React.PureComponent<Props, States> {
             source: 'geojson',
             paint: basePaint,
         });
-
-        map.addLayer({
-            id: 'geojson-stroke',
-            type: 'line',
-            source: 'geojson',
-            paint: {
-                'line-color': strokeColor,
-                'line-width': 1,
-            },
-        });
         map.addLayer({
             id: 'geojson-hover',
             type: 'fill',
             source: 'geojson',
             paint: {
                 ...basePaint,
-                'fill-color': '#155f9f',
-                'fill-opacity': 0.9,
+                'fill-color': '#005ea5',
+                'fill-opacity': 0.8,
             },
             filter: ['==', idKey, ''],
         });
@@ -310,6 +293,16 @@ export default class Map extends React.PureComponent<Props, States> {
             filter: getInFilter(idKey, selections),
         });
 
+        map.addLayer({
+            id: 'geojson-stroke',
+            type: 'line',
+            source: 'geojson',
+            paint: {
+                'line-color': strokeColor,
+                'line-width': 1,
+            },
+        });
+
         this.layers = [
             ...this.layers,
             'geojson-stroke',
@@ -317,6 +310,25 @@ export default class Map extends React.PureComponent<Props, States> {
             'geojson-hover',
             'geojson-selected',
         ];
+    }
+
+    flyToBounds = (geoJson: GeoJSON) => {
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+
+        const bounds = turf.bbox(geoJson);
+        map.fitBounds(
+            [[
+                bounds[0],
+                bounds[1],
+            ], [
+                bounds[2],
+                bounds[3],
+            ]],
+            { padding: 128 },
+        );
     }
 
     render() {

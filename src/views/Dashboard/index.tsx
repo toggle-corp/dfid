@@ -4,6 +4,7 @@ import {
 } from 'react-router-dom';
 
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
+import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
 import {
@@ -11,10 +12,11 @@ import {
     createParamsForProvinceData,
     urlForProvinces,
     createParamsForProvinces,
+    createUrlForProvinceGeoJson,
+    urlForCountryGeoJson,
 } from '../../rest';
 import schema from '../../schema';
-import Map from '../../components/Map';
-import provinceGeoJson from '../../geofiles/province.geo.json';
+import Map, { GeoJSON } from '../../components/Map';
 
 import styles from './styles.scss';
 
@@ -47,6 +49,10 @@ interface State {
     provinces?: Province[];
     loadingProvinceData: boolean;
     loadingProvinces: boolean;
+    loadingGeoJson: boolean;
+    geoJson?: GeoJSON;
+    geoJsonIdKey: string;
+    geoJsonLabelKey: string;
 }
 
 interface Option {
@@ -63,6 +69,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     indicatorOptions: Option[];
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
+    geoJsonRequest: RestRequest;
+    geoJsons: {
+        [key: string]: GeoJSON,
+    };
 
     static provinceKeyExtractor = (p: Province) => p.id;
     static provinceLabelExtractor = (p: Province) => p.name;
@@ -77,6 +87,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             provinces: [],
             loadingProvinceData: true,
             loadingProvinces: true,
+            loadingGeoJson: false,
+            geoJson: undefined,
+            geoJsonIdKey: 'id',
+            geoJsonLabelKey: 'label',
         };
 
         this.provinceOptions = [
@@ -99,6 +113,8 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             { key: 1, label: 'HDI' },
             { key: 2, label: 'Population density' },
         ];
+
+        this.geoJsons = {};
     }
 
     componentDidMount() {
@@ -135,6 +151,8 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             .build();
 
         this.provincesRequest.start();
+
+        this.reloadGeoJson();
     }
 
     componentWillUnmount() {
@@ -144,10 +162,80 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         if (this.provincesRequest) {
             this.provincesRequest.stop();
         }
+        if (this.geoJsonRequest) {
+            this.geoJsonRequest.stop();
+        }
     }
 
     handleProvinceChange = (key: number) => {
-        this.setState({ selectedProvince: key });
+        this.setState(
+            {
+                selectedProvince: key,
+                loadingGeoJson: true,
+            },
+            this.reloadGeoJson,
+        );
+    }
+
+    reloadGeoJson = () => {
+        const { selectedProvince } = this.state;
+
+        if (this.geoJsonRequest) {
+            this.geoJsonRequest.stop();
+        }
+
+        let url: string;
+        let idKey: string;
+        let labelKey: string;
+
+        if (!selectedProvince) {
+            url = urlForCountryGeoJson;
+            idKey = 'Province';
+            labelKey = 'Province';
+        } else {
+            url = createUrlForProvinceGeoJson(selectedProvince);
+            idKey = 'FIRST_DCOD';
+            labelKey = 'FIRST_DIST';
+        }
+
+        if (this.geoJsons[url]) {
+            this.setState({
+                geoJsonIdKey: idKey,
+                geoJsonLabelKey: labelKey,
+                geoJson: this.geoJsons[url],
+                loadingGeoJson: false,
+            });
+            return;
+        }
+
+        this.geoJsonRequest = this.createGeoJsonRequest(url, idKey, labelKey);
+        this.geoJsonRequest.start();
+    }
+
+    createGeoJsonRequest = (url: string, geoJsonIdKey: string, geoJsonLabelKey: string) => {
+        const request = new FgRestBuilder()
+            .url(url)
+            .params(createParamsForProvinces)
+            .preLoad(() => this.setState({ loadingGeoJson: true }))
+            .postLoad(() => this.setState({ loadingGeoJson: false }))
+            .success((response: GeoJSON) => {
+                this.geoJsons[url] = response;
+
+                // Convert ids to strings to make things simpler later
+                response.features.forEach((acc: any) => {
+                    acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
+                });
+
+                this.setState({
+                    geoJsonIdKey,
+                    geoJsonLabelKey,
+                    geoJson: response,
+                    loadingGeoJson: false,
+                });
+            })
+            .build();
+
+        return request;
     }
 
     renderFilters = () => (
@@ -285,12 +373,15 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             <div className={styles.dashboard}>
                 <div className={styles.left}>
                     <Filters />
-                    <Map
-                        className={styles.map}
-                        geojson={provinceGeoJson}
-                        idKey="D_ID"
-                        labelKey="Title"
-                    />
+                    <div className={styles.mapContainer}>
+                        {this.state.loadingGeoJson && <LoadingAnimation />}
+                        <Map
+                            className={styles.map}
+                            geojson={this.state.geoJson}
+                            idKey={this.state.geoJsonIdKey}
+                            labelKey={this.state.geoJsonLabelKey}
+                        />
+                    </div>
                 </div>
                 <Information />
             </div>
