@@ -73,7 +73,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "dependencies": "bash scripts/dependencies.sh"
+    "dependencies": "bash scripts/dependencies.sh",
+    "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
     "@types/jest": "^22.1.3",
