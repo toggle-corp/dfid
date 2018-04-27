@@ -3,6 +3,7 @@ import attachValidator from '../vendor/ravl/attachValidator';
 
 import token from './token';
 import user from './user';
+import province from './province';
 import { SchemaGroup } from './interface';
 
 // Validator mixin
@@ -63,6 +64,7 @@ const userDefinedSchemas: SchemaGroup  = [];
     ...userDefinedSchemas,
     ...token,
     ...user,
+    ...province,
 ].forEach(
     ({ name, schema }) => dict.put(name, schema),
 );

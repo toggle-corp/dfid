@@ -1,16 +1,19 @@
 import React from 'react';
-import {
-    Link,
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
-
+import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 import {
-    pathNames,
-} from '../../constants';
+    urlForProvinceData,
+    createParamsForProvinceData,
+} from '../../rest';
+import schema from '../../schema';
 
-import styles from './styles.scss';
+import { pathNames } from '../../constants';
+import logo from '../../resources/img/logo.png';
+import budgetIcon from '../../resources/img/budget.png';
+import projectIcon from '../../resources/img/project.png';
 import province1Image from '../../resources/img/province1.png';
 import province2Image from '../../resources/img/province2.png';
 import province3Image from '../../resources/img/province3.png';
@@ -18,11 +21,11 @@ import province4Image from '../../resources/img/province4.png';
 import province5Image from '../../resources/img/province5.png';
 import province6Image from '../../resources/img/province6.png';
 import province7Image from '../../resources/img/province7.png';
-import logo from '../../resources/img/logo.png';
-import budgetIcon from '../../resources/img/budget.png';
-import projectIcon from '../../resources/img/project.png';
+
+import styles from './styles.scss';
 
 interface Props {}
+interface State {}
 
 interface Data {
     provincesCovered: number;
@@ -35,15 +38,16 @@ interface Data {
 
 interface Item {
     label: string;
-    value: number;
+    value: number | string;
     icon?: string;
 }
 
-export default class Landing extends React.PureComponent {
+export default class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
     provincesData: object;
     data: Data;
     defaultData: object;
+    provinceDataRequest: RestRequest;
 
     constructor(props: Props) {
         super(props);
@@ -54,45 +58,51 @@ export default class Landing extends React.PureComponent {
             1:  {
                 id: 1,
                 name: 'Province 1',
-                totalPopulation: 5404145,
-                povertyRate: 24.3,
-                noOfActiveProjects: 7,
-                totalBudget: 3434345225,
                 image: province1Image,
+                noOfActiveProjects: 2,
+                totalBudget: 2759366,
             },
             2: {
                 id: 2,
                 name: 'Province 2',
                 image: province2Image,
+                noOfActiveProjects: 3,
+                totalBudget: 38342,
             },
             3: {
                 id: 3,
                 name: 'Province 3',
                 image: province3Image,
+                noOfActiveProjects: 4,
+                totalBudget: 8464567,
             },
             4: {
                 id: 4,
                 name: 'Province 4',
                 image: province4Image,
+                noOfActiveProjects: 1,
+                totalBudget: 263947,
             },
             5: {
                 id: 5,
                 name: 'Province 5',
                 image: province5Image,
+                noOfActiveProjects: 1,
+                totalBudget: 1937492,
             },
             6: {
                 id: 6,
                 name: 'Province 6',
-                totalPopulation: 5404145,
-                povertyRate: 24.3,
-                noOfActiveProjects: 7,
-                totalBudget: 3434345,
                 image: province6Image,
+                noOfActiveProjects: 4,
+                totalBudget: 173933,
             },
             7: {
                 id: 7,
                 name: 'Province 7',
                 image: province7Image,
+                noOfActiveProjects: 6,
+                totalBudget: 1331321,
             },
         };
 
@@ -106,9 +116,28 @@ export default class Landing extends React.PureComponent {
         };
     }
 
-    getLinkForProvince = (id: number) => (
-        reverseRoute(pathNames.province, { provinceId: id })
-    )
+    componentDidMount() {
+        this.provinceDataRequest = new FgRestBuilder()
+            .url(urlForProvinceData)
+            .params(createParamsForProvinceData)
+            .success((response: object) => {
+                try {
+                    schema.validate(response, 'array.provinceData');
+                    this.setState({ provincesDataFromServer: response });
+                } catch (error) {
+                    console.warn(error);
+                }
+            })
+            .build();
+
+        this.provinceDataRequest.start();
+    }
+
+    componentWillUnmount() {
+        if (this.provinceDataRequest) {
+            this.provinceDataRequest.stop();
+        }
+    }
 
     renderProvinceDetailItem = (k: undefined, data: Item) => {
         console.log(k);
@@ -141,15 +170,24 @@ export default class Landing extends React.PureComponent {
 
         const provinceDetailItemList = [
             { label: 'Active DFID projects', value: noOfActiveProjects, icon: projectIcon },
-            { label: 'Total budget (FY 2017/18)', value: totalBudget, icon: budgetIcon },
+            {
+                label: 'Total budget (FY 2017/18)',
+                value: totalBudget,
+                icon: budgetIcon,
+            },
         ];
 
         console.log(image);
 
+        const route = {
+            pathname: reverseRoute(pathNames.dashboard),
+            state: { provinceId: id },
+        };
+
         return (
             <Link
                 key={id}
-                to={this.getLinkForProvince(id)}
+                to={route}
                 className={styles.province}
             >
                 <img
@@ -201,7 +239,10 @@ export default class Landing extends React.PureComponent {
             { label: 'Municipalities covered', value: municipalitiesCovered },
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
-            { label: 'Total budget', value: totalBudget },
+            {
+                label: 'Total budget',
+                value: totalBudget,
+            },
         ];
 
         return (
@@ -289,10 +330,14 @@ export default class Landing extends React.PureComponent {
                 </div>
                 <footer className={styles.footer}>
                     <div className={styles.title}>
-                        DFID
+                        DFID Nepal
                     </div>
-                    <div className={styles.link}>Dashboard</div>
-                    <div className={styles.link}>Explore</div>
+                    <div className={styles.link}>
+                        Dashboard
+                    </div>
+                    <div className={styles.link}>
+                        Explore
+                    </div>
                 </footer>
             </div>
         );
