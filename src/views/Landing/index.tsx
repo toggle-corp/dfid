@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
-import Numeral from '../../vendor/react-store/components/View/Numeral';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 import {
@@ -173,7 +172,7 @@ export default class Landing extends React.PureComponent<Props, State> {
             { label: 'Active DFID projects', value: noOfActiveProjects, icon: projectIcon },
             {
                 label: 'Total budget (FY 2017/18)',
-                value: Numeral.getNormalizedNumber({ value: totalBudget }).number,
+                value: totalBudget,
                 icon: budgetIcon,
             },
         ];
@@ -242,7 +241,7 @@ export default class Landing extends React.PureComponent<Props, State> {
             { label: 'Total sectors', value: totalSectors  },
             {
                 label: 'Total budget',
-                value: Numeral.getNormalizedNumber({ value: totalBudget }).number,
+                value: totalBudget,
             },
         ];
 

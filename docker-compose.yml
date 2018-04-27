@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+    react:
+        build: .
+        env_file:
+            - .env
+        command: ['/code/scripts/run_develop.sh']
+        volumes:
+            - .:/code
+        ports:
+            - '3000:3000'
