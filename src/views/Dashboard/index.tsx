@@ -4,6 +4,7 @@ import {
 } from 'react-router-dom';
 
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
+import ListView from '../../vendor/react-store/components/View/List/ListView';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
@@ -60,6 +61,11 @@ interface Option {
     label: string;
 }
 
+interface Item {
+    label: string;
+    value: number | string;
+}
+
 const noOp = () => {};
 
 export default class Dashboard extends React.PureComponent<Props, State>{
@@ -67,6 +73,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     projectOptions: Option[];
     sectorOptions: Option[];
     indicatorOptions: Option[];
+    defaultData: object;
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     geoJsonRequest: RestRequest;
@@ -80,6 +87,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     constructor(props: Props) {
         super(props);
 
+        this.defaultData = {};
         this.state = {
             selectedProvince: props.location.state
                 ? props.location.state.provinceId
@@ -280,10 +288,85 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         </div>
     )
 
+    renderProvinceDetailInfoList = (k: undefined, data: Item) => {
+        console.log(k);
+
+        return (
+            <div className={styles.item}>
+                <div className={styles.label}>
+                    {data.label || '-'}
+                </div>
+                <div className={styles.value}>
+                    {data.value || '-'}
+                </div>
+            </div>
+        );
+    }
+
+
     renderInformation = () => {
-        const provinceData = this.state.provinceData && this.state.selectedProvince
-            ? this.state.provinceData.find(d => d.id === this.state.selectedProvince)
-            : undefined;
+        const {
+            provinceData = [],
+            selectedProvince,
+        } = this.state;
+
+        const selectedProvinceData = provinceData.find(d =>
+            d.id === selectedProvince,
+        ) || {};
+
+        const provinceInformationMapping = [
+            {
+                label: 'Total population',
+                key: 'total_population',
+            },
+            {
+                label: 'Area',
+                key: 'area',
+            },
+            {
+                label: 'Population Density',
+                key: 'population_density',
+            },
+            {
+                label: 'Poverty Rate',
+                key: 'poverty_rate',
+            },
+            {
+                label: 'Population Under Poverty',
+                key: 'population_under_poverty_line',
+            },
+            {
+                label: 'Per Capita Income',
+                key: 'per_capita_income',
+            },
+            {
+                label: 'HH By Lowest Wealth Quantiles',
+                key: 'hh_by_lowest_wealth_quantiles',
+            },
+            {
+                label: 'HDI',
+                key: 'human_development_index',
+            },
+            {
+                label: 'Minute Access To',
+                key: 'minute_access_to',
+            },
+            {
+                label: 'Vulnerability Index',
+                key: 'vulnerability_index',
+            },
+            {
+                label: 'GDP',
+                key: 'gdp',
+            },
+        ];
+
+        const provinceInformationItemList = provinceInformationMapping.map(
+            map => ({
+                value: selectedProvinceData[map.key],
+                label: map.label,
+            }),
+        );
 
         return (
             <div className={styles.right}>
@@ -298,54 +381,11 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                             </div>
                         }
                         { provinceData && !this.state.loadingProvinceData &&
-                            <div className={styles.content}>
-                                <p>
-                                    {provinceData.province}
-                                </p>
-                                <p>
-                                    Total population:
-                                    {provinceData.total_population}
-                                </p>
-                                <p>
-                                    Area:
-                                    {provinceData.area}
-                                </p>
-                                <p>
-                                    Population Density:
-                                    {provinceData.population_density}
-                                </p>
-                                <p>
-                                    Poverty Rate:
-                                    {provinceData.poverty_rate}
-                                </p>
-                                <p> Population under poverty line:
-                                    {provinceData.population_under_poverty_line}
-                                </p>
-                                <p>
-                                    Per capita income:
-                                    {provinceData.per_capita_income}
-                                </p>
-                                <p>
-                                    HH by lowest wealth quantiles:
-                                    {provinceData.hh_by_lowest_wealth_quantiles}
-                                </p>
-                                <p>
-                                    HDI:
-                                    {provinceData.human_development_index}
-                                </p>
-                                <p>
-                                    Minute access to:
-                                    {provinceData.minute_access_to}
-                                </p>
-                                <p>
-                                    Vulnerability index:
-                                    {provinceData.vulnerability_index}
-                                </p>
-                                <p>
-                                    GDP:
-                                    {provinceData.gdp}
-                                </p>
-                            </div>
+                            <ListView
+                                className={styles.content}
+                                data={provinceInformationItemList}
+                                modifier={this.renderProvinceDetailInfoList}
+                            />
                         }
                     </div>
                 }
