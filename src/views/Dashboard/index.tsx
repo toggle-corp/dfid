@@ -38,6 +38,7 @@ interface ProvinceData {
     minute_access_to: number;
     vulnerability_index: number;
     gdp: number;
+    annual_spend: number;
 }
 interface Province {
     id: number;
@@ -320,7 +321,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                 key: 'total_population',
             },
             {
-                label: 'Area',
+                label: 'Area (sq.km)',
                 key: 'area',
             },
             {
@@ -358,6 +359,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             {
                 label: 'GDP',
                 key: 'gdp',
+            },
+            {
+                label: 'DFID Annual Expenditure (£)',
+                key: 'annual_spend',
             },
         ];
 

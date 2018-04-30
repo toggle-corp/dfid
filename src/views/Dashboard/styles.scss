@@ -23,6 +23,8 @@
             .content {
                 display: table;
                 padding: $spacing-small;
+                width: 100%;
+                font-size: $font-size-medium-alt;
             }
         }
 
@@ -30,10 +32,10 @@
             @extend %base;
             .item {
                 display: table-row;
+                padding: $spacing-small;
 
-                .icon {
-                    padding-left: $spacing-medium;
-                    height: $font-size-large;
+                &:nth-child(odd){
+                    background-color: $color-background-row-alt;
                 }
 
                 .label {

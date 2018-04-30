@@ -12,6 +12,7 @@
         background-color: $color-foreground;
 
         .overview {
+            background-color: $color-background-alt;
             .logo {
                 display: block;
                 align-self: flex-start;
@@ -50,6 +51,7 @@
 
         .bottom-content {
             display: flex;
+            border-top: $width-separator-thin solid $color-separator;
             background-color: $color-background-alt;
             padding: $spacing-medium 0;
 
@@ -146,13 +148,13 @@
     }
 
     .footer {
+        display: flex;
+        align-items: center;
         flex-basis: 100%;
         background-color: #414141;
         padding: 0 $spacing-medium;
-        height: 164px;
+        height: 158px;
         color: $color-text-on-dark;
-        display: flex;
-        align-items: center;
 
         .title {
             font-size: $font-size-super-large;
