@@ -17,4 +17,22 @@ const programmesSchema: SchemaGroup = [];
     programmesSchema.push({ name, schema });
 }
 
+{
+    const name = 'programmeData';
+    const schema = {
+        doc: {
+            name: 'Programme  Data',
+            description: 'Data for each programme',
+        },
+        fields: {
+            id: { type: 'uint', required: true },
+            program: { type: 'string', required: true },
+            programBudget: { type: 'number' },
+            description: { type: 'string' },
+        },
+    };
+    programmesSchema.push({ name, schema });
+}
+
+
 export default programmesSchema;

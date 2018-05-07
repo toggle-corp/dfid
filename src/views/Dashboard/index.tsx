@@ -17,6 +17,8 @@ import {
 
     urlForProgrammes,
     createParamsForProgrammes,
+    urlForProgrammeData,
+    createParamsForProgrammeData,
 } from '../../rest';
 import schema from '../../schema';
 import Map, { GeoJSON } from '../../components/Map';
@@ -50,6 +52,14 @@ interface ProvinceData {
     totalBudget: number;
 }
 
+interface ProgrammeData {
+    id: number;
+    program: string;
+    programBudget: number;
+    description: string;
+}
+
+
 interface Province {
     id: number;
     name: string;
@@ -64,9 +74,11 @@ interface State {
     selectedProvince?: number;
     selectedProgramme?: number;
     provinceData?: ProvinceData[];
+    programmeData?: ProgrammeData[];
     provinces?: Province[];
     programmes?: Programme[];
     loadingProvinceData: boolean;
+    loadingProgrammeData: boolean;
     loadingProvinces: boolean;
     loadingProgrammes: boolean;
     loadingGeoJson: boolean;
@@ -91,6 +103,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
+    programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
     geoJsons: {
         [key: string]: GeoJSON,
@@ -115,6 +128,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             selectedProgramme: undefined,
             programmes: [],
             loadingProvinceData: true,
+            loadingProgrammeData: true,
             loadingProvinces: true,
             loadingProgrammes: true,
             loadingGeoJson: false,
@@ -192,7 +206,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             .postLoad(() => this.setState({ loadingProgrammes: false }))
             .success((response: Programme[]) => {
                 try {
-                    schema.validate(response, 'array.province');
+                    schema.validate(response, 'array.programmes');
                     this.setState({ programmes: response });
                 } catch (error) {
                     console.warn(error);
@@ -201,6 +215,24 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             .build();
 
         this.programmeRequest.start();
+
+        this.programmeDataRequest = new FgRestBuilder()
+            .url(urlForProgrammeData)
+            .params(createParamsForProgrammeData)
+            .preLoad(() => this.setState({ loadingProgrammeData: true }))
+            .postLoad(() => this.setState({ loadingProgrammeData: false }))
+            .success((response: ProgrammeData[]) => {
+                try {
+                    schema.validate(response, 'array.programmeData');
+                    this.setState({ programmeData: response });
+                } catch (error) {
+                    console.warn(error);
+                }
+            })
+            .build();
+
+        this.programmeDataRequest.start();
+
 
 
     }
@@ -214,6 +246,9 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.programmeRequest) {
             this.programmeRequest.stop();
+        }
+        if (this.programmeDataRequest) {
+            this.programmeDataRequest.stop();
         }
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
@@ -522,14 +557,68 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 
+    renderProgrammeDetailInfo = () => {
+        const {
+            programmeData = [],
+            selectedProgramme,
+        } = this.state;
+
+        const data: Partial<ProgrammeData> = programmeData.find(d =>
+            d.id === selectedProgramme,
+        ) || {};
+
+        return (
+            <div
+                className={styles.content}
+            >
+                <div
+                    className={styles.item}
+                    key="program"
+                >
+                    <div className={styles.label}>
+                        Program
+                    </div>
+                    <div className={styles.value}>
+                        {data.program || '-'} </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="programBudget"
+                >
+                    <div className={styles.label}>
+                       Budget
+                    </div>
+                    <div className={styles.value}>
+                        {data.programBudget || '-'} </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="description"
+                >
+                    <div className={styles.label}>
+                       Description
+                    </div>
+                    <div className={styles.value}>
+                        {data.description || '-'}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     renderInformation = () => {
         const {
             selectedProvince,
             loadingProvinceData,
+            loadingProgrammeData,
         } = this.state;
 
         // tslint:disable-next-line variable-name
         const ProvinceDetailInfo = this.renderProvinceDetailInfo;
+
+        // tslint:disable-next-line variable-name
+        const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
+
 
         return (
             <div className={styles.right}>
@@ -554,9 +643,16 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                     <h3 className={styles.title}>
                         Project details
                     </h3>
-                    <div className={styles.content}>
-                        Project details
-                    </div>
+                        { loadingProgrammeData &&
+                            <div className={styles.content}>
+                                Loading Project Information ...
+                            </div>
+                        }
+                        {
+                            !loadingProgrammeData &&
+                            <ProgrammeDetailInfo />
+                        }
+
                 </div>
             </div>
         );
