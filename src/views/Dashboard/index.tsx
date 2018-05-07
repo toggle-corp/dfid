@@ -65,6 +65,7 @@ interface Option {
 interface Item {
     label: string;
     value: number | string;
+    key: string;
 }
 
 const noOp = () => {};
@@ -289,20 +290,19 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         </div>
     )
 
-    renderProvinceDetailInfoList = (k: undefined, data: Item) => {
-        console.log(k);
-
-        return (
-            <div className={styles.item}>
-                <div className={styles.label}>
-                    {data.label || '-'}
-                </div>
-                <div className={styles.value}>
-                    {data.value || '-'}
-                </div>
+    renderProvinceDetailInfoList = (data: Item) => (
+        <div
+            className={styles.item}
+            key={data.key}
+        >
+            <div className={styles.label}>
+                {data.label || '-'}
             </div>
-        );
-    }
+            <div className={styles.value}>
+                {data.value || '-'}
+            </div>
+        </div>
+    )
 
 
     renderInformation = () => {
@@ -367,9 +367,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         ];
 
         const provinceInformationItemList = provinceInformationMapping.map(
-            map => ({
-                value: selectedProvinceData[map.key],
-                label: map.label,
+            info => ({
+                value: selectedProvinceData[info.key],
+                label: info.label,
+                key: info.key,
             }),
         );
 
