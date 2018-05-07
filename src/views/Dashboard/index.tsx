@@ -57,6 +57,7 @@ interface ProgrammeData {
     program: string;
     programBudget: number;
     description: string;
+    programId: number;
 }
 
 
@@ -266,12 +267,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleProgrammeChange = (key: number) => {
-        this.setState(
-            {
-                selectedProgramme: key,
-            },
-        );
-
+        this.setState({ selectedProgramme: key });
     }
 
 
@@ -564,8 +560,11 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         } = this.state;
 
         const data: Partial<ProgrammeData> = programmeData.find(d =>
-            d.id === selectedProgramme,
+            d.programId === selectedProgramme,
         ) || {};
+
+        console.warn('ProgrammeData:', programmeData);
+        console.warn('SelectedProgramme:', selectedProgramme);
 
         return (
             <div

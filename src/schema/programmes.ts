@@ -29,6 +29,7 @@ const programmesSchema: SchemaGroup = [];
             program: { type: 'string', required: true },
             programBudget: { type: 'number' },
             description: { type: 'string' },
+            programId: { type: 'number', required: true },
         },
     };
     programmesSchema.push({ name, schema });
