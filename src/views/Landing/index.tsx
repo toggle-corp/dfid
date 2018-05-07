@@ -22,6 +22,7 @@ import province5Image from '../../resources/img/province5.png';
 import province6Image from '../../resources/img/province6.png';
 import province7Image from '../../resources/img/province7.png';
 
+
 import styles from './styles.scss';
 
 interface Props {}
@@ -240,7 +241,7 @@ export default class Landing extends React.PureComponent<Props, State> {
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
             {
-                label: 'Total budget',
+                label: 'Total budget (NPR)',
                 value: totalBudget,
             },
         ];
@@ -318,7 +319,7 @@ export default class Landing extends React.PureComponent<Props, State> {
                         <Explore />
                     </div>
                 </div>
-                <div className={styles.right}>
+             <div className={styles.right}>
                     <h2 className={styles.title}>
                         Provinces
                     </h2>
@@ -328,7 +329,8 @@ export default class Landing extends React.PureComponent<Props, State> {
                         modifier={this.renderProvince}
                     />
                 </div>
-                <footer className={styles.footer}>
+
+            <footer className={styles.footer}>
                     <div className={styles.title}>
                         DFID Nepal
                     </div>

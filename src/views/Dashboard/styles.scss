@@ -21,12 +21,36 @@
             }
 
             .content {
+                display: table;
                 padding: $spacing-small;
+                width: 100%;
+                font-size: $font-size-medium-alt;
             }
         }
 
         .province-details {
             @extend %base;
+            .item {
+                display: table-row;
+                padding: $spacing-small;
+
+                &:nth-child(odd){
+                    background-color: $color-background-row-alt;
+                }
+
+                .label {
+                    display: table-cell;
+                    padding: $spacing-extra-small $spacing-medium;
+                }
+
+                .value {
+                    display: table-cell;
+                    padding: $spacing-extra-small $spacing-medium;
+                    font-size: $font-size-large;
+                    font-weight: $font-weight-bold;
+                }
+            }
+
         }
 
         .project-details {
@@ -35,7 +59,9 @@
     }
 
     >.left {
+        display: flex;
         flex-basis: 70%;
+        flex-direction: column;
 
         .filters {
             display: flex;
@@ -57,7 +83,6 @@
 
         .map-container {
             position: relative;
-            flex-basis: 70%;
             height: 100%;
 
             .map {
