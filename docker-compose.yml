@@ -2,7 +2,11 @@ version: '3'
 
 services:
     react:
-        build: .
+        image: devtc/dfid:latest
+        build:
+          context: .
+          cache_from:
+            - devtc/dfid:latest
         env_file:
             - .env
         command: ['/code/scripts/run_develop.sh']
