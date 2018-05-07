@@ -14,6 +14,9 @@ import {
     createParamsForProvinces,
     createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
+
+    urlForProgrammes,
+    createParamsForProgrammes,
 } from '../../rest';
 import schema from '../../schema';
 import Map, { GeoJSON } from '../../components/Map';
@@ -52,12 +55,20 @@ interface Province {
     name: string;
 }
 
+interface Programme {
+    id: number;
+    name: string;
+}
+
 interface State {
     selectedProvince?: number;
+    selectedProgramme?: number;
     provinceData?: ProvinceData[];
     provinces?: Province[];
+    programmes?: Programme[];
     loadingProvinceData: boolean;
     loadingProvinces: boolean;
+    loadingProgrammes: boolean;
     loadingGeoJson: boolean;
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
@@ -79,6 +90,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     defaultData: object;
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
+    programmeRequest: RestRequest;
     geoJsonRequest: RestRequest;
     geoJsons: {
         [key: string]: GeoJSON,
@@ -86,6 +98,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
 
     static provinceKeyExtractor = (p: Province) => p.id;
     static provinceLabelExtractor = (p: Province) => p.name;
+
+    static programmeKeyExtractor = (p: Programme) => p.id;
+    static programmeLabelExtractor = (p: Programme) => p.name;
+
 
     constructor(props: Props) {
         super(props);
@@ -96,8 +112,11 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                 ? props.location.state.provinceId
                 : undefined,
             provinces: [],
+            selectedProgramme: undefined,
+            programmes: [],
             loadingProvinceData: true,
             loadingProvinces: true,
+            loadingProgrammes: true,
             loadingGeoJson: false,
             geoJson: undefined,
             geoJsonIdKey: 'id',
@@ -164,6 +183,26 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         this.provincesRequest.start();
 
         this.reloadGeoJson();
+
+
+        this.programmeRequest = new FgRestBuilder()
+            .url(urlForProgrammes)
+            .params(createParamsForProgrammes)
+            .preLoad(() => this.setState({ loadingProgrammes: true }))
+            .postLoad(() => this.setState({ loadingProgrammes: false }))
+            .success((response: Programme[]) => {
+                try {
+                    schema.validate(response, 'array.province');
+                    this.setState({ programmes: response });
+                } catch (error) {
+                    console.warn(error);
+                }
+            })
+            .build();
+
+        this.programmeRequest.start();
+
+
     }
 
     componentWillUnmount() {
@@ -172,6 +211,9 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.provincesRequest) {
             this.provincesRequest.stop();
+        }
+        if (this.programmeRequest) {
+            this.programmeRequest.stop();
         }
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
@@ -187,6 +229,16 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             this.reloadGeoJson,
         );
     }
+
+    handleProgrammeChange = (key: number) => {
+        this.setState(
+            {
+                selectedProgramme: key,
+            },
+        );
+
+    }
+
 
     reloadGeoJson = () => {
         const { selectedProvince } = this.state;
@@ -267,9 +319,13 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                 <SelectInput
                     label="Project"
                     className={styles.filter}
-                    options={this.projectOptions}
+                    options={this.state.programmes}
+                    value={this.state.selectedProgramme}
+                    keySelector={Dashboard.programmeKeyExtractor}
+                    labelSelector={Dashboard.programmeLabelExtractor}
                     showHintAndError={false}
-                    onChange={noOp}
+                    onChange={this.handleProgrammeChange}
+ 
                 />
                 <SelectInput
                     label="Sector"
