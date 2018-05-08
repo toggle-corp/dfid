@@ -1,3 +1,4 @@
+import { RestRequest } from '../vendor/react-store/utils/rest';
 // FIXME: move form related parts outside
 
 export interface RestPostBody {
@@ -19,6 +20,10 @@ export interface RestHeader {
 
 export interface RestAuthorizationHeader {
     Authorization?: string;
+}
+
+export interface Request<T> {
+    create: (value: T) => RestRequest;
 }
 
 export interface FormConditionFnRule {

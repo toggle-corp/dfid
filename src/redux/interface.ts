@@ -41,3 +41,46 @@ export interface RootState {
 export interface ReducerGroup<T> {
     [key: string]: ((state: T, action: object) => T);
 }
+
+// Dashboard
+export interface ProgrammeName {
+    id: number;
+    programName: string;
+}
+
+export interface ProvinceData {
+    id: number;
+    province: string;
+    district: number;
+    totalPopulation: number;
+    area: number;
+    populationDensity: number;
+    povertyRate: number;
+    populationUnderPovertyLine: number;
+    perCapitaIncome: number;
+    hhByLowestWealthQuantiles: number;
+    humanDevelopmentIndex: number;
+    minuteAccessTo: number;
+    vulnerabilityIndex: number;
+    gdp: number;
+    activeProgrammes: ProgrammeName[];
+    totalBudget: number;
+}
+
+export interface ProgrammeData {
+    id: number;
+    program: string;
+    programBudget: number;
+    description: string;
+    programId: number;
+}
+
+export interface Province {
+    id: number;
+    name: string;
+}
+
+export interface Programme {
+    id: number;
+    name: string;
+}
