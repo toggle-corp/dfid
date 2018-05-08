@@ -608,6 +608,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     renderInformation = () => {
         const {
             selectedProvince,
+            selectedProgramme,
             loadingProvinceData,
             loadingProgrammeData,
         } = this.state;
@@ -638,6 +639,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                     </div>
                 }
 
+               { selectedProgramme &&
                 <div className={styles.projectDetails}>
                     <h3 className={styles.title}>
                         Project details
@@ -653,6 +655,7 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                         }
 
                 </div>
+              }
             </div>
         );
     }
