@@ -1,7 +1,9 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { iconNames } from '../../constants';
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
+import PrimaryButton from '../../vendor/react-store/components/Action/Button/PrimaryButton';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
@@ -45,6 +47,8 @@ interface State {
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
+
+    isHidden: boolean;
 }
 
 interface Option {
@@ -91,6 +95,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
+
+            isHidden: true,
         };
 
         this.sectorOptions = [
@@ -248,13 +254,42 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return request;
     }
 
+    toggleHidden = () => {
+        this.setState({
+            isHidden: !this.state.isHidden,
+        });
+    }
+
+    renderPopup = () => (
+        <div className={styles.popup}>
+        <PrimaryButton
+                    title="Expand"
+                    onClick={this.toggleHidden}
+                    iconName={iconNames.expand}
+        />
+
+        </div>
+    )
+
     renderFilters = () => (
         <div className={styles.filters}>
+            <div className={styles.title}>
+                <h3>
+                    filters
+                </h3>
+                <PrimaryButton
+                    title="Close"
+                    onClick={this.toggleHidden}
+                    iconName={iconNames.close}
+                    className={styles.close}
+                    transparent
+                />
+            </div>
             <div className={styles.left}>
                 { !this.state.loadingProvinces &&
                     <SelectInput
                         label="Province"
-                        className={styles.filter}
+                        className={styles.province}
                         value={this.state.selectedProvince}
                         options={this.state.provinces}
                         keySelector={Dashboard.provinceKeyExtractor}
@@ -264,8 +299,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     />
                 }
                 <SelectInput
-                    label="Project"
-                    className={styles.filter}
+                    label="Programme"
+                    className={styles.programme}
                     options={this.state.programmes}
                     value={this.state.selectedProgramme}
                     keySelector={Dashboard.programmeKeyExtractor}
@@ -276,20 +311,33 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 />
                 <SelectInput
                     label="Sector"
-                    className={styles.filter}
+                    className={styles.sector}
                     options={this.sectorOptions}
                     showHintAndError={false}
                     onChange={noOp}
                 />
             </div>
+            <div className={styles.title}>
+                <h3>
+                    Sub-filters
+                </h3>
+            </div>
             <div className={styles.right}>
                 <SelectInput
                     label="Indicator"
-                    className={styles.filter}
+                    className={styles.indicator}
                     options={this.indicatorOptions}
                     showHintAndError={false}
                     onChange={noOp}
                 />
+                <SelectInput
+                    label="Map Layers"
+                    className={styles.layers}
+                    options={this.indicatorOptions}
+                    showHintAndError={false}
+                    onChange={noOp}
+                />
+
             </div>
         </div>
     )
@@ -579,15 +627,23 @@ export class Dashboard extends React.PureComponent<Props, State>{
         // tslint:disable-next-line variable-name
         const Filters = this.renderFilters;
 
+         // tslint:disable-next-line variable-name
+        const Popup = this.renderPopup;
+
         // tslint:disable-next-line variable-name
         const Information = this.renderInformation;
 
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
-                    <Filters />
                     <div className={styles.mapContainer}>
                         {this.state.loadingGeoJson && <LoadingAnimation />}
+                        { this.state.isHidden &&
+                        <Popup />
+                        }
+                        { !this.state.isHidden &&
+                        <Filters />
+                        }
                         <Map
                             className={styles.map}
                             geojson={this.state.geoJson}
