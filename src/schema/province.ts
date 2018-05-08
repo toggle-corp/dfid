@@ -3,6 +3,21 @@ import { SchemaGroup } from './interface';
 const provinceSchema: SchemaGroup = [];
 
 {
+    const name = 'programmeName';
+    const schema = {
+        doc: {
+            name: 'Programme Name',
+            description: 'Data for province programme name',
+        },
+        fields: {
+            id: { type: 'uint', required: true },
+            programName: { type: 'string', required: true },
+        },
+    };
+    provinceSchema.push({ name, schema });
+}
+
+{
     const name = 'provinceData';
     const schema = {
         doc: {
@@ -12,17 +27,20 @@ const provinceSchema: SchemaGroup = [];
         fields: {
             id: { type: 'uint', required: true },
             province: { type: 'string', required: true },
-            total_population: { type: 'uint', required: true },
+            district: { type: 'number', required: true },
+            totalPopulation: { type: 'uint', required: true },
             area: { type: 'number', required: true },
-            population_density: { type: 'number', required: true },
-            poverty_rate: { type: 'number', required: true },
-            population_under_poverty_line: { type: 'uint', required: true },
-            per_capita_income: { type: 'number', required: true },
-            hh_by_lowest_wealth_quantiles: { type: 'number', required: true },
-            human_development_index: { type: 'number', required: true },
-            minute_access_to: { type: 'number', required: true },
-            vulnerability_index: { type: 'number', required: true },
+            populationDensity: { type: 'number', required: true },
+            povertyRate: { type: 'number', required: true },
+            populationUnderPovertyLine: { type: 'uint', required: true },
+            perCapitaIncome: { type: 'number', required: true },
+            hhByLowestWealthQuantiles: { type: 'number', required: true },
+            humanDevelopmentIndex: { type: 'number', required: true },
+            minuteAccessTo: { type: 'number', required: true },
+            vulnerabilityIndex: { type: 'number', required: true },
             gdp: { type: 'number', required: true },
+            activeProgrammes: { type: 'array.programmeName', required: true },
+            totalBudget: { type: 'number' },
         },
     };
     provinceSchema.push({ name, schema });

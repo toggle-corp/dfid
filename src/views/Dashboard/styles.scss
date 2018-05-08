@@ -28,7 +28,8 @@
             }
         }
 
-        .province-details {
+        .province-details,
+        .project-details {
             @extend %base;
             .item {
                 display: table-row;
@@ -73,10 +74,12 @@
             }
 
             .right {
+                flex-basis: 15%;
                 flex-shrink: 0;
             }
 
             .filter {
+                flex-basis: 20%;
                 margin: $spacing-medium;
             }
         }

@@ -4,7 +4,6 @@ import {
 } from 'react-router-dom';
 
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
-import ListView from '../../vendor/react-store/components/View/List/ListView';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
@@ -15,8 +14,17 @@ import {
     createParamsForProvinces,
     createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
+
+    urlForProgrammes,
+    createParamsForProgrammes,
+    urlForProgrammeData,
+    createParamsForProgrammeData,
 } from '../../rest';
+
+import CountryDetails from '../Dashboard/CountryDetails';
+
 import schema from '../../schema';
+
 import Map, { GeoJSON } from '../../components/Map';
 
 import styles from './styles.scss';
@@ -24,33 +32,60 @@ import styles from './styles.scss';
 interface Props extends RouteComponentProps<{}> {
 }
 
+interface ProgrammeName {
+    id: number;
+    programName: string;
+}
+
 interface ProvinceData {
     id: number;
     province: string;
-    total_population: number;
+    district: number;
+    totalPopulation: number;
     area: number;
-    population_density: number;
-    poverty_rate: number;
-    population_under_poverty_line: number;
-    per_capita_income: number;
-    hh_by_lowest_wealth_quantiles: number;
-    human_development_index: number;
-    minute_access_to: number;
-    vulnerability_index: number;
+    populationDensity: number;
+    povertyRate: number;
+    populationUnderPovertyLine: number;
+    perCapitaIncome: number;
+    hhByLowestWealthQuantiles: number;
+    humanDevelopmentIndex: number;
+    minuteAccessTo: number;
+    vulnerabilityIndex: number;
     gdp: number;
-    annual_spend: number;
+    activeProgrammes: ProgrammeName[];
+    totalBudget: number;
 }
+
+interface ProgrammeData {
+    id: number;
+    program: string;
+    programBudget: number;
+    description: string;
+    programId: number;
+}
+
+
 interface Province {
+    id: number;
+    name: string;
+}
+
+interface Programme {
     id: number;
     name: string;
 }
 
 interface State {
     selectedProvince?: number;
+    selectedProgramme?: number;
     provinceData?: ProvinceData[];
+    programmeData?: ProgrammeData[];
     provinces?: Province[];
+    programmes?: Programme[];
     loadingProvinceData: boolean;
+    loadingProgrammeData: boolean;
     loadingProvinces: boolean;
+    loadingProgrammes: boolean;
     loadingGeoJson: boolean;
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
@@ -62,22 +97,15 @@ interface Option {
     label: string;
 }
 
-interface Item {
-    label: string;
-    value: number | string;
-    key: string;
-}
-
 const noOp = () => {};
 
 export default class Dashboard extends React.PureComponent<Props, State>{
-    provinceOptions: Option[];
-    projectOptions: Option[];
     sectorOptions: Option[];
     indicatorOptions: Option[];
-    defaultData: object;
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
+    programmeRequest: RestRequest;
+    programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
     geoJsons: {
         [key: string]: GeoJSON,
@@ -86,33 +114,29 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     static provinceKeyExtractor = (p: Province) => p.id;
     static provinceLabelExtractor = (p: Province) => p.name;
 
+    static programmeKeyExtractor = (p: Programme) => p.id;
+    static programmeLabelExtractor = (p: Programme) => p.name;
+
+
     constructor(props: Props) {
         super(props);
 
-        this.defaultData = {};
         this.state = {
             selectedProvince: props.location.state
                 ? props.location.state.provinceId
                 : undefined,
             provinces: [],
+            selectedProgramme: undefined,
+            programmes: [],
             loadingProvinceData: true,
+            loadingProgrammeData: true,
             loadingProvinces: true,
+            loadingProgrammes: true,
             loadingGeoJson: false,
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
         };
-
-        this.provinceOptions = [
-            { key: 1, label: 'Province 1' },
-            { key: 2, label: 'Province 2' },
-            { key: 3, label: 'Province 3' },
-        ];
-
-        this.projectOptions = [
-            { key: 1, label: 'Project 1' },
-            { key: 2, label: 'Project 2' },
-        ];
 
         this.sectorOptions = [
             { key: 1, label: 'Sector 1' },
@@ -163,6 +187,44 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         this.provincesRequest.start();
 
         this.reloadGeoJson();
+
+
+        this.programmeRequest = new FgRestBuilder()
+            .url(urlForProgrammes)
+            .params(createParamsForProgrammes)
+            .preLoad(() => this.setState({ loadingProgrammes: true }))
+            .postLoad(() => this.setState({ loadingProgrammes: false }))
+            .success((response: Programme[]) => {
+                try {
+                    schema.validate(response, 'array.programmes');
+                    this.setState({ programmes: response });
+                } catch (error) {
+                    console.warn(error);
+                }
+            })
+            .build();
+
+        this.programmeRequest.start();
+
+        this.programmeDataRequest = new FgRestBuilder()
+            .url(urlForProgrammeData)
+            .params(createParamsForProgrammeData)
+            .preLoad(() => this.setState({ loadingProgrammeData: true }))
+            .postLoad(() => this.setState({ loadingProgrammeData: false }))
+            .success((response: ProgrammeData[]) => {
+                try {
+                    schema.validate(response, 'array.programmeData');
+                    this.setState({ programmeData: response });
+                } catch (error) {
+                    console.warn(error);
+                }
+            })
+            .build();
+
+        this.programmeDataRequest.start();
+
+
+
     }
 
     componentWillUnmount() {
@@ -171,6 +233,12 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.provincesRequest) {
             this.provincesRequest.stop();
+        }
+        if (this.programmeRequest) {
+            this.programmeRequest.stop();
+        }
+        if (this.programmeDataRequest) {
+            this.programmeDataRequest.stop();
         }
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
@@ -186,6 +254,11 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             this.reloadGeoJson,
         );
     }
+
+    handleProgrammeChange = (key: number) => {
+        this.setState({ selectedProgramme: key });
+    }
+
 
     reloadGeoJson = () => {
         const { selectedProvince } = this.state;
@@ -266,9 +339,13 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                 <SelectInput
                     label="Project"
                     className={styles.filter}
-                    options={this.projectOptions}
+                    options={this.state.programmes}
+                    value={this.state.selectedProgramme}
+                    keySelector={Dashboard.programmeKeyExtractor}
+                    labelSelector={Dashboard.programmeLabelExtractor}
                     showHintAndError={false}
-                    onChange={noOp}
+                    onChange={this.handleProgrammeChange}
+ 
                 />
                 <SelectInput
                     label="Sector"
@@ -290,120 +367,284 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         </div>
     )
 
-    renderProvinceDetailInfoList = (data: Item) => (
-        <div
-            className={styles.item}
-            key={data.key}
-        >
-            <div className={styles.label}>
-                {data.label || '-'}
-            </div>
-            <div className={styles.value}>
-                {data.value || '-'}
-            </div>
-        </div>
-    )
-
-
-    renderInformation = () => {
+    renderProvinceDetailInfo = () => {
         const {
             provinceData = [],
             selectedProvince,
         } = this.state;
 
-        const selectedProvinceData = provinceData.find(d =>
+        const data: Partial<ProvinceData> = provinceData.find(d =>
             d.id === selectedProvince,
         ) || {};
 
-        const provinceInformationMapping = [
-            {
-                label: 'Total population',
-                key: 'total_population',
-            },
-            {
-                label: 'Area (sq.km)',
-                key: 'area',
-            },
-            {
-                label: 'Population Density',
-                key: 'population_density',
-            },
-            {
-                label: 'Poverty Rate',
-                key: 'poverty_rate',
-            },
-            {
-                label: 'Population Under Poverty',
-                key: 'population_under_poverty_line',
-            },
-            {
-                label: 'Per Capita Income',
-                key: 'per_capita_income',
-            },
-            {
-                label: 'HH By Lowest Wealth Quantiles',
-                key: 'hh_by_lowest_wealth_quantiles',
-            },
-            {
-                label: 'HDI',
-                key: 'human_development_index',
-            },
-            {
-                label: 'Minute Access To',
-                key: 'minute_access_to',
-            },
-            {
-                label: 'Vulnerability Index',
-                key: 'vulnerability_index',
-            },
-            {
-                label: 'GDP',
-                key: 'gdp',
-            },
-            {
-                label: 'DFID Annual Expenditure (£)',
-                key: 'annual_spend',
-            },
-        ];
+        const programmeNames = (data.activeProgrammes || []).map(programme => (
+            programme.programName
+        )).join(', ');
 
-        const provinceInformationItemList = provinceInformationMapping.map(
-            info => ({
-                value: selectedProvinceData[info.key],
-                label: info.label,
-                key: info.key,
-            }),
+        return (
+            <div
+                className={styles.content}
+            >
+                <div
+                    className={styles.item}
+                    key="totalPopulation"
+                >
+                    <div className={styles.label}>
+                        Total population
+                    </div>
+                    <div className={styles.value}>
+                        {data.totalPopulation || '-'} </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="district"
+                >
+                    <div className={styles.label}>
+                       No. of Districts
+                    </div>
+                    <div className={styles.value}>
+                        {data.totalPopulation || '-'} </div>
+                </div>
+
+                <div
+                    className={styles.item}
+                    key="area"
+                >
+                    <div className={styles.label}>
+                        Area (sq.km)
+                    </div>
+                    <div className={styles.value}>
+                        {data.area || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="populationDensity"
+                >
+                    <div className={styles.label}>
+                        Population Density
+                    </div>
+                    <div className={styles.value}>
+                        {data.populationDensity || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="povertyRate"
+                >
+                    <div className={styles.label}>
+                        Poverty Rate
+                    </div>
+                    <div className={styles.value}>
+                        {data.povertyRate || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="populationUnderPovertyLine"
+                >
+                    <div className={styles.label}>
+                        Population Under Poverty
+                    </div>
+                    <div className={styles.value}>
+                        {data.populationUnderPovertyLine || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="perCapitaIncome"
+                >
+                    <div className={styles.label}>
+                        Per Capita Income
+                    </div>
+                    <div className={styles.value}>
+                        {data.perCapitaIncome || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="hhByLowestWealthQuantiles"
+                >
+                    <div className={styles.label}>
+                        HH By Lowest Wealth Quantiles
+                    </div>
+                    <div className={styles.value}>
+                        {data.hhByLowestWealthQuantiles || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="humanDevelopmentIndex"
+                >
+                    <div className={styles.label}>
+                        HDI
+                    </div>
+                    <div className={styles.value}>
+                        {data.humanDevelopmentIndex || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="minuteAccessTo"
+                >
+                    <div className={styles.label}>
+                        Minute Access To
+                    </div>
+                    <div className={styles.value}>
+                        {data.minuteAccessTo || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="vulnerabilityIndex"
+                >
+                    <div className={styles.label}>
+                        Vulnerability Index
+                    </div>
+                    <div className={styles.value}>
+                        {data.vulnerabilityIndex || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="gdp"
+                >
+                    <div className={styles.label}>
+                        GDP
+                    </div>
+                    <div className={styles.value}>
+                        {data.gdp || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="programmeName"
+                >
+                    <div className={styles.label}>
+                        Active Programmes
+                    </div>
+                    <div className={styles.value}>
+                        {programmeNames || '-'}
+                    </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="totalBudget"
+                >
+                    <div className={styles.label}>
+                        Total Budget
+                    </div>
+                    <div className={styles.value}>
+                        {data.totalBudget || '-'}
+                    </div>
+                </div>
+            </div>
         );
+    }
+
+    renderProgrammeDetailInfo = () => {
+        const {
+            programmeData = [],
+            selectedProgramme,
+        } = this.state;
+
+        const data: Partial<ProgrammeData> = programmeData.find(d =>
+            d.programId === selectedProgramme,
+        ) || {};
+
+        return (
+            <div
+                className={styles.content}
+            >
+                <div
+                    className={styles.item}
+                    key="program"
+                >
+                    <div className={styles.label}>
+                        Program
+                    </div>
+                    <div className={styles.value}>
+                        {data.program || '-'} </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="programBudget"
+                >
+                    <div className={styles.label}>
+                       Budget
+                    </div>
+                    <div className={styles.value}>
+                        {data.programBudget || '-'} </div>
+                </div>
+                <div
+                    className={styles.item}
+                    key="description"
+                >
+                    <div className={styles.label}>
+                       Description
+                    </div>
+                    <div className={styles.value}>
+                        {data.description || '-'}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    renderInformation = () => {
+        const {
+            selectedProvince,
+            selectedProgramme,
+            loadingProvinceData,
+            loadingProgrammeData,
+        } = this.state;
+
+        // tslint:disable-next-line variable-name
+        const ProvinceDetailInfo = this.renderProvinceDetailInfo;
+
+        // tslint:disable-next-line variable-name
+        const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
 
         return (
             <div className={styles.right}>
-                { this.state.selectedProvince &&
+                {
+                    !(selectedProvince || selectedProgramme) &&
+                        <CountryDetails />
+                }
+                { selectedProvince &&
                     <div className={styles.provinceDetails}>
                         <h3 className={styles.title}>
                             Province details
                         </h3>
-                        { this.state.loadingProvinceData &&
+                        { loadingProvinceData &&
                             <div className={styles.content}>
                                 Loading Province Information ...
                             </div>
                         }
-                        { provinceData && !this.state.loadingProvinceData &&
-                            <ListView
-                                className={styles.content}
-                                data={provinceInformationItemList}
-                                modifier={this.renderProvinceDetailInfoList}
-                            />
+                        {
+                            !loadingProvinceData &&
+                            <ProvinceDetailInfo />
                         }
                     </div>
                 }
 
+               { selectedProgramme &&
                 <div className={styles.projectDetails}>
                     <h3 className={styles.title}>
                         Project details
                     </h3>
-                    <div className={styles.content}>
-                        Project details
-                    </div>
+                        { loadingProgrammeData &&
+                            <div className={styles.content}>
+                                Loading Project Information ...
+                            </div>
+                        }
+                        {
+                            !loadingProgrammeData &&
+                            <ProgrammeDetailInfo />
+                        }
+
                 </div>
+              }
             </div>
         );
     }
