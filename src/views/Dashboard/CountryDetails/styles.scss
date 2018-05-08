@@ -1,0 +1,44 @@
+@import '../../../stylesheets/base';
+
+%base {
+    border-bottom: $width-separator-thin solid $color-separator;
+
+    .title {
+        flex-shrink: 0;
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: $spacing-medium;
+    }
+
+    .content {
+        display: table;
+        padding: $spacing-small;
+        width: 100%;
+        font-size: $font-size-medium-alt;
+    }
+}
+
+
+.country-details {
+    @extend %base;
+    .item {
+        display: table-row;
+        padding: $spacing-small;
+
+        &:nth-child(odd){
+            background-color: $color-background-row-alt;
+        }
+
+        .label {
+            display: table-cell;
+            padding: $spacing-extra-small $spacing-medium;
+        }
+
+        .value {
+            display: table-cell;
+            padding: $spacing-extra-small $spacing-medium;
+            font-size: $font-size-large;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+}

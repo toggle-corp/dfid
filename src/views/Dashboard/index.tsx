@@ -20,7 +20,11 @@ import {
     urlForProgrammeData,
     createParamsForProgrammeData,
 } from '../../rest';
+
+import CountryDetails from '../Dashboard/CountryDetails';
+
 import schema from '../../schema';
+
 import Map, { GeoJSON } from '../../components/Map';
 
 import styles from './styles.scss';
@@ -96,11 +100,8 @@ interface Option {
 const noOp = () => {};
 
 export default class Dashboard extends React.PureComponent<Props, State>{
-    provinceOptions: Option[];
-    projectOptions: Option[];
     sectorOptions: Option[];
     indicatorOptions: Option[];
-    defaultData: object;
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
@@ -120,7 +121,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     constructor(props: Props) {
         super(props);
 
-        this.defaultData = {};
         this.state = {
             selectedProvince: props.location.state
                 ? props.location.state.provinceId
@@ -137,17 +137,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
         };
-
-        this.provinceOptions = [
-            { key: 1, label: 'Province 1' },
-            { key: 2, label: 'Province 2' },
-            { key: 3, label: 'Province 3' },
-        ];
-
-        this.projectOptions = [
-            { key: 1, label: 'Project 1' },
-            { key: 2, label: 'Project 2' },
-        ];
 
         this.sectorOptions = [
             { key: 1, label: 'Sector 1' },
@@ -563,9 +552,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             d.programId === selectedProgramme,
         ) || {};
 
-        console.warn('ProgrammeData:', programmeData);
-        console.warn('SelectedProgramme:', selectedProgramme);
-
         return (
             <div
                 className={styles.content}
@@ -619,9 +605,12 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         // tslint:disable-next-line variable-name
         const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
 
-
         return (
             <div className={styles.right}>
+                {
+                    !(selectedProvince || selectedProgramme) &&
+                        <CountryDetails />
+                }
                 { selectedProvince &&
                     <div className={styles.provinceDetails}>
                         <h3 className={styles.title}>
