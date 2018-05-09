@@ -44,7 +44,7 @@ export interface ReducerGroup<T> {
 
 // Dashboard
 export interface ProgrammeName {
-    id: number;
+    programID: number;
     programName: string;
 }
 

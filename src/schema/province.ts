@@ -10,7 +10,7 @@ const provinceSchema: SchemaGroup = [];
             description: 'Data for province programme name',
         },
         fields: {
-            id: { type: 'uint', required: true },
+            programID: { type: 'uint', required: true },
             programName: { type: 'string', required: true },
         },
     };
