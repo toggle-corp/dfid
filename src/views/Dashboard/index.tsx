@@ -71,6 +71,7 @@ interface DefaultHash {
 
 interface Views {
     country: object;
+    province: object;
 }
 const noOp = () => {};
 
@@ -123,7 +124,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             province: 'Province Details',
             programme: 'Programme Details',
             sector: 'Sector Details',
-            country: 'Country',
+            country: 'Country Details',
         };
 
         this.views = {
@@ -133,6 +134,41 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <CountryDetails />
                 ),
             },
+            province: {
+                component: () => {
+                    const {
+                        selectedProvince,
+                        loadingProvinceData,
+                    } = this.state;
+
+                    if (!selectedProvince) {
+                        return <div />;
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const ProvinceDetailInfo = this.renderProvinceDetailInfo;
+                    // tslint:disable-next-line variable-name
+                    const LoadingMessage = () => (
+                        <div className={styles.content}>
+                            Loading Province Information ...
+                        </div>
+                    );
+
+                    return (
+                        <div className={styles.provinceDetails}>
+                            <h3 className={styles.title}>
+                                Province details
+                            </h3>
+                            {
+                                loadingProvinceData ?
+                                    <LoadingMessage /> :
+                                    <ProvinceDetailInfo />
+                            }
+                        </div>
+                    );
+                },
+            },
+
         };
 
 
@@ -605,14 +641,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     renderInformation = () => {
         const {
-            selectedProvince,
             selectedProgramme,
-            loadingProvinceData,
             loadingProgrammeData,
         } = this.state;
-
-        // tslint:disable-next-line variable-name
-        const ProvinceDetailInfo = this.renderProvinceDetailInfo;
 
         // tslint:disable-next-line variable-name
         const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
@@ -627,31 +658,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
                  />
 
                 <MultiViewContainer
-                         useHash
-                         views={this.views}
+                     useHash
+                     views={this.views}
                 />
-               { selectedProvince &&
-                    <div className={styles.provinceDetails}>
+               {
+                   selectedProgramme &&
+                    <div className={styles.projectDetails}>
                         <h3 className={styles.title}>
-                            Province details
+                            Project details
                         </h3>
-                        { loadingProvinceData &&
-                            <div className={styles.content}>
-                                Loading Province Information ...
-                            </div>
-                        }
                         {
-                            !loadingProvinceData &&
-                            <ProvinceDetailInfo />
-                        }
-                    </div>
-                }
-               { selectedProgramme &&
-                <div className={styles.projectDetails}>
-                    <h3 className={styles.title}>
-                        Project details
-                    </h3>
-                        { loadingProgrammeData &&
+                            loadingProgrammeData &&
                             <div className={styles.content}>
                                 Loading Project Information ...
                             </div>
@@ -660,8 +677,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                             !loadingProgrammeData &&
                             <ProgrammeDetailInfo />
                         }
-
-                </div>
+                    </div>
               }
              </div>
         );
