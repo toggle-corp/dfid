@@ -1,79 +1,34 @@
 import React from 'react';
-import {
-    RouteComponentProps,
-} from 'react-router-dom';
+import { RouteComponentProps } from 'react-router-dom';
 
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
 import {
-    urlForProvinceData,
-    createParamsForProvinceData,
-    urlForProvinces,
     createParamsForProvinces,
     createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
-
-    urlForProgrammes,
-    createParamsForProgrammes,
-    urlForProgrammeData,
-    createParamsForProgrammeData,
 } from '../../rest';
 
+import {
+    ProvinceData,
+    ProgrammeData,
+    Province,
+    Programme,
+} from '../../redux/interface';
 import CountryDetails from '../Dashboard/CountryDetails';
-
-import schema from '../../schema';
 
 import Map, { GeoJSON } from '../../components/Map';
 
+import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
+import ProvincesGetRequest from './requests/ProvincesGetRequest';
+import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
+import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
+
 import styles from './styles.scss';
 
-interface Props extends RouteComponentProps<{}> {
-}
-
-interface ProgrammeName {
-    id: number;
-    programName: string;
-}
-
-interface ProvinceData {
-    id: number;
-    province: string;
-    district: number;
-    totalPopulation: number;
-    area: number;
-    populationDensity: number;
-    povertyRate: number;
-    populationUnderPovertyLine: number;
-    perCapitaIncome: number;
-    hhByLowestWealthQuantiles: number;
-    humanDevelopmentIndex: number;
-    minuteAccessTo: number;
-    vulnerabilityIndex: number;
-    gdp: number;
-    activeProgrammes: ProgrammeName[];
-    totalBudget: number;
-}
-
-interface ProgrammeData {
-    id: number;
-    program: string;
-    programBudget: number;
-    description: string;
-    programId: number;
-}
-
-
-interface Province {
-    id: number;
-    name: string;
-}
-
-interface Programme {
-    id: number;
-    name: string;
-}
+interface Props extends RouteComponentProps<{}> {}
 
 interface State {
     selectedProvince?: number;
@@ -99,7 +54,7 @@ interface Option {
 
 const noOp = () => {};
 
-export default class Dashboard extends React.PureComponent<Props, State>{
+export class Dashboard extends React.PureComponent<Props, State>{
     sectorOptions: Option[];
     indicatorOptions: Option[];
     provinceDataRequest: RestRequest;
@@ -152,79 +107,11 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     }
 
     componentDidMount() {
-        this.provinceDataRequest = new FgRestBuilder()
-            .url(urlForProvinceData)
-            .params(createParamsForProvinceData)
-            .preLoad(() => this.setState({ loadingProvinceData: true }))
-            .postLoad(() => this.setState({ loadingProvinceData: false }))
-            .success((response: ProvinceData[]) => {
-                try {
-                    schema.validate(response, 'array.provinceData');
-                    this.setState({ provinceData: response });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
-
-        this.provinceDataRequest.start();
-
-        this.provincesRequest = new FgRestBuilder()
-            .url(urlForProvinces)
-            .params(createParamsForProvinces)
-            .preLoad(() => this.setState({ loadingProvinces: true }))
-            .postLoad(() => this.setState({ loadingProvinces: false }))
-            .success((response: Province[]) => {
-                try {
-                    schema.validate(response, 'array.province');
-                    this.setState({ provinces: response });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
-
-        this.provincesRequest.start();
-
+        this.startRequestForProvinceData();
+        this.startRequestForProvinces();
         this.reloadGeoJson();
-
-
-        this.programmeRequest = new FgRestBuilder()
-            .url(urlForProgrammes)
-            .params(createParamsForProgrammes)
-            .preLoad(() => this.setState({ loadingProgrammes: true }))
-            .postLoad(() => this.setState({ loadingProgrammes: false }))
-            .success((response: Programme[]) => {
-                try {
-                    schema.validate(response, 'array.programmes');
-                    this.setState({ programmes: response });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
-
-        this.programmeRequest.start();
-
-        this.programmeDataRequest = new FgRestBuilder()
-            .url(urlForProgrammeData)
-            .params(createParamsForProgrammeData)
-            .preLoad(() => this.setState({ loadingProgrammeData: true }))
-            .postLoad(() => this.setState({ loadingProgrammeData: false }))
-            .success((response: ProgrammeData[]) => {
-                try {
-                    schema.validate(response, 'array.programmeData');
-                    this.setState({ programmeData: response });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
-
-        this.programmeDataRequest.start();
-
-
-
+        this.startRequestForProgrammes();
+        this.startRequestForProgrammesData();
     }
 
     componentWillUnmount() {
@@ -245,6 +132,50 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
+    startRequestForProvinceData = () => {
+        if (this.provinceDataRequest) {
+            this.provinceDataRequest.stop();
+        }
+        const provinceDataRequest = new ProvinceDataGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.provinceDataRequest = provinceDataRequest.create();
+        this.provinceDataRequest.start();
+    }
+
+    startRequestForProvinces = () => {
+        if (this.provincesRequest) {
+            this.provincesRequest.stop();
+        }
+        const provincesRequest = new ProvincesGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.provincesRequest = provincesRequest.create();
+        this.provincesRequest.start();
+    }
+
+    startRequestForProgrammes = () => {
+        if (this.programmeRequest) {
+            this.programmeRequest.stop();
+        }
+        const programmeRequest = new ProgrammesGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.programmeRequest = programmeRequest.create();
+        this.programmeRequest.start();
+    }
+
+    startRequestForProgrammesData = () => {
+        if (this.programmeDataRequest) {
+            this.programmeDataRequest.stop();
+        }
+        const programmeDataRequest = new ProgrammesDataRequest({
+            setState: params => this.setState(params),
+        });
+        this.programmeDataRequest = programmeDataRequest.create();
+        this.programmeDataRequest.start();
+    }
+
     handleProvinceChange = (key: number) => {
         this.setState(
             {
@@ -258,7 +189,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
     handleProgrammeChange = (key: number) => {
         this.setState({ selectedProgramme: key });
     }
-
 
     reloadGeoJson = () => {
         const { selectedProvince } = this.state;
@@ -303,12 +233,10 @@ export default class Dashboard extends React.PureComponent<Props, State>{
             .postLoad(() => this.setState({ loadingGeoJson: false }))
             .success((response: GeoJSON) => {
                 this.geoJsons[url] = response;
-
                 // Convert ids to strings to make things simpler later
                 response.features.forEach((acc: any) => {
                     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
                 });
-
                 this.setState({
                     geoJsonIdKey,
                     geoJsonLabelKey,
@@ -317,7 +245,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                 });
             })
             .build();
-
         return request;
     }
 
@@ -627,7 +554,6 @@ export default class Dashboard extends React.PureComponent<Props, State>{
                         }
                     </div>
                 }
-
                { selectedProgramme &&
                 <div className={styles.projectDetails}>
                     <h3 className={styles.title}>
@@ -675,3 +601,5 @@ export default class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 }
+
+export default Dashboard;

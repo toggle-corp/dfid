@@ -1,6 +1,6 @@
 import React from 'react';
 
-import provinceGeoJson from '../../geofiles/province.geo.json';
+import provinceGeoJson from '../../resources/geofiles/province.geo.json';
 import Map from '../../components/Map';
 
 import styles from './styles.scss';

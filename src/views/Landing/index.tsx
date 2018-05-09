@@ -3,12 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
-import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
-import {
-    urlForProvinceData,
-    createParamsForProvinceData,
-} from '../../rest';
-import schema from '../../schema';
+import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import { pathNames } from '../../constants';
 import logo from '../../resources/img/logo.png';
@@ -22,6 +17,7 @@ import province5Image from '../../resources/img/province5.png';
 import province6Image from '../../resources/img/province6.png';
 import province7Image from '../../resources/img/province7.png';
 
+import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 
 import styles from './styles.scss';
 
@@ -43,7 +39,7 @@ interface Item {
     icon?: string;
 }
 
-export default class Landing extends React.PureComponent<Props, State> {
+export class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
     provincesData: object;
     data: Data;
@@ -118,20 +114,7 @@ export default class Landing extends React.PureComponent<Props, State> {
     }
 
     componentDidMount() {
-        this.provinceDataRequest = new FgRestBuilder()
-            .url(urlForProvinceData)
-            .params(createParamsForProvinceData)
-            .success((response: object) => {
-                try {
-                    schema.validate(response, 'array.provinceData');
-                    this.setState({ provincesDataFromServer: response });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
-
-        this.provinceDataRequest.start();
+        this.startRequestForProvinceData();
     }
 
     componentWillUnmount() {
@@ -140,28 +123,33 @@ export default class Landing extends React.PureComponent<Props, State> {
         }
     }
 
-    renderProvinceDetailItem = (k: undefined, data: Item) => {
-        console.log(k);
-
-        return (
-            <div className={styles.item}>
-                <img
-                    className={styles.icon}
-                    src={data.icon}
-                />
-                <div className={styles.label}>
-                    {data.label || '-'}
-                </div>
-                <div className={styles.value}>
-                    {data.value || '-'}
-                </div>
-            </div>
-        );
+    startRequestForProvinceData = () => {
+        if (this.provinceDataRequest) {
+            this.provinceDataRequest.stop();
+        }
+        const provinceDataRequest = new ProvinceDataGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.provinceDataRequest = provinceDataRequest.create();
+        this.provinceDataRequest.start();
     }
 
-    renderProvince = (k: undefined, id: number) => {
-        console.log(k);
+    renderProvinceDetailItem = (k: undefined, data: Item) => (
+        <div className={styles.item}>
+            <img
+                className={styles.icon}
+                src={data.icon}
+            />
+            <div className={styles.label}>
+                {data.label || '-'}
+            </div>
+            <div className={styles.value}>
+                {data.value || '-'}
+            </div>
+        </div>
+    )
 
+    renderProvince = (k: undefined, id: number) => {
         const {
             name,
             noOfActiveProjects,
@@ -177,8 +165,6 @@ export default class Landing extends React.PureComponent<Props, State> {
                 icon: budgetIcon,
             },
         ];
-
-        console.log(image);
 
         const route = {
             pathname: reverseRoute(pathNames.dashboard),
@@ -209,20 +195,16 @@ export default class Landing extends React.PureComponent<Props, State> {
         );
     }
 
-    renderOverviewItem = (k: undefined, data: Item) => {
-        console.log(k);
-
-        return (
-            <div className={styles.item}>
-                <div className={styles.value}>
-                    {data.value || '-'}
-                </div>
-                <div className={styles.label}>
-                    {data.label || '-'}
-                </div>
+    renderOverviewItem = (k: undefined, data: Item) => (
+        <div className={styles.item}>
+            <div className={styles.value}>
+                {data.value || '-'}
             </div>
-        );
-    }
+            <div className={styles.label}>
+                {data.label || '-'}
+            </div>
+        </div>
+    )
 
     renderOverview = () => {
         const {
@@ -345,3 +327,5 @@ export default class Landing extends React.PureComponent<Props, State> {
         );
     }
 }
+
+export default Landing;
