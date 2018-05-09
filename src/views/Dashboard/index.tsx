@@ -5,6 +5,8 @@ import { iconNames } from '../../constants';
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
 import PrimaryButton from '../../vendor/react-store/components/Action/Button/PrimaryButton';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
+import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
 import {
@@ -56,6 +58,20 @@ interface Option {
     label: string;
 }
 
+interface Routes {
+    province: string;
+    programme: string;
+    sector: string;
+    country: string;
+}
+
+interface DefaultHash {
+    province: string;
+}
+
+interface Views {
+    country: object;
+}
 const noOp = () => {};
 
 export class Dashboard extends React.PureComponent<Props, State>{
@@ -69,6 +85,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
     geoJsons: {
         [key: string]: GeoJSON,
     };
+
+    routes: Routes;
+    defaultHash: DefaultHash;
+    views: Views;
 
     static provinceKeyExtractor = (p: Province) => p.id;
     static provinceLabelExtractor = (p: Province) => p.name;
@@ -98,6 +118,23 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             isHidden: true,
         };
+
+        this.routes = {
+            province: 'Province Details',
+            programme: 'Programme Details',
+            sector: 'Sector Details',
+            country: 'Country',
+        };
+
+        this.views = {
+            country: {
+                component: () => (
+                    !(this.state.selectedProvince || this.state.selectedProgramme) &&
+                    <CountryDetails />
+                ),
+            },
+        };
+
 
         this.sectorOptions = [
             { key: 1, label: 'Sector 1' },
@@ -582,11 +619,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.right}>
-                {
-                    !(selectedProvince || selectedProgramme) &&
-                        <CountryDetails />
-                }
-                { selectedProvince &&
+                 <FixedTabs
+                    useHash
+                    replaceHistory
+                    tabs={this.routes}
+                    defaultHash={this.defaultHash}
+                 />
+
+                <MultiViewContainer
+                         useHash
+                         views={this.views}
+                />
+               { selectedProvince &&
                     <div className={styles.provinceDetails}>
                         <h3 className={styles.title}>
                             Province details
@@ -619,7 +663,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
                 </div>
               }
-            </div>
+             </div>
         );
     }
 

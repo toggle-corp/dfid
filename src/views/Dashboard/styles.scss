@@ -35,6 +35,7 @@
             .item {
                 display: table-row;
                 padding: $spacing-small;
+                line-height: 1.6;
 
                 &:nth-child(odd){
                     background-color: $color-background-row-alt;
@@ -43,6 +44,7 @@
                 .label {
                     display: table-cell;
                     padding: $spacing-extra-small $spacing-medium;
+                    width: 40%;
                 }
 
                 .value {
