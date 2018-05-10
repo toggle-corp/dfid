@@ -337,6 +337,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleProvinceChange = (key: number) => {
+        window.location.hash = '#/province';
         this.setState(
             {
                 selectedProvince: key,
@@ -347,10 +348,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleProgrammeChange = (key: number) => {
+        window.location.hash = '#/programme';
         this.setState({ selectedProgramme: key });
     }
 
     handleSectorChange = (key: number) => {
+        window.location.hash = '#/sector';
         this.setState({ selectedSector: key });
     }
 
