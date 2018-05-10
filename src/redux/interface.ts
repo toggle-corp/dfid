@@ -84,3 +84,9 @@ export interface Programme {
     id: number;
     name: string;
 }
+
+export interface Sector {
+    id: number;
+    name: string;
+    code: string;
+}

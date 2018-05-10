@@ -20,6 +20,7 @@ import {
     ProgrammeData,
     Province,
     Programme,
+    Sector,
 } from '../../redux/interface';
 import CountryDetails from '../Dashboard/CountryDetails';
 
@@ -28,6 +29,7 @@ import Map, { GeoJSON } from '../../components/Map';
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
+import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
 
 import styles from './styles.scss';
@@ -37,14 +39,18 @@ interface Props extends RouteComponentProps<{}> {}
 interface State {
     selectedProvince?: number;
     selectedProgramme?: number;
+    selectedSector?: number;
     provinceData?: ProvinceData[];
     programmeData?: ProgrammeData[];
     provinces?: Province[];
     programmes?: Programme[];
+    sectors?: Sector[];
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
+    loadingSectorData: boolean;
     loadingProvinces: boolean;
     loadingProgrammes: boolean;
+    loadingSectors: boolean;
     loadingGeoJson: boolean;
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
@@ -71,15 +77,16 @@ interface DefaultHash {
 interface Views {
     province: object;
     programme: object;
+    sector: object;
 }
 const noOp = () => {};
 
 export class Dashboard extends React.PureComponent<Props, State>{
-    sectorOptions: Option[];
     indicatorOptions: Option[];
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
+    sectorRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
     geoJsons: {
@@ -97,6 +104,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
     static programmeLabelExtractor = (p: Programme) => p.name;
 
 
+    static sectorKeyExtractor = (p: Sector) => p.id;
+    static sectorLabelExtractor = (p: Sector) => p.name;
+
+
     constructor(props: Props) {
         super(props);
 
@@ -107,10 +118,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
             provinces: [],
             selectedProgramme: undefined,
             programmes: [],
+            sectors: [],
+            selectedSector: undefined,
             loadingProvinceData: true,
             loadingProgrammeData: true,
             loadingProvinces: true,
+            loadingSectorData: true,
             loadingProgrammes: true,
+            loadingSectors: true,
             loadingGeoJson: false,
             geoJson: undefined,
             geoJsonIdKey: 'id',
@@ -134,7 +149,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     } = this.state;
 
                     if (!selectedProvince) {
-                        return <div />;
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a provice </h3>
+                            </div>
+                        );
                     }
 
                     // tslint:disable-next-line variable-name
@@ -167,7 +186,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     } = this.state;
 
                     if (!selectedProgramme) {
-                        return <div />;
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a programme </h3>
+                            </div>
+                        );
                     }
 
                     // tslint:disable-next-line variable-name
@@ -192,14 +215,33 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 },
             },
 
+            sector: {
+                component: () => {
+                    const {
+                        selectedSector,
+                    } = this.state;
+
+                    if (!selectedSector) {
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a sector </h3>
+                            </div>
+                        );
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const SectorDetailInfo = this.renderSectorDetailInfo;
+
+                    return (
+                        <div className={styles.sectorDetails}>
+                            <SectorDetailInfo />
+                        </div>
+                    );
+                },
+            },
+
 
         };
-
-
-        this.sectorOptions = [
-            { key: 1, label: 'Sector 1' },
-            { key: 2, label: 'Sector 2' },
-        ];
 
         this.indicatorOptions = [
             { key: 1, label: 'HDI' },
@@ -215,6 +257,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.reloadGeoJson();
         this.startRequestForProgrammes();
         this.startRequestForProgrammesData();
+        this.startRequestForSectors();
     }
 
     componentWillUnmount() {
@@ -232,6 +275,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
+        }
+        if (this.sectorRequest) {
+            this.sectorRequest.stop();
         }
     }
 
@@ -279,6 +325,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.programmeDataRequest.start();
     }
 
+    startRequestForSectors = () => {
+        if (this.sectorRequest) {
+            this.sectorRequest.stop();
+        }
+        const sectorRequest = new SectorsGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.sectorRequest = sectorRequest.create();
+        this.sectorRequest.start();
+    }
+
     handleProvinceChange = (key: number) => {
         this.setState(
             {
@@ -291,6 +348,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleProgrammeChange = (key: number) => {
         this.setState({ selectedProgramme: key });
+    }
+
+    handleSectorChange = (key: number) => {
+        this.setState({ selectedSector: key });
     }
 
     reloadGeoJson = () => {
@@ -409,9 +470,13 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <SelectInput
                     label="Sector"
                     className={styles.sector}
-                    options={this.sectorOptions}
+                    options={this.state.sectors}
+                    value={this.state.selectedSector}
+                    keySelector={Dashboard.sectorKeyExtractor}
+                    labelSelector={Dashboard.sectorLabelExtractor}
                     showHintAndError={false}
-                    onChange={noOp}
+                    onChange={this.handleSectorChange}
+
                 />
             </div>
             <div className={styles.title}>
@@ -663,18 +728,29 @@ export class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 
+    renderSectorDetailInfo = () => {
+
+        return (
+            <div className={styles.message}>
+                <h3> Data Not Available</h3>
+            </div>
+
+        );
+    }
     renderInformation = () => {
         const {
             selectedProgramme,
             selectedProvince,
+            selectedSector,
         } = this.state;
 
 
         return (
             <div className={styles.right}>
-                { (selectedProgramme || selectedProvince)  ?
-                <div>
+                { (selectedProgramme || selectedProvince || selectedSector)  ?
+                <div className={styles.details} >
                  <FixedTabs
+                    className={styles.tabs}
                     useHash
                     replaceHistory
                     tabs={this.routes}
