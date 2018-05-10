@@ -62,7 +62,6 @@ interface Routes {
     province: string;
     programme: string;
     sector: string;
-    country: string;
 }
 
 interface DefaultHash {
@@ -70,8 +69,8 @@ interface DefaultHash {
 }
 
 interface Views {
-    country: object;
     province: object;
+    programme: object;
 }
 const noOp = () => {};
 
@@ -124,16 +123,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
             province: 'Province Details',
             programme: 'Programme Details',
             sector: 'Sector Details',
-            country: 'Country Details',
         };
 
         this.views = {
-            country: {
-                component: () => (
-                    !(this.state.selectedProvince || this.state.selectedProgramme) &&
-                    <CountryDetails />
-                ),
-            },
             province: {
                 component: () => {
                     const {
@@ -154,11 +146,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         </div>
                     );
 
+
                     return (
                         <div className={styles.provinceDetails}>
-                            <h3 className={styles.title}>
-                                Province details
-                            </h3>
                             {
                                 loadingProvinceData ?
                                     <LoadingMessage /> :
@@ -168,6 +158,40 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     );
                 },
             },
+
+            programme: {
+                component: () => {
+                    const {
+                        selectedProgramme,
+                        loadingProgrammeData,
+                    } = this.state;
+
+                    if (!selectedProgramme) {
+                        return <div />;
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
+                    // tslint:disable-next-line variable-name
+                    const LoadingMessage = () => (
+                        <div className={styles.content}>
+                            Loading Province Information ...
+                        </div>
+                    );
+
+
+                    return (
+                        <div className={styles.programmeDetails}>
+                            {
+                                loadingProgrammeData ?
+                                    <LoadingMessage /> :
+                                    <ProgrammeDetailInfo />
+                            }
+                        </div>
+                    );
+                },
+            },
+
 
         };
 
@@ -451,7 +475,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                        No. of Districts
                     </div>
                     <div className={styles.value}>
-                        {data.totalPopulation || '-'} </div>
+                        {data.district || '-'} </div>
                 </div>
 
                 <div
@@ -642,14 +666,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
     renderInformation = () => {
         const {
             selectedProgramme,
-            loadingProgrammeData,
+            selectedProvince,
         } = this.state;
 
-        // tslint:disable-next-line variable-name
-        const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
 
         return (
             <div className={styles.right}>
+                { (selectedProgramme || selectedProvince)  ?
+                <div>
                  <FixedTabs
                     useHash
                     replaceHistory
@@ -661,25 +685,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                      useHash
                      views={this.views}
                 />
-               {
-                   selectedProgramme &&
-                    <div className={styles.projectDetails}>
-                        <h3 className={styles.title}>
-                            Project details
-                        </h3>
-                        {
-                            loadingProgrammeData &&
-                            <div className={styles.content}>
-                                Loading Project Information ...
-                            </div>
-                        }
-                        {
-                            !loadingProgrammeData &&
-                            <ProgrammeDetailInfo />
-                        }
-                    </div>
-              }
-             </div>
+                </div>
+                :
+                    <CountryDetails />
+                }
+            </div>
         );
     }
 
