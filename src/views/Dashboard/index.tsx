@@ -421,6 +421,13 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
     }
 
+    handleMapClick = (key: string) => {
+        const { selectedProvince } = this.state;
+        if (!selectedProvince) {
+            this.handleProvinceChange(parseInt(key, 10));
+        }
+    }
+
     renderPopup = () => (
         <div className={styles.popup}>
         <PrimaryButton
@@ -798,6 +805,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                             geojson={this.state.geoJson}
                             idKey={this.state.geoJsonIdKey}
                             labelKey={this.state.geoJsonLabelKey}
+                            onClick={this.handleMapClick}
                         />
                     </div>
                 </div>
