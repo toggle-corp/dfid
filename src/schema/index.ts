@@ -6,6 +6,7 @@ import user from './user';
 import province from './province';
 import country from './country';
 import programmes from './programmes';
+import sectors from './sectors';
 import { SchemaGroup } from './interface';
 
 // Validator mixin
@@ -69,6 +70,7 @@ const userDefinedSchemas: SchemaGroup  = [];
     ...province,
     ...country,
     ...programmes,
+    ...sectors,
 ].forEach(
     ({ name, schema }) => dict.put(name, schema),
 );

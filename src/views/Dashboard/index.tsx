@@ -1,8 +1,12 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
+import { iconNames } from '../../constants';
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
+import PrimaryButton from '../../vendor/react-store/components/Action/Button/PrimaryButton';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
+import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
 
 import {
@@ -16,6 +20,7 @@ import {
     ProgrammeData,
     Province,
     Programme,
+    Sector,
 } from '../../redux/interface';
 import CountryDetails from '../Dashboard/CountryDetails';
 
@@ -24,6 +29,7 @@ import Map, { GeoJSON } from '../../components/Map';
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
+import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
 
 import styles from './styles.scss';
@@ -33,18 +39,24 @@ interface Props extends RouteComponentProps<{}> {}
 interface State {
     selectedProvince?: number;
     selectedProgramme?: number;
+    selectedSector?: number;
     provinceData?: ProvinceData[];
     programmeData?: ProgrammeData[];
     provinces?: Province[];
     programmes?: Programme[];
+    sectors?: Sector[];
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
+    loadingSectorData: boolean;
     loadingProvinces: boolean;
     loadingProgrammes: boolean;
+    loadingSectors: boolean;
     loadingGeoJson: boolean;
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
+
+    isHidden: boolean;
 }
 
 interface Option {
@@ -52,25 +64,48 @@ interface Option {
     label: string;
 }
 
+interface Routes {
+    province: string;
+    programme: string;
+    sector: string;
+}
+
+interface DefaultHash {
+    province: string;
+}
+
+interface Views {
+    province: object;
+    programme: object;
+    sector: object;
+}
 const noOp = () => {};
 
 export class Dashboard extends React.PureComponent<Props, State>{
-    sectorOptions: Option[];
     indicatorOptions: Option[];
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
+    sectorRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
     geoJsons: {
         [key: string]: GeoJSON,
     };
 
+    routes: Routes;
+    defaultHash: DefaultHash;
+    views: Views;
+
     static provinceKeyExtractor = (p: Province) => p.id;
     static provinceLabelExtractor = (p: Province) => p.name;
 
     static programmeKeyExtractor = (p: Programme) => p.id;
     static programmeLabelExtractor = (p: Programme) => p.name;
+
+
+    static sectorKeyExtractor = (p: Sector) => p.id;
+    static sectorLabelExtractor = (p: Sector) => p.name;
 
 
     constructor(props: Props) {
@@ -83,20 +118,130 @@ export class Dashboard extends React.PureComponent<Props, State>{
             provinces: [],
             selectedProgramme: undefined,
             programmes: [],
+            sectors: [],
+            selectedSector: undefined,
             loadingProvinceData: true,
             loadingProgrammeData: true,
             loadingProvinces: true,
+            loadingSectorData: true,
             loadingProgrammes: true,
+            loadingSectors: true,
             loadingGeoJson: false,
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
+
+            isHidden: true,
         };
 
-        this.sectorOptions = [
-            { key: 1, label: 'Sector 1' },
-            { key: 2, label: 'Sector 2' },
-        ];
+        this.routes = {
+            province: 'Province Details',
+            programme: 'Programme Details',
+            sector: 'Sector Details',
+        };
+
+        this.views = {
+            province: {
+                component: () => {
+                    const {
+                        selectedProvince,
+                        loadingProvinceData,
+                    } = this.state;
+
+                    if (!selectedProvince) {
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a provice </h3>
+                            </div>
+                        );
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const ProvinceDetailInfo = this.renderProvinceDetailInfo;
+                    // tslint:disable-next-line variable-name
+                    const LoadingMessage = () => (
+                        <div className={styles.content}>
+                            Loading Province Information ...
+                        </div>
+                    );
+
+
+                    return (
+                        <div className={styles.provinceDetails}>
+                            {
+                                loadingProvinceData ?
+                                    <LoadingMessage /> :
+                                    <ProvinceDetailInfo />
+                            }
+                        </div>
+                    );
+                },
+            },
+
+            programme: {
+                component: () => {
+                    const {
+                        selectedProgramme,
+                        loadingProgrammeData,
+                    } = this.state;
+
+                    if (!selectedProgramme) {
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a programme </h3>
+                            </div>
+                        );
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
+                    // tslint:disable-next-line variable-name
+                    const LoadingMessage = () => (
+                        <div className={styles.content}>
+                            Loading Province Information ...
+                        </div>
+                    );
+
+
+                    return (
+                        <div className={styles.programmeDetails}>
+                            {
+                                loadingProgrammeData ?
+                                    <LoadingMessage /> :
+                                    <ProgrammeDetailInfo />
+                            }
+                        </div>
+                    );
+                },
+            },
+
+            sector: {
+                component: () => {
+                    const {
+                        selectedSector,
+                    } = this.state;
+
+                    if (!selectedSector) {
+                        return (
+                            <div className={styles.message}>
+                                <h3> Select a sector </h3>
+                            </div>
+                        );
+                    }
+
+                    // tslint:disable-next-line variable-name
+                    const SectorDetailInfo = this.renderSectorDetailInfo;
+
+                    return (
+                        <div className={styles.sectorDetails}>
+                            <SectorDetailInfo />
+                        </div>
+                    );
+                },
+            },
+
+
+        };
 
         this.indicatorOptions = [
             { key: 1, label: 'HDI' },
@@ -112,6 +257,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.reloadGeoJson();
         this.startRequestForProgrammes();
         this.startRequestForProgrammesData();
+        this.startRequestForSectors();
     }
 
     componentWillUnmount() {
@@ -129,6 +275,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
+        }
+        if (this.sectorRequest) {
+            this.sectorRequest.stop();
         }
     }
 
@@ -176,7 +325,19 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.programmeDataRequest.start();
     }
 
+    startRequestForSectors = () => {
+        if (this.sectorRequest) {
+            this.sectorRequest.stop();
+        }
+        const sectorRequest = new SectorsGetRequest({
+            setState: params => this.setState(params),
+        });
+        this.sectorRequest = sectorRequest.create();
+        this.sectorRequest.start();
+    }
+
     handleProvinceChange = (key: number) => {
+        window.location.hash = '#/province';
         this.setState(
             {
                 selectedProvince: key,
@@ -187,7 +348,13 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleProgrammeChange = (key: number) => {
+        window.location.hash = '#/programme';
         this.setState({ selectedProgramme: key });
+    }
+
+    handleSectorChange = (key: number) => {
+        window.location.hash = '#/sector';
+        this.setState({ selectedSector: key });
     }
 
     reloadGeoJson = () => {
@@ -248,13 +415,49 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return request;
     }
 
+    toggleHidden = () => {
+        this.setState({
+            isHidden: !this.state.isHidden,
+        });
+    }
+
+    handleMapClick = (key: string) => {
+        const { selectedProvince } = this.state;
+        if (!selectedProvince) {
+            this.handleProvinceChange(parseInt(key, 10));
+        }
+    }
+
+    renderPopup = () => (
+        <div className={styles.popup}>
+        <PrimaryButton
+                    title="Expand"
+                    onClick={this.toggleHidden}
+                    iconName={iconNames.expand}
+        />
+
+        </div>
+    )
+
     renderFilters = () => (
         <div className={styles.filters}>
+            <div className={styles.title}>
+                <h3>
+                    filters
+                </h3>
+                <PrimaryButton
+                    title="Close"
+                    onClick={this.toggleHidden}
+                    iconName={iconNames.close}
+                    className={styles.close}
+                    transparent
+                />
+            </div>
             <div className={styles.left}>
                 { !this.state.loadingProvinces &&
                     <SelectInput
                         label="Province"
-                        className={styles.filter}
+                        className={styles.province}
                         value={this.state.selectedProvince}
                         options={this.state.provinces}
                         keySelector={Dashboard.provinceKeyExtractor}
@@ -264,8 +467,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     />
                 }
                 <SelectInput
-                    label="Project"
-                    className={styles.filter}
+                    label="Programme"
+                    className={styles.programme}
                     options={this.state.programmes}
                     value={this.state.selectedProgramme}
                     keySelector={Dashboard.programmeKeyExtractor}
@@ -276,20 +479,37 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 />
                 <SelectInput
                     label="Sector"
-                    className={styles.filter}
-                    options={this.sectorOptions}
+                    className={styles.sector}
+                    options={this.state.sectors}
+                    value={this.state.selectedSector}
+                    keySelector={Dashboard.sectorKeyExtractor}
+                    labelSelector={Dashboard.sectorLabelExtractor}
                     showHintAndError={false}
-                    onChange={noOp}
+                    onChange={this.handleSectorChange}
+
                 />
+            </div>
+            <div className={styles.title}>
+                <h3>
+                    Sub-filters
+                </h3>
             </div>
             <div className={styles.right}>
                 <SelectInput
                     label="Indicator"
-                    className={styles.filter}
+                    className={styles.indicator}
                     options={this.indicatorOptions}
                     showHintAndError={false}
                     onChange={noOp}
                 />
+                <SelectInput
+                    label="Map Layers"
+                    className={styles.layers}
+                    options={this.indicatorOptions}
+                    showHintAndError={false}
+                    onChange={noOp}
+                />
+
             </div>
         </div>
     )
@@ -330,7 +550,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                        No. of Districts
                     </div>
                     <div className={styles.value}>
-                        {data.totalPopulation || '-'} </div>
+                        {data.district || '-'} </div>
                 </div>
 
                 <div
@@ -518,59 +738,43 @@ export class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 
+    renderSectorDetailInfo = () => {
+
+        return (
+            <div className={styles.message}>
+                <h3> Data Not Available</h3>
+            </div>
+
+        );
+    }
     renderInformation = () => {
         const {
-            selectedProvince,
             selectedProgramme,
-            loadingProvinceData,
-            loadingProgrammeData,
+            selectedProvince,
+            selectedSector,
         } = this.state;
 
-        // tslint:disable-next-line variable-name
-        const ProvinceDetailInfo = this.renderProvinceDetailInfo;
-
-        // tslint:disable-next-line variable-name
-        const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
 
         return (
             <div className={styles.right}>
-                {
-                    !(selectedProvince || selectedProgramme) &&
-                        <CountryDetails />
-                }
-                { selectedProvince &&
-                    <div className={styles.provinceDetails}>
-                        <h3 className={styles.title}>
-                            Province details
-                        </h3>
-                        { loadingProvinceData &&
-                            <div className={styles.content}>
-                                Loading Province Information ...
-                            </div>
-                        }
-                        {
-                            !loadingProvinceData &&
-                            <ProvinceDetailInfo />
-                        }
-                    </div>
-                }
-               { selectedProgramme &&
-                <div className={styles.projectDetails}>
-                    <h3 className={styles.title}>
-                        Project details
-                    </h3>
-                        { loadingProgrammeData &&
-                            <div className={styles.content}>
-                                Loading Project Information ...
-                            </div>
-                        }
-                        {
-                            !loadingProgrammeData &&
-                            <ProgrammeDetailInfo />
-                        }
+                { (selectedProgramme || selectedProvince || selectedSector)  ?
+                <div className={styles.details} >
+                 <FixedTabs
+                    className={styles.tabs}
+                    useHash
+                    replaceHistory
+                    tabs={this.routes}
+                    defaultHash={this.defaultHash}
+                 />
 
+                <MultiViewContainer
+                     useHash
+                     views={this.views}
+                />
                 </div>
-              }
+                :
+                    <CountryDetails />
+                }
             </div>
         );
     }
@@ -579,20 +783,29 @@ export class Dashboard extends React.PureComponent<Props, State>{
         // tslint:disable-next-line variable-name
         const Filters = this.renderFilters;
 
+         // tslint:disable-next-line variable-name
+        const Popup = this.renderPopup;
+
         // tslint:disable-next-line variable-name
         const Information = this.renderInformation;
 
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
-                    <Filters />
                     <div className={styles.mapContainer}>
                         {this.state.loadingGeoJson && <LoadingAnimation />}
+                        { this.state.isHidden &&
+                        <Popup />
+                        }
+                        { !this.state.isHidden &&
+                        <Filters />
+                        }
                         <Map
                             className={styles.map}
                             geojson={this.state.geoJson}
                             idKey={this.state.geoJsonIdKey}
                             labelKey={this.state.geoJsonLabelKey}
+                            onClick={this.handleMapClick}
                         />
                     </div>
                 </div>

@@ -25,4 +25,5 @@ export * from './token';
 export * from './user';
 export * from './province';
 export * from './programmes';
+export * from './sectors';
 export * from './country';
