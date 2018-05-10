@@ -70,10 +70,6 @@ interface Routes {
     sector: string;
 }
 
-interface DefaultHash {
-    province: string;
-}
-
 interface Views {
     province: object;
     programme: object;
@@ -94,7 +90,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     };
 
     routes: Routes;
-    defaultHash: DefaultHash;
+    defaultHash: string;
     views: Views;
 
     static provinceKeyExtractor = (p: Province) => p.id;
@@ -133,6 +129,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             isHidden: true,
         };
+
+        this.defaultHash = 'province';
 
         this.routes = {
             province: 'Province Details',
@@ -532,6 +530,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
             <div
                 className={styles.content}
             >
+                <div
+                    className={styles.item}
+                    key="province"
+                >
+                    <div className={styles.label}>
+                        Province
+                    </div>
+                    <div className={styles.value}>
+                        {data.province || '-'} </div>
+                </div>
+
                 <div
                     className={styles.item}
                     key="totalPopulation"

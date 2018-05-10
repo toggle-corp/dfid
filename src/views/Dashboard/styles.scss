@@ -104,7 +104,7 @@
             .popup {
                 display: flex;
                 position: absolute;
-                z-index: 1111;
+                z-index: 1;
 
                 button {
                     padding: $spacing-medium;
@@ -115,7 +115,7 @@
                 display: flex;
                 position: absolute;
                 flex-direction: column;
-                z-index: 1111;
+                z-index: 1;
                 background-color: $color-foreground-alt;
                 padding: $spacing-medium;
                 width: 300px;
