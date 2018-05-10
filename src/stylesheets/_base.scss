@@ -27,6 +27,7 @@ $font-family-icons: 'Ionicons';
 body {
     margin: 0;
     padding: 0;
+    line-height: 1.6;
     color: $color-text;
     font-family: $font-family-sans-serif;
     font-size: $font-size-default;
@@ -59,9 +60,9 @@ body {
         .dfid-main-content {
             @include background-color($color-background);
             position: relative;
+            perspective: 1000px;
             padding: $spacing-small-alt;
             height: calc(100vh - #{$height-navbar});
-            perspective: 1000px;
             overflow-y: auto;
         }
 
@@ -87,9 +88,9 @@ body {
     // @frozenhelium
     @include background-color($color-background-alt);
     transform-origin: bottom;
-    animation: slide-in $duration-slow ease forwards;
     border: $width-separator-thin solid $color-separator-alt;
     height: 100%;
+    animation: slide-in $duration-slow ease forwards;
 }
 
 @keyframes slide-in {

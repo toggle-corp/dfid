@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
+import Numeral from '../../vendor/react-store/components/View/Numeral';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import { pathNames } from '../../constants';
@@ -37,6 +38,7 @@ interface Item {
     label: string;
     value: number | string;
     icon?: string;
+    isCurrency?: boolean;
 }
 
 export class Landing extends React.PureComponent<Props, State> {
@@ -135,7 +137,10 @@ export class Landing extends React.PureComponent<Props, State> {
     }
 
     renderProvinceDetailItem = (k: undefined, data: Item) => (
-        <div className={styles.item}>
+        <div
+            key={data.label}
+            className={styles.item}
+        >
             <img
                 className={styles.icon}
                 src={data.icon}
@@ -144,7 +149,12 @@ export class Landing extends React.PureComponent<Props, State> {
                 {data.label || '-'}
             </div>
             <div className={styles.value}>
-                {data.value || '-'}
+                <Numeral
+                    precision={data.isCurrency ? 2 : 0}
+                    prefix={data.isCurrency ? '£' : undefined}
+                    normal={data.isCurrency}
+                    value={data.value}
+                />
             </div>
         </div>
     )
@@ -163,6 +173,7 @@ export class Landing extends React.PureComponent<Props, State> {
                 label: 'Total budget (FY 2017/18)',
                 value: totalBudget,
                 icon: budgetIcon,
+                isCurrency: true,
             },
         ];
 
@@ -196,9 +207,15 @@ export class Landing extends React.PureComponent<Props, State> {
     }
 
     renderOverviewItem = (k: undefined, data: Item) => (
-        <div className={styles.item}>
+        <div
+            key={data.label}
+            className={styles.item}
+        >
             <div className={styles.value}>
-                {data.value || '-'}
+                <Numeral
+                    value={data.value}
+                    precision={0}
+                />
             </div>
             <div className={styles.label}>
                 {data.label || '-'}
@@ -217,9 +234,9 @@ export class Landing extends React.PureComponent<Props, State> {
         } = this.data;
 
         const items: Item[] = [
-            { label: 'Provinces covered', value: provincesCovered },
-            { label: 'District reached', value: districtReached },
-            { label: 'Municipalities covered', value: municipalitiesCovered },
+            { label: 'Provinces', value: provincesCovered },
+            { label: 'District', value: districtReached },
+            { label: 'Municipalities', value: municipalitiesCovered },
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
             {

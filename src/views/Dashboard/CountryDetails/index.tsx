@@ -7,6 +7,7 @@ import {
     createParamsForCountryData,
 } from '../../../rest';
 
+import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import schema from '../../../schema';
 
 import * as styles from './styles.scss';
@@ -116,8 +117,11 @@ export default class CountryDetails extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Total population
                     </div>
-                    <div className={styles.value}>
-                        {data.totalPopulation || '-'} </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        value={data.totalPopulation}
+                    />
                 </div>
                 <div
                     className={styles.item}

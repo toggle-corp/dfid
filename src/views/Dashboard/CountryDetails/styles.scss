@@ -22,8 +22,6 @@
     @extend %base;
     .item {
         display: table-row;
-        padding: $spacing-small;
-        line-height: 1.6;
 
         &:nth-child(odd){
             background-color: $color-background-row-alt;
@@ -31,15 +29,15 @@
 
         .label {
             display: table-cell;
-            padding: $spacing-extra-small $spacing-medium;
-            width: 40%;
+            padding: $spacing-small $spacing-medium;
+            white-space: nowrap;
+            color: $color-text-label;
         }
 
         .value {
             display: table-cell;
-            padding: $spacing-extra-small $spacing-medium;
+            padding: $spacing-small $spacing-medium;
             font-size: $font-size-large;
-            font-weight: $font-weight-bold;
         }
     }
 
