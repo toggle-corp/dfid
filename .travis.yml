@@ -4,6 +4,7 @@ services:
     - docker
 
 before_install:
+    - npm install --global surge
     - mkdir -p src/vendor
 
     - git clone https://github.com/toggle-corp/react-store.git src/vendor/react-store
@@ -25,3 +26,4 @@ script:
 after_success:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push devtc/dfid:latest
+    - ./scripts/travis_deploy.sh
