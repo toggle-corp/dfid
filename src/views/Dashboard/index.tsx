@@ -5,6 +5,8 @@ import { iconNames } from '../../constants';
 import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
 import PrimaryButton from '../../vendor/react-store/components/Action/Button/PrimaryButton';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+import Numeral from '../../vendor/react-store/components/View/Numeral';
+import ListView from '../../vendor/react-store/components/View/List/ListView';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
@@ -18,6 +20,7 @@ import {
 import {
     ProvinceData,
     ProgrammeData,
+    ProgrammeName,
     Province,
     Programme,
     Sector,
@@ -522,9 +525,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             d.id === selectedProvince,
         ) || {};
 
-        const programmeNames = (data.activeProgrammes || []).map(programme => (
-            programme.programName
-        )).join(', ');
+        const { activeProgrammes = [] } = data;
 
         return (
             <div
@@ -540,7 +541,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.value}>
                         {data.province || '-'} </div>
                 </div>
-
                 <div
                     className={styles.item}
                     key="totalPopulation"
@@ -548,8 +548,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Total population
                     </div>
-                    <div className={styles.value}>
-                        {data.totalPopulation || '-'} </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        value={data.totalPopulation}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -561,7 +564,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.value}>
                         {data.district || '-'} </div>
                 </div>
-
                 <div
                     className={styles.item}
                     key="area"
@@ -569,9 +571,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Area (sq.km)
                     </div>
-                    <div className={styles.value}>
-                        {data.area || '-'}
-                    </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        value={data.area}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -602,9 +606,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Population Under Poverty
                     </div>
-                    <div className={styles.value}>
-                        {data.populationUnderPovertyLine || '-'}
-                    </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        value={data.populationUnderPovertyLine}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -679,9 +685,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Active Programmes
                     </div>
-                    <div className={styles.value}>
-                        {programmeNames || '-'}
-                    </div>
+                    <ListView
+                        className={`${styles.value} ${styles.programme}`}
+                        data={activeProgrammes}
+                        modifier={this.renderProgrammeName}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -690,13 +698,25 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Total Budget
                     </div>
-                    <div className={styles.value}>
-                        {data.totalBudget || '-'}
-                    </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        value={data.totalBudget}
+                    />
                 </div>
             </div>
         );
     }
+
+    renderProgrammeName = (k: undefined, data: ProgrammeName) => (
+        <div
+            key={data.programID}
+            className={styles.programmeName}
+        >
+            <span className={styles.marker}>•</span>
+            <span className={styles.title}>{data.programName}</span>
+        </div>
+    )
 
     renderProgrammeDetailInfo = () => {
         const {
@@ -803,12 +823,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <div className={styles.left}>
                     <div className={styles.mapContainer}>
                         {this.state.loadingGeoJson && <LoadingAnimation />}
-                        { this.state.isHidden &&
-                        <Popup />
-                        }
-                        { !this.state.isHidden &&
-                        <Filters />
-                        }
+                        {this.state.isHidden ? <Popup /> : <Filters />}
                         <Map
                             className={styles.map}
                             geojson={this.state.geoJson}

@@ -94,13 +94,17 @@
 
         >.content {
             .province {
+                @extend %background-alternating-row;
+                @include transition-medium;
                 display: flex;
                 align-items: center;
                 border-bottom: $width-separator-thin solid $color-separator;
+                border-left: $width-separator-medium solid $color-separator;
                 text-transform: none;
 
                 &:hover {
-                    background-color: rgba(0, 0, 0, .06);
+                    border-left-color: $color-accent;
+                    background-color: $color-background-hover;
                 }
 
                 .image {
@@ -138,7 +142,13 @@
                                 display: table-cell;
                                 padding: $spacing-extra-small $spacing-medium;
                                 font-size: $font-size-large;
-                                font-weight: $font-weight-bold;
+
+                                :global {
+                                    .normalized-suffix {
+                                        margin-left: $spacing-small;
+                                        font-family: $font-family-sans-serif;
+                                    }
+                                }
                             }
                         }
                     }

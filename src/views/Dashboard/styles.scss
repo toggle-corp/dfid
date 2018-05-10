@@ -15,7 +15,7 @@
         %base {
             border-bottom: $width-separator-thin solid $color-separator;
 
-            .title {
+            >.title {
                 flex-shrink: 0;
                 border-bottom: $width-separator-thin solid $color-accent;
                 padding: $spacing-medium;
@@ -23,7 +23,6 @@
 
             .content {
                 display: table;
-                padding: $spacing-small;
                 width: 100%;
                 font-size: $font-size-medium-alt;
             }
@@ -50,10 +49,9 @@
             .province-details,
             .programme-details {
                 @extend %base;
+
                 .item {
                     display: table-row;
-                    padding: $spacing-small;
-                    line-height: 1.6;
 
                     &:nth-child(odd){
                         background-color: $color-background-row-alt;
@@ -61,15 +59,31 @@
 
                     .label {
                         display: table-cell;
-                        padding: $spacing-extra-small $spacing-medium;
-                        width: 40%;
+                        padding: $spacing-small $spacing-medium;
+                        white-space: nowrap;
+                        color: $color-text-label;
                     }
 
                     .value {
                         display: table-cell;
-                        padding: $spacing-extra-small $spacing-medium;
+                        padding: $spacing-small $spacing-medium;
                         font-size: $font-size-large;
-                        font-weight: $font-weight-bold;
+
+                        &.programme {
+                            .programme-name {
+                                display: flex;
+
+                                .marker {
+                                    align-self: flex-start;
+                                    flex-shrink: 0;
+                                    margin-right: $spacing-extra-small-alt;
+                                }
+
+                                >.title {
+                                    flex-grow: 1;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -120,7 +134,7 @@
                 padding: $spacing-medium;
                 width: 300px;
 
-                .title {
+                >.title {
                     display: flex;
                     justify-content: space-between;
                     border-bottom: $width-separator-thin solid $color-accent;
