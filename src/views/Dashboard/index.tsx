@@ -155,7 +155,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     if (!selectedProvince) {
                         return (
                             <div className={styles.message}>
-                                <h3> Select a provice </h3>
+                                <h3> Select a province </h3>
                             </div>
                         );
                     }
@@ -671,9 +671,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Per Capita Income
                     </div>
-                    <div className={styles.value}>
-                        {data.perCapitaIncome || '-'}
-                    </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        prefix="$"
+                        value={data.perCapitaIncome}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -726,9 +729,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         GDP
                     </div>
-                    <div className={styles.value}>
-                        {data.gdp || '-'}
-                    </div>
+                    <Numeral
+                        className={styles.value}
+                        precision={0}
+                        prefix="$"
+                        value={data.gdp}
+                    />
                 </div>
                 <div
                     className={styles.item}
@@ -753,6 +759,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <Numeral
                         className={styles.value}
                         precision={0}
+                        prefix="£"
                         value={data.totalBudget}
                     />
                 </div>
@@ -801,8 +808,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                        Budget
                     </div>
-                    <div className={styles.value}>
-                        {data.programBudget || '-'} </div>
+                    <Numeral
+                        className={styles.value}
+                        prefix="£"
+                        precision={0}
+                        value={data.programBudget}
+                    />
                 </div>
                 <div
                     className={styles.item}
