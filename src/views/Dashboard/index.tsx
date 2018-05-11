@@ -43,6 +43,9 @@ interface State {
     selectedProvince?: number;
     selectedProgramme?: number;
     selectedSector?: number;
+    selectedProvinceName?: string;
+    selectedProgrammeName?: string;
+    selectedSectorName?: string;
     provinceData?: ProvinceData[];
     programmeData?: ProgrammeData[];
     provinces?: Province[];
@@ -97,7 +100,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     views: Views;
 
     static provinceKeyExtractor = (p: Province) => p.id;
-    static provinceLabelExtractor = (p: Province) => p.name;
+    // static provinceLabelExtractor = (p: Province) => p.name;
 
     static programmeKeyExtractor = (p: Programme) => p.id;
     static programmeLabelExtractor = (p: Programme) => p.name;
@@ -339,9 +342,16 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleProvinceChange = (key: number) => {
         window.location.hash = '#/province';
+        const {
+            provinces = [],
+        } = this.state;
+        const province: Partial<Province> = provinces.find(
+            p => p.id === key,
+        ) || {};
         this.setState(
             {
                 selectedProvince: key,
+                selectedProvinceName: province.name,
                 loadingGeoJson: true,
             },
             this.reloadGeoJson,
@@ -350,12 +360,34 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleProgrammeChange = (key: number) => {
         window.location.hash = '#/programme';
-        this.setState({ selectedProgramme: key });
+        const {
+            programmes = [],
+        } = this.state;
+        const programme: Partial<Programme> = programmes.find(
+            p => p.id === key,
+        ) || {};
+
+        this.setState(
+            {
+                selectedProgramme: key,
+                selectedProgrammeName: programme.name,
+            });
     }
 
     handleSectorChange = (key: number) => {
         window.location.hash = '#/sector';
-        this.setState({ selectedSector: key });
+        const {
+            sectors = [],
+        } = this.state;
+        const sector: Partial<Sector> = sectors.find(
+            p => p.id === key,
+        ) || {};
+
+        this.setState(
+            {
+                selectedSector: key,
+                selectedSectorName: sector.name,
+            });
     }
 
     reloadGeoJson = () => {
@@ -422,6 +454,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
     }
 
+    handleClearFilter = () => {
+        this.setState(
+            {
+                selectedProvince: undefined,
+                selectedProgramme: undefined,
+                selectedSector: undefined,
+            },
+            this.reloadGeoJson,
+        );
+    }
+
     handleMapClick = (key: string) => {
         const { selectedProvince } = this.state;
         if (!selectedProvince) {
@@ -454,6 +497,15 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     transparent
                 />
             </div>
+            <div className={styles.clear}>
+                <PrimaryButton
+                    title="Clear Filter"
+                    onClick={this.handleClearFilter}
+                    transparent
+                >
+                    Clear Filter
+                </PrimaryButton>
+            </div>
             <div className={styles.left}>
                 { !this.state.loadingProvinces &&
                     <SelectInput
@@ -462,7 +514,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         value={this.state.selectedProvince}
                         options={this.state.provinces}
                         keySelector={Dashboard.provinceKeyExtractor}
-                        labelSelector={Dashboard.provinceLabelExtractor}
+                        labelSelector={Dashboard.provinceKeyExtractor}
                         showHintAndError={false}
                         onChange={this.handleProvinceChange}
                     />
@@ -818,19 +870,51 @@ export class Dashboard extends React.PureComponent<Props, State>{
         // tslint:disable-next-line variable-name
         const Information = this.renderInformation;
 
+        const {
+            selectedProvince,
+            selectedProgramme,
+            selectedSector,
+            selectedProvinceName,
+            selectedProgrammeName,
+            selectedSectorName,
+            geoJson,
+            geoJsonLabelKey,
+            geoJsonIdKey,
+            loadingGeoJson,
+            isHidden,
+        } = this.state;
+
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
                     <div className={styles.mapContainer}>
-                        {this.state.loadingGeoJson && <LoadingAnimation />}
-                        {this.state.isHidden ? <Popup /> : <Filters />}
+                        {loadingGeoJson && <LoadingAnimation />}
+                        {isHidden ? <Popup /> : <Filters />}
                         <Map
                             className={styles.map}
-                            geojson={this.state.geoJson}
-                            idKey={this.state.geoJsonIdKey}
-                            labelKey={this.state.geoJsonLabelKey}
+                            geojson={geoJson}
+                            idKey={geoJsonIdKey}
+                            labelKey={geoJsonLabelKey}
                             onClick={this.handleMapClick}
                         />
+
+                        <div className={styles.overlay}>
+                            { selectedProvince &&
+                                <span className={styles.provinceName}>
+                                    {selectedProvinceName}
+                                </span>
+                            }
+                            { selectedProgramme &&
+                                    <span className={styles.programName}>
+                                    {selectedProgrammeName}
+                                    </span>
+                            }
+                            { selectedSector &&
+                                    <span className={styles.sectorName}>
+                                    {selectedSectorName}
+                                    </span>
+                            }
+                        </div>
                     </div>
                 </div>
                 <Information />
