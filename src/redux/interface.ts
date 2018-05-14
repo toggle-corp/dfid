@@ -26,6 +26,12 @@ export interface Auth {
 }
 
 export interface DomainData {
+    provinces: Province[];
+    provincesData: ProvinceData[];
+    programmes: Programme[];
+    programmesData: ProgrammeData[];
+    sectors: Sector[];
+    countriesData: CountryData[];
 }
 
 export interface Notify {
@@ -75,18 +81,63 @@ export interface ProgrammeData {
     programId: number;
 }
 
+// Province
 export interface Province {
     id: number;
     name: string;
 }
 
+export interface SetProvincesAction {
+    provinces: Province[];
+}
+
+export interface SetProvincesDataAction {
+    provincesData: ProvinceData[];
+}
+
+// Programme
 export interface Programme {
     id: number;
     name: string;
 }
 
+export interface SetProgrammesAction {
+    programmes: Programme[];
+}
+
+export interface SetProgrammesDataAction {
+    programmesData: ProgrammeData[];
+}
+
+// Sector
 export interface Sector {
     id: number;
     name: string;
     code: string;
+}
+
+export interface SetSectorsAction {
+    sectors: Sector[];
+}
+
+// Country
+
+export interface CountryData {
+    id: number;
+    provinces: number;
+    paalikas: number;
+    municipalities: number;
+    totalPopulation: number;
+    area: number;
+    populationDensity: number;
+    povertyRate: number;
+    literacyRate: number;
+    populationUnderPovertyLine: number;
+    perCapitaIncome: number;
+    humanDevelopmentIndex: number;
+    gdp: number;
+}
+
+export interface SetCountriesDataAction {
+    countriesData: CountryData[];
 }

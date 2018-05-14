@@ -4,7 +4,10 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { Sector } from '../../../redux/interface';
+import {
+    Sector,
+    SetSectorsAction,
+} from '../../../redux/interface';
 import {
     urlForSectors,
     createParamsForSectors,
@@ -14,6 +17,7 @@ import schema from '../../../schema';
 
 interface Props {
     setState: Dashboard['setState'];
+    setSectors(params: SetSectorsAction): void;
 }
 
 export default class SectorsGetRequest implements Request<{}> {
@@ -32,7 +36,7 @@ export default class SectorsGetRequest implements Request<{}> {
             .success((response: Sector[]) => {
                 try {
                     schema.validate(response, 'array.sector');
-                    this.props.setState({ sectors: response });
+                    this.props.setSectors({ sectors: response });
                 } catch (error) {
                     console.warn(error);
                 }

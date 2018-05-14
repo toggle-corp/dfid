@@ -1,4 +1,6 @@
 import React from 'react';
+import Redux from 'redux';
+import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { iconNames } from '../../constants';
@@ -16,15 +18,34 @@ import {
     createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
 } from '../../rest';
+import {
+    setProvincesAction,
+    setProvincesDataAction,
+    setProgrammesAction,
+    setProgrammesDataAction,
+    setSectorsAction,
+    provincesDataSelector,
+    provincesSelector,
+    programmesSelector,
+    programmesDataSelector,
+    sectorsSelector,
+} from '../../redux';
 
 import {
+    RootState,
     ProvinceData,
     ProgrammeData,
     ProgrammeName,
     Province,
     Programme,
     Sector,
+    SetProvincesAction,
+    SetProvincesDataAction,
+    SetProgrammesAction,
+    SetProgrammesDataAction,
+    SetSectorsAction,
 } from '../../redux/interface';
+
 import CountryDetails from '../Dashboard/CountryDetails';
 
 import Map, { GeoJSON } from '../../components/Map';
@@ -37,7 +58,23 @@ import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
 
 import styles from './styles.scss';
 
-interface Props extends RouteComponentProps<{}> {}
+interface OwnProps {}
+interface PropsFromState {
+    provinces: Province[];
+    provincesData: ProvinceData[];
+    programmes: Programme[];
+    programmesData: ProgrammeData[];
+    sectors: Sector[];
+}
+interface PropsFromDispatch {
+    setProvinces(params: SetProvincesAction): void;
+    setProvincesData(params: SetProvincesDataAction): void;
+    setProgrammes(params: SetProgrammesAction): void;
+    setProgrammesData(params: SetProgrammesDataAction): void;
+    setSectors(params: SetSectorsAction): void;
+}
+
+type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
 interface State {
     selectedProvince?: number;
@@ -46,11 +83,6 @@ interface State {
     selectedProvinceName?: string;
     selectedProgrammeName?: string;
     selectedSectorName?: string;
-    provinceData?: ProvinceData[];
-    programmeData?: ProgrammeData[];
-    provinces?: Province[];
-    programmes?: Programme[];
-    sectors?: Sector[];
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
@@ -91,6 +123,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     sectorRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
+
     geoJsons: {
         [key: string]: GeoJSON,
     };
@@ -109,7 +142,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
     static sectorKeyExtractor = (p: Sector) => p.id;
     static sectorLabelExtractor = (p: Sector) => p.name;
 
-
     constructor(props: Props) {
         super(props);
 
@@ -117,10 +149,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             selectedProvince: props.location.state
                 ? props.location.state.provinceId
                 : undefined,
-            provinces: [],
             selectedProgramme: undefined,
-            programmes: [],
-            sectors: [],
             selectedSector: undefined,
             loadingProvinceData: true,
             loadingProgrammeData: true,
@@ -243,8 +272,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     );
                 },
             },
-
-
         };
 
         this.indicatorOptions = [
@@ -291,6 +318,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         const provinceDataRequest = new ProvinceDataGetRequest({
             setState: params => this.setState(params),
+            setProvincesData: this.props.setProvincesData,
         });
         this.provinceDataRequest = provinceDataRequest.create();
         this.provinceDataRequest.start();
@@ -302,6 +330,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         const provincesRequest = new ProvincesGetRequest({
             setState: params => this.setState(params),
+            setProvinces: this.props.setProvinces,
         });
         this.provincesRequest = provincesRequest.create();
         this.provincesRequest.start();
@@ -313,6 +342,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         const programmeRequest = new ProgrammesGetRequest({
             setState: params => this.setState(params),
+            setProgrammes: this.props.setProgrammes,
         });
         this.programmeRequest = programmeRequest.create();
         this.programmeRequest.start();
@@ -324,6 +354,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         const programmeDataRequest = new ProgrammesDataRequest({
             setState: params => this.setState(params),
+            setProgrammesData: this.props.setProgrammesData,
         });
         this.programmeDataRequest = programmeDataRequest.create();
         this.programmeDataRequest.start();
@@ -335,6 +366,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         const sectorRequest = new SectorsGetRequest({
             setState: params => this.setState(params),
+            setSectors: this.props.setSectors,
         });
         this.sectorRequest = sectorRequest.create();
         this.sectorRequest.start();
@@ -342,9 +374,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleProvinceChange = (key: number) => {
         window.location.hash = '#/province';
-        const {
-            provinces = [],
-        } = this.state;
+        const { provinces } = this.props;
         const province: Partial<Province> = provinces.find(
             p => p.id === key,
         ) || {};
@@ -360,9 +390,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleProgrammeChange = (key: number) => {
         window.location.hash = '#/programme';
-        const {
-            programmes = [],
-        } = this.state;
+        const { programmes } = this.props;
         const programme: Partial<Programme> = programmes.find(
             p => p.id === key,
         ) || {};
@@ -376,9 +404,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     handleSectorChange = (key: number) => {
         window.location.hash = '#/sector';
-        const {
-            sectors = [],
-        } = this.state;
+        const { sectors } = this.props;
         const sector: Partial<Sector> = sectors.find(
             p => p.id === key,
         ) || {};
@@ -512,7 +538,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         label="Province"
                         className={styles.province}
                         value={this.state.selectedProvince}
-                        options={this.state.provinces}
+                        options={this.props.provinces}
                         keySelector={Dashboard.provinceKeyExtractor}
                         labelSelector={Dashboard.provinceKeyExtractor}
                         showHintAndError={false}
@@ -522,7 +548,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <SelectInput
                     label="Programme"
                     className={styles.programme}
-                    options={this.state.programmes}
+                    options={this.props.programmes}
                     value={this.state.selectedProgramme}
                     keySelector={Dashboard.programmeKeyExtractor}
                     labelSelector={Dashboard.programmeLabelExtractor}
@@ -533,7 +559,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <SelectInput
                     label="Sector"
                     className={styles.sector}
-                    options={this.state.sectors}
+                    options={this.props.sectors}
                     value={this.state.selectedSector}
                     keySelector={Dashboard.sectorKeyExtractor}
                     labelSelector={Dashboard.sectorLabelExtractor}
@@ -568,12 +594,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
     )
 
     renderProvinceDetailInfo = () => {
-        const {
-            provinceData = [],
-            selectedProvince,
-        } = this.state;
+        const { provincesData } = this.props;
+        const { selectedProvince } = this.state;
 
-        const data: Partial<ProvinceData> = provinceData.find(d =>
+        const data: Partial<ProvinceData> = provincesData.find(d =>
             d.id === selectedProvince,
         ) || {};
 
@@ -778,12 +802,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
     )
 
     renderProgrammeDetailInfo = () => {
-        const {
-            programmeData = [],
-            selectedProgramme,
-        } = this.state;
+        const { programmesData } = this.props;
+        const { selectedProgramme } = this.state;
 
-        const data: Partial<ProgrammeData> = programmeData.find(d =>
+        const data: Partial<ProgrammeData> = programmesData.find(d =>
             d.programId === selectedProgramme,
         ) || {};
 
@@ -934,4 +956,23 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 }
 
-export default Dashboard;
+const mapStateToProps = (state: RootState) => ({
+    provinces: provincesSelector(state),
+    provincesData: provincesDataSelector(state),
+    programmes: programmesSelector(state),
+    programmesData: programmesDataSelector(state),
+    sectors: sectorsSelector(state),
+});
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setProvinces: (params: SetProvincesAction) => dispatch(setProvincesAction(params)),
+    setProvincesData: (params: SetProvincesDataAction) => dispatch(setProvincesDataAction(params)),
+    setProgrammes: (params: SetProgrammesAction) => dispatch(setProgrammesAction(params)),
+    setProgrammesData: (params: SetProgrammesDataAction) =>
+        dispatch(setProgrammesDataAction(params)),
+    setSectors: (params: SetSectorsAction) => dispatch(setSectorsAction(params)),
+});
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
+    mapStateToProps, mapDispatchToProps,
+)(Dashboard);
