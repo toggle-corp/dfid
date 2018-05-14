@@ -147,6 +147,17 @@
                     }
                 }
 
+                .clear {
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: flex-end;
+                    margin: $spacing-small 0;
+
+                    button:hover {
+                        background-color: $color-background-hover;
+                    }
+                }
+
 
                 .left {
                     display: flex;
@@ -176,6 +187,26 @@
 
             .map {
                 flex-basis: 100%;
+            }
+
+            .overlay {
+                @include shadow-medium;
+                display: flex;
+                position: absolute;
+                top: 5%;
+                left: 40%;
+                flex-direction: column;
+                border: $width-separator-thin solid $color-accent;
+                background-color: $color-foreground-alt;
+                opacity: 0.6;
+
+                .province-name,
+                .program-name,
+                .sector-name {
+                    padding: $spacing-small;
+                    font-size: $font-size-large;
+                    font-weight: $font-weight-bold;
+                }
             }
         }
     }

@@ -111,7 +111,7 @@ export class Landing extends React.PureComponent<Props, State> {
             municipalitiesCovered:756,
             totalProjects: 12,
             totalSectors: 11,
-            totalBudget: 2352352,
+            totalBudget: 49793430,
         };
     }
 
@@ -235,12 +235,12 @@ export class Landing extends React.PureComponent<Props, State> {
 
         const items: Item[] = [
             { label: 'Provinces', value: provincesCovered },
-            { label: 'District', value: districtReached },
+            { label: 'Districts', value: districtReached },
             { label: 'Municipalities', value: municipalitiesCovered },
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
             {
-                label: 'Total budget (NPR)',
+                label: 'Total budget (£)',
                 value: totalBudget,
             },
         ];
