@@ -5,7 +5,7 @@ import token from './token';
 import user from './user';
 import province from './province';
 import country from './country';
-import programmes from './programmes';
+import programme from './programme';
 import sectors from './sectors';
 import { SchemaGroup } from './interface';
 
@@ -69,7 +69,7 @@ const userDefinedSchemas: SchemaGroup  = [];
     ...user,
     ...province,
     ...country,
-    ...programmes,
+    ...programme,
     ...sectors,
 ].forEach(
     ({ name, schema }) => dict.put(name, schema),

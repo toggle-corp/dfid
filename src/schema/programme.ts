@@ -3,10 +3,10 @@ import { SchemaGroup } from './interface';
 const programmesSchema: SchemaGroup = [];
 
 {
-    const name = 'programmes';
+    const name = 'programme';
     const schema = {
         doc: {
-            name: 'Programmes',
+            name: 'Programme',
         },
         fields: {
             id: { type: 'uint', required: true },

@@ -4,7 +4,10 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { Programme } from '../../../redux/interface';
+import {
+    Programme,
+    SetProgrammesAction,
+} from '../../../redux/interface';
 import {
     urlForProgrammes,
     createParamsForProgrammes,
@@ -14,6 +17,7 @@ import schema from '../../../schema';
 
 interface Props {
     setState: Dashboard['setState'];
+    setProgrammes(params: SetProgrammesAction): void;
 }
 
 export default class ProgrammesGetRequest implements Request<{}> {
@@ -31,8 +35,8 @@ export default class ProgrammesGetRequest implements Request<{}> {
             .postLoad(() => this.props.setState({ loadingProgrammes: false }))
             .success((response: Programme[]) => {
                 try {
-                    schema.validate(response, 'array.programmes');
-                    this.props.setState({ programmes: response });
+                    schema.validate(response, 'array.programme');
+                    this.props.setProgrammes({ programmes: response });
                 } catch (error) {
                     console.warn(error);
                 }

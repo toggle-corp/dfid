@@ -1,43 +1,40 @@
 import React from 'react';
+import Redux from 'redux';
+import { connect } from 'react-redux';
 
-import { RestRequest, FgRestBuilder } from '../../../vendor/react-store/utils/rest';
+import { RestRequest } from '../../../vendor/react-store/utils/rest';
 
 import {
-    urlForCountryData,
-    createParamsForCountryData,
-} from '../../../rest';
+    RootState,
+    CountryData,
+    SetCountriesDataAction,
+} from '../../../redux/interface';
+import {
+    countryDataSelector,
+    setCountriesDataAction,
+} from '../../../redux';
 
 import Numeral from '../../../vendor/react-store/components/View/Numeral';
-import schema from '../../../schema';
+
+import CountriesDataGetRequest from '../requests/CountriesDataGetRequest';
 
 import * as styles from './styles.scss';
 
 interface OwnProps {}
-interface PropsFromState {}
-type Props = OwnProps & PropsFromState;
-
-interface CountryData {
-    id: number;
-    provinces: number;
-    paalikas: number;
-    municipalities: number;
-    totalPopulation: number;
-    area: number;
-    populationDensity: number;
-    povertyRate: number;
-    literacyRate: number;
-    populationUnderPovertyLine: number;
-    perCapitaIncome: number;
-    humanDevelopmentIndex: number;
-    gdp: number;
+interface PropsFromState {
+    countryData: CountryData;
 }
+interface PropsFromDispatch {
+    setCountriesData(params: SetCountriesDataAction): void;
+}
+type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State {
     countryData?: CountryData;
     loadingCountryData: boolean;
 }
 
-export default class CountryDetails extends React.PureComponent<Props, State>{
+export class CountryDetails extends React.PureComponent<Props, State>{
     countryDataRequest: RestRequest;
 
     constructor(props: Props) {
@@ -49,20 +46,18 @@ export default class CountryDetails extends React.PureComponent<Props, State>{
     }
 
     componentDidMount() {
-        this.countryDataRequest = new FgRestBuilder()
-            .url(urlForCountryData)
-            .params(createParamsForCountryData)
-            .preLoad(() => this.setState({ loadingCountryData: true }))
-            .postLoad(() => this.setState({ loadingCountryData: false }))
-            .success((response: CountryData[]) => {
-                try {
-                    schema.validate(response, 'array.countryData');
-                    this.setState({ countryData: response[0] });
-                } catch (error) {
-                    console.warn(error);
-                }
-            })
-            .build();
+        this.startRequestForCountriesData();
+    }
+
+    startRequestForCountriesData = () => {
+        if (this.countryDataRequest) {
+            this.countryDataRequest.stop();
+        }
+        const countryDataRequest = new CountriesDataGetRequest({
+            setState: params => this.setState(params),
+            setCountriesData: this.props.setCountriesData,
+        });
+        this.countryDataRequest = countryDataRequest.create();
         this.countryDataRequest.start();
     }
 
@@ -73,8 +68,7 @@ export default class CountryDetails extends React.PureComponent<Props, State>{
     }
 
     renderCountryDetailInfo = () => {
-        const countryData: Partial<CountryData> = this.state.countryData || {};
-        const data = countryData;
+        const { countryData: data } = this.props;
 
         return (
             <div
@@ -229,3 +223,15 @@ export default class CountryDetails extends React.PureComponent<Props, State>{
         );
     }
 }
+
+const mapStateToProps = (state: RootState) => ({
+    countryData: countryDataSelector(state),
+});
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setCountriesData: (params: SetCountriesDataAction) => dispatch(setCountriesDataAction(params)),
+});
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
+    mapStateToProps, mapDispatchToProps,
+)(CountryDetails);

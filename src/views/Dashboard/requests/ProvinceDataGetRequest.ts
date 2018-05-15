@@ -4,7 +4,10 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { ProvinceData } from '../../../redux/interface';
+import {
+    ProvinceData,
+    SetProvincesDataAction,
+} from '../../../redux/interface';
 import {
     urlForProvinceData,
     createParamsForProvinceData,
@@ -14,6 +17,7 @@ import schema from '../../../schema';
 
 interface Props {
     setState: Dashboard['setState'];
+    setProvincesData(params: SetProvincesDataAction): void;
 }
 
 export default class ProvinceDataGetRequest implements Request<{}> {
@@ -32,7 +36,7 @@ export default class ProvinceDataGetRequest implements Request<{}> {
             .success((response: ProvinceData[]) => {
                 try {
                     schema.validate(response, 'array.provinceData');
-                    this.props.setState({ provinceData: response });
+                    this.props.setProvincesData({ provincesData: response });
                 } catch (error) {
                     console.warn(error);
                 }

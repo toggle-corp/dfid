@@ -4,7 +4,10 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { ProgrammeData } from '../../../redux/interface';
+import {
+    ProgrammeData,
+    SetProgrammesDataAction,
+} from '../../../redux/interface';
 import {
     urlForProgrammeData,
     createParamsForProgrammeData,
@@ -14,6 +17,7 @@ import schema from '../../../schema';
 
 interface Props {
     setState: Dashboard['setState'];
+    setProgrammesData(params: SetProgrammesDataAction): void;
 }
 
 export default class ProgrammesDataRequest implements Request<{}> {
@@ -32,7 +36,7 @@ export default class ProgrammesDataRequest implements Request<{}> {
             .success((response: ProgrammeData[]) => {
                 try {
                     schema.validate(response, 'array.programmeData');
-                    this.props.setState({ programmeData: response });
+                    this.props.setProgrammesData({ programmesData: response });
                 } catch (error) {
                     console.warn(error);
                 }
