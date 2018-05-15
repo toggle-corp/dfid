@@ -8,3 +8,4 @@ export * from './reducers/domainData/province';
 export * from './reducers/domainData/programme';
 export * from './reducers/domainData/sector';
 export * from './reducers/domainData/country';
+export * from './reducers/domainData/dashboard';

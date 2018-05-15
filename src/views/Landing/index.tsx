@@ -1,4 +1,6 @@
 import React from 'react';
+import Redux from 'redux';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
@@ -17,12 +19,16 @@ import province4Image from '../../resources/img/province4.png';
 import province5Image from '../../resources/img/province5.png';
 import province6Image from '../../resources/img/province6.png';
 import province7Image from '../../resources/img/province7.png';
+import { RootState } from '../../redux/interface';
+import { setDashboardProvinceAction } from '../../redux';
 
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 
 import styles from './styles.scss';
 
-interface Props {}
+interface Props {
+    setDashboardProvince(provinceId: number): void;
+}
 interface State {}
 
 interface Data {
@@ -136,6 +142,10 @@ export class Landing extends React.PureComponent<Props, State> {
         this.provinceDataRequest.start();
     }
 
+    setDashboardProvince = (id: number) => () => {
+        this.props.setDashboardProvince(id);
+    }
+
     renderProvinceDetailItem = (k: undefined, data: Item) => (
         <div
             key={data.label}
@@ -179,13 +189,13 @@ export class Landing extends React.PureComponent<Props, State> {
 
         const route = {
             pathname: reverseRoute(pathNames.dashboard),
-            state: { provinceId: id },
         };
 
         return (
             <Link
                 key={id}
                 to={route}
+                onClick={this.setDashboardProvince(id)}
                 className={styles.province}
             >
                 <img
@@ -345,4 +355,10 @@ export class Landing extends React.PureComponent<Props, State> {
     }
 }
 
-export default Landing;
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
+});
+
+export default connect<Props>(
+    undefined, mapDispatchToProps,
+)(Landing);

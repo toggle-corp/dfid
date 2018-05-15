@@ -28,5 +28,19 @@ const countrySchema: SchemaGroup = [];
     };
     countrySchema.push({ name, schema });
 }
+{
+    // TODO: Not Complete
+    const name = 'countryGeoJson';
+    const schema = {
+        doc: {
+            name: 'Country GeoJson',
+            description: 'GeoJson For Country',
+        },
+        fields: {
+            features: { type: 'array', required: true },
+        },
+    };
+    countrySchema.push({ name, schema });
+}
 
 export default countrySchema;

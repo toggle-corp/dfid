@@ -79,3 +79,12 @@ interface ArraySchema {
 }
 
 export type Schema = ArraySchema | ObjectSchema | ConditionFns;
+
+export interface FaramErrors {
+    $internal?: undefined | string[];
+    [key: string]: string | string[] | undefined | FaramErrors;
+}
+
+export interface FaramValues {
+    [key: string]: any; // tslint:disable-line no-any
+}
