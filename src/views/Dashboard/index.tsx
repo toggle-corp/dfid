@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
-import Numeral from '../../vendor/react-store/components/View/Numeral';
-import ListView from '../../vendor/react-store/components/View/List/ListView';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
@@ -38,7 +36,6 @@ import {
     SetProgrammesDataAction,
     SetSectorsAction,
     DashboardFilterParams,
-    ProgrammeSectorName,
 } from '../../redux/interface';
 
 import Map, { GeoJSON } from '../../components/Map';
@@ -46,12 +43,13 @@ import Map, { GeoJSON } from '../../components/Map';
 import CountryDetails from '../Dashboard/CountryDetails';
 import Filter from './Filter';
 import ProvinceDetailInfo from './ProvinceDetailInfo';
+import ProgrammeDetails from '../Dashboard/ProgrammeDetails';
 
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
-import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
+import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
 
 import styles from './styles.scss';
@@ -148,38 +146,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
             },
 
             programme: {
-                component: () => {
-                    const { selectedProgramme } = this.props;
-                    const { loadingProgrammeData } = this.state;
-
-                    if (!selectedProgramme.id) {
-                        return (
-                            <div className={styles.message}>
-                                <h3> Select a programme </h3>
-                            </div>
-                        );
-                    }
-
-                    // tslint:disable-next-line variable-name
-                    const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
-                    // tslint:disable-next-line variable-name
-                    const LoadingMessage = () => (
-                        <div className={styles.content}>
-                            Loading Province Information ...
-                        </div>
-                    );
-
-
-                    return (
-                        <div className={styles.programmeDetails}>
-                            {
-                                loadingProgrammeData ?
-                                    <LoadingMessage /> :
-                                    <ProgrammeDetailInfo />
-                            }
-                        </div>
-                    );
-                },
+                component: () => (
+                    <ProgrammeDetails />
+                ),
             },
 
             sector: {
@@ -279,7 +248,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (this.programmeDataRequest) {
             this.programmeDataRequest.stop();
         }
-        const programmeDataRequest = new ProgrammesDataRequest({
+        const programmeDataRequest = new ProgrammesDataGetRequest({
             setState: params => this.setState(params),
             setProgrammesData: this.props.setProgrammesData,
         });
@@ -387,80 +356,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
-    renderProgrammeDetailInfo = () => {
-        const { selectedProgrammeData: data } = this.props;
-
-
-        const { sectors = [] } = data;
-
-        return (
-            <div
-                className={styles.content}
-            >
-                <div
-                    className={styles.item}
-                    key="program"
-                >
-                    <div className={styles.label}>
-                        Program
-                    </div>
-                    <div className={styles.data}>
-                        {data.program || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="programBudget"
-                >
-                    <div className={styles.label}>
-                       Budget
-                    </div>
-                    <Numeral
-                        className={styles.data}
-                        prefix="£"
-                        precision={0}
-                        value={data.programBudget}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="programmeSectorName"
-                >
-                    <div className={styles.label}>
-                        Sector
-                    </div>
-                    <ListView
-                        className={`${styles.value} ${styles.programme}`}
-                        data={sectors}
-                        modifier={this.renderProgrammeSectorName}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="description"
-                >
-                    <div className={styles.label}>
-                       Description
-                    </div>
-                    <div className={styles.data}>
-                        {data.description || '-'}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     renderSectorDetailInfo = () => (
         <div className={styles.message}>
             <h3> Data Not Available</h3>
-        </div>
-    )
-
-    renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
-        <div
-            key={data.sectorId}
-            className={styles.programmeName}
-        >
-            <span className={styles.title}>{data.sectorName}</span>
         </div>
     )
 
