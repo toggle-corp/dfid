@@ -9,6 +9,11 @@ const initialDomainDataState: DomainData = {
     sectors: [],
 
     countriesData: [],
+
+    dashboardFilter: {
+        faramValues: {},
+        faramErrors: {},
+    },
 };
 
 export default initialDomainDataState;

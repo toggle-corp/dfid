@@ -1,3 +1,6 @@
+import {
+    FaramErrors,
+} from '../rest/interface';
 export interface Notification {
     type: string;
     title: string;
@@ -32,6 +35,7 @@ export interface DomainData {
     programmesData: ProgrammeData[];
     sectors: Sector[];
     countriesData: CountryData[];
+    dashboardFilter: DashboardFilter;
 }
 
 export interface Notify {
@@ -141,3 +145,18 @@ export interface CountryData {
 export interface SetCountriesDataAction {
     countriesData: CountryData[];
 }
+
+// Dashboard
+
+export interface DashboardFilterParams {
+    provinceId?: number;
+    programmeId?: number;
+    sectorId?: number;
+}
+
+export interface DashboardFilter {
+    faramValues: DashboardFilterParams;
+    faramErrors: FaramErrors;
+}
+
+export type SetDashboardFilterAction = Partial<DashboardFilter>;

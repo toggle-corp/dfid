@@ -3,15 +3,13 @@ import Redux from 'redux';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { iconNames } from '../../constants';
-import SelectInput from '../../vendor/react-store/components/Input/SelectInput';
-import PrimaryButton from '../../vendor/react-store/components/Action/Button/PrimaryButton';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import Numeral from '../../vendor/react-store/components/View/Numeral';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
+import schema from '../../schema';
 
 import {
     createParamsForProvinces,
@@ -24,11 +22,11 @@ import {
     setProgrammesAction,
     setProgrammesDataAction,
     setSectorsAction,
-    provincesDataSelector,
-    provincesSelector,
-    programmesSelector,
-    programmesDataSelector,
-    sectorsSelector,
+    dashboardProvinceSelector,
+    dashboardProgrammeSelector,
+    dashboardSectorSelector,
+    dashboardProvinceDataSelector,
+    dashboardProgrammeDataSelector,
 } from '../../redux';
 
 import {
@@ -44,9 +42,11 @@ import {
     SetProgrammesAction,
     SetProgrammesDataAction,
     SetSectorsAction,
+    DashboardFilterParams,
 } from '../../redux/interface';
 
 import CountryDetails from '../Dashboard/CountryDetails';
+import Filter from './Filter';
 
 import Map, { GeoJSON } from '../../components/Map';
 
@@ -60,11 +60,11 @@ import styles from './styles.scss';
 
 interface OwnProps {}
 interface PropsFromState {
-    provinces: Province[];
-    provincesData: ProvinceData[];
-    programmes: Programme[];
-    programmesData: ProgrammeData[];
-    sectors: Sector[];
+    selectedProvince: Province;
+    selectedProvinceData: ProvinceData;
+    selectedProgramme: Programme;
+    selectedProgrammeData: ProgrammeData;
+    selectedSector: Sector;
 }
 interface PropsFromDispatch {
     setProvinces(params: SetProvincesAction): void;
@@ -77,12 +77,6 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
 interface State {
-    selectedProvince?: number;
-    selectedProgramme?: number;
-    selectedSector?: number;
-    selectedProvinceName?: string;
-    selectedProgrammeName?: string;
-    selectedSectorName?: string;
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
@@ -93,13 +87,6 @@ interface State {
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
-
-    isHidden: boolean;
-}
-
-interface Option {
-    key: number;
-    label: string;
 }
 
 interface Routes {
@@ -113,10 +100,8 @@ interface Views {
     programme: object;
     sector: object;
 }
-const noOp = () => {};
 
 export class Dashboard extends React.PureComponent<Props, State>{
-    indicatorOptions: Option[];
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
@@ -132,25 +117,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
     defaultHash: string;
     views: Views;
 
-    static provinceKeyExtractor = (p: Province) => p.id;
-    // static provinceLabelExtractor = (p: Province) => p.name;
-
-    static programmeKeyExtractor = (p: Programme) => p.id;
-    static programmeLabelExtractor = (p: Programme) => p.name;
-
-
-    static sectorKeyExtractor = (p: Sector) => p.id;
-    static sectorLabelExtractor = (p: Sector) => p.name;
-
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            selectedProvince: props.location.state
-                ? props.location.state.provinceId
-                : undefined,
-            selectedProgramme: undefined,
-            selectedSector: undefined,
             loadingProvinceData: true,
             loadingProgrammeData: true,
             loadingProvinces: true,
@@ -161,8 +131,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
-
-            isHidden: true,
         };
 
         this.defaultHash = 'province';
@@ -176,12 +144,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.views = {
             province: {
                 component: () => {
-                    const {
-                        selectedProvince,
-                        loadingProvinceData,
-                    } = this.state;
+                    const { selectedProvince } = this.props;
+                    const { loadingProvinceData } = this.state;
 
-                    if (!selectedProvince) {
+                    if (!selectedProvince.id) {
                         return (
                             <div className={styles.message}>
                                 <h3> Select a province </h3>
@@ -213,12 +179,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             programme: {
                 component: () => {
-                    const {
-                        selectedProgramme,
-                        loadingProgrammeData,
-                    } = this.state;
+                    const { selectedProgramme } = this.props;
+                    const { loadingProgrammeData } = this.state;
 
-                    if (!selectedProgramme) {
+                    if (!selectedProgramme.id) {
                         return (
                             <div className={styles.message}>
                                 <h3> Select a programme </h3>
@@ -250,11 +214,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             sector: {
                 component: () => {
-                    const {
-                        selectedSector,
-                    } = this.state;
+                    const { selectedSector } = this.props;
 
-                    if (!selectedSector) {
+                    if (!selectedSector.id) {
                         return (
                             <div className={styles.message}>
                                 <h3> Select a sector </h3>
@@ -273,11 +235,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 },
             },
         };
-
-        this.indicatorOptions = [
-            { key: 1, label: 'HDI' },
-            { key: 2, label: 'Population density' },
-        ];
 
         this.geoJsons = {};
     }
@@ -372,52 +329,31 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.sectorRequest.start();
     }
 
+    handleFilterChange = (oldValues: DashboardFilterParams, values: DashboardFilterParams) => {
+        const { provinceId, programmeId, sectorId } = values;
+        if (provinceId && oldValues.provinceId !== provinceId) {
+            this.handleProvinceChange(provinceId);
+        }
+        if (programmeId && oldValues.programmeId !== values.programmeId) {
+            window.location.hash = '#/programme';
+        }
+        if (sectorId && oldValues.sectorId !== values.sectorId) {
+            window.location.hash = '#/sector';
+        }
+    }
+
     handleProvinceChange = (key: number) => {
         window.location.hash = '#/province';
-        const { provinces } = this.props;
-        const province: Partial<Province> = provinces.find(
-            p => p.id === key,
-        ) || {};
         this.setState(
             {
-                selectedProvince: key,
-                selectedProvinceName: province.name,
                 loadingGeoJson: true,
             },
             this.reloadGeoJson,
         );
     }
 
-    handleProgrammeChange = (key: number) => {
-        window.location.hash = '#/programme';
-        const { programmes } = this.props;
-        const programme: Partial<Programme> = programmes.find(
-            p => p.id === key,
-        ) || {};
-
-        this.setState(
-            {
-                selectedProgramme: key,
-                selectedProgrammeName: programme.name,
-            });
-    }
-
-    handleSectorChange = (key: number) => {
-        window.location.hash = '#/sector';
-        const { sectors } = this.props;
-        const sector: Partial<Sector> = sectors.find(
-            p => p.id === key,
-        ) || {};
-
-        this.setState(
-            {
-                selectedSector: key,
-                selectedSectorName: sector.name,
-            });
-    }
-
     reloadGeoJson = () => {
-        const { selectedProvince } = this.state;
+        const { selectedProvince } = this.props;
 
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
@@ -427,12 +363,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
         let idKey: string;
         let labelKey: string;
 
-        if (!selectedProvince) {
+        if (!selectedProvince.id) {
             url = urlForCountryGeoJson;
             idKey = 'Province';
             labelKey = 'Province';
         } else {
-            url = createUrlForProvinceGeoJson(selectedProvince);
+            url = createUrlForProvinceGeoJson(selectedProvince.id);
             idKey = 'FIRST_DCOD';
             labelKey = 'FIRST_DIST';
         }
@@ -458,6 +394,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             .preLoad(() => this.setState({ loadingGeoJson: true }))
             .postLoad(() => this.setState({ loadingGeoJson: false }))
             .success((response: GeoJSON) => {
+                schema.validate(response, 'countryGeoJson');
                 this.geoJsons[url] = response;
                 // Convert ids to strings to make things simpler later
                 response.features.forEach((acc: any) => {
@@ -474,133 +411,15 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return request;
     }
 
-    toggleHidden = () => {
-        this.setState({
-            isHidden: !this.state.isHidden,
-        });
-    }
-
-    handleClearFilter = () => {
-        this.setState(
-            {
-                selectedProvince: undefined,
-                selectedProgramme: undefined,
-                selectedSector: undefined,
-            },
-            this.reloadGeoJson,
-        );
-    }
-
     handleMapClick = (key: string) => {
-        const { selectedProvince } = this.state;
-        if (!selectedProvince) {
+        const { selectedProvince } = this.props;
+        if (!selectedProvince.id) {
             this.handleProvinceChange(parseInt(key, 10));
         }
     }
 
-    renderPopup = () => (
-        <div className={styles.popup}>
-        <PrimaryButton
-                    title="Expand"
-                    onClick={this.toggleHidden}
-                    iconName={iconNames.expand}
-        />
-
-        </div>
-    )
-
-    renderFilters = () => (
-        <div className={styles.filters}>
-            <div className={styles.title}>
-                <h3>
-                    filters
-                </h3>
-                <PrimaryButton
-                    title="Close"
-                    onClick={this.toggleHidden}
-                    iconName={iconNames.close}
-                    className={styles.close}
-                    transparent
-                />
-            </div>
-            <div className={styles.clear}>
-                <PrimaryButton
-                    title="Clear Filter"
-                    onClick={this.handleClearFilter}
-                    transparent
-                >
-                    Clear Filter
-                </PrimaryButton>
-            </div>
-            <div className={styles.left}>
-                { !this.state.loadingProvinces &&
-                    <SelectInput
-                        label="Province"
-                        className={styles.province}
-                        value={this.state.selectedProvince}
-                        options={this.props.provinces}
-                        keySelector={Dashboard.provinceKeyExtractor}
-                        labelSelector={Dashboard.provinceKeyExtractor}
-                        showHintAndError={false}
-                        onChange={this.handleProvinceChange}
-                    />
-                }
-                <SelectInput
-                    label="Programme"
-                    className={styles.programme}
-                    options={this.props.programmes}
-                    value={this.state.selectedProgramme}
-                    keySelector={Dashboard.programmeKeyExtractor}
-                    labelSelector={Dashboard.programmeLabelExtractor}
-                    showHintAndError={false}
-                    onChange={this.handleProgrammeChange}
- 
-                />
-                <SelectInput
-                    label="Sector"
-                    className={styles.sector}
-                    options={this.props.sectors}
-                    value={this.state.selectedSector}
-                    keySelector={Dashboard.sectorKeyExtractor}
-                    labelSelector={Dashboard.sectorLabelExtractor}
-                    showHintAndError={false}
-                    onChange={this.handleSectorChange}
-
-                />
-            </div>
-            <div className={styles.title}>
-                <h3>
-                    Sub-filters
-                </h3>
-            </div>
-            <div className={styles.right}>
-                <SelectInput
-                    label="Indicator"
-                    className={styles.indicator}
-                    options={this.indicatorOptions}
-                    showHintAndError={false}
-                    onChange={noOp}
-                />
-                <SelectInput
-                    label="Map Layers"
-                    className={styles.layers}
-                    options={this.indicatorOptions}
-                    showHintAndError={false}
-                    onChange={noOp}
-                />
-
-            </div>
-        </div>
-    )
-
     renderProvinceDetailInfo = () => {
-        const { provincesData } = this.props;
-        const { selectedProvince } = this.state;
-
-        const data: Partial<ProvinceData> = provincesData.find(d =>
-            d.id === selectedProvince,
-        ) || {};
-
+        const { selectedProvinceData: data } = this.props;
         const { activeProgrammes = [] } = data;
 
         return (
@@ -802,12 +621,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     )
 
     renderProgrammeDetailInfo = () => {
-        const { programmesData } = this.props;
-        const { selectedProgramme } = this.state;
-
-        const data: Partial<ProgrammeData> = programmesData.find(d =>
-            d.programId === selectedProgramme,
-        ) || {};
+        const { selectedProgrammeData: data } = this.props;
 
         return (
             <div
@@ -852,26 +666,22 @@ export class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 
-    renderSectorDetailInfo = () => {
+    renderSectorDetailInfo = () => (
+        <div className={styles.message}>
+            <h3> Data Not Available</h3>
+        </div>
+    )
 
-        return (
-            <div className={styles.message}>
-                <h3> Data Not Available</h3>
-            </div>
-
-        );
-    }
     renderInformation = () => {
         const {
-            selectedProgramme,
             selectedProvince,
+            selectedProgramme,
             selectedSector,
-        } = this.state;
-
+        } = this.props;
 
         return (
             <div className={styles.right}>
-                { (selectedProgramme || selectedProvince || selectedSector)  ?
+                { (selectedProgramme.id || selectedProvince.id || selectedSector.id)  ?
                 <div className={styles.details} >
                  <FixedTabs
                     className={styles.tabs}
@@ -895,26 +705,19 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     render() {
         // tslint:disable-next-line variable-name
-        const Filters = this.renderFilters;
-
-         // tslint:disable-next-line variable-name
-        const Popup = this.renderPopup;
-
-        // tslint:disable-next-line variable-name
         const Information = this.renderInformation;
 
         const {
             selectedProvince,
             selectedProgramme,
             selectedSector,
-            selectedProvinceName,
-            selectedProgrammeName,
-            selectedSectorName,
+        } = this.props;
+
+        const {
             geoJson,
             geoJsonLabelKey,
             geoJsonIdKey,
             loadingGeoJson,
-            isHidden,
         } = this.state;
 
         return (
@@ -922,7 +725,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <div className={styles.left}>
                     <div className={styles.mapContainer}>
                         {loadingGeoJson && <LoadingAnimation />}
-                        {isHidden ? <Popup /> : <Filters />}
+                        <Filter
+                            disabled={loadingGeoJson}
+                            onChange={this.handleFilterChange}
+                        />
                         <Map
                             className={styles.map}
                             geojson={geoJson}
@@ -932,19 +738,19 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         />
 
                         <div className={styles.overlay}>
-                            { selectedProvince &&
+                            { selectedProvince.id &&
                                 <span className={styles.provinceName}>
-                                    {selectedProvinceName}
+                                    {selectedProvince.name}
                                 </span>
                             }
-                            { selectedProgramme &&
+                            { selectedProgramme.id &&
                                     <span className={styles.programName}>
-                                    {selectedProgrammeName}
+                                    {selectedProgramme.name}
                                     </span>
                             }
-                            { selectedSector &&
+                            { selectedSector.id &&
                                     <span className={styles.sectorName}>
-                                    {selectedSectorName}
+                                    {selectedSector.name}
                                     </span>
                             }
                         </div>
@@ -957,11 +763,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
 }
 
 const mapStateToProps = (state: RootState) => ({
-    provinces: provincesSelector(state),
-    provincesData: provincesDataSelector(state),
-    programmes: programmesSelector(state),
-    programmesData: programmesDataSelector(state),
-    sectors: sectorsSelector(state),
+    selectedProvince: dashboardProvinceSelector(state),
+    selectedProvinceData: dashboardProvinceDataSelector(state),
+    selectedProgramme: dashboardProgrammeSelector(state),
+    selectedProgrammeData: dashboardProgrammeDataSelector(state),
+    selectedSector: dashboardSectorSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
