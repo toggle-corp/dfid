@@ -30,6 +30,22 @@ const programmesSchema: SchemaGroup = [];
             programBudget: { type: 'number' },
             description: { type: 'string' },
             programId: { type: 'number', required: true },
+            sectors: { type: 'array.programmeSectorName', required: true },
+        },
+    };
+    programmesSchema.push({ name, schema });
+}
+
+{
+    const name = 'programmeSectorName';
+    const schema = {
+        doc: {
+            name: 'Sector Name',
+            description: 'Data for sectors in a programme',
+        },
+        fields: {
+            sectorId: { type: 'uint', required: true },
+            sectorName: { type: 'string', required: true },
         },
     };
     programmesSchema.push({ name, schema });

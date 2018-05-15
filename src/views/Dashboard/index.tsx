@@ -5,6 +5,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import Numeral from '../../vendor/react-store/components/View/Numeral';
+import ListView from '../../vendor/react-store/components/View/List/ListView';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
@@ -37,6 +38,7 @@ import {
     SetProgrammesDataAction,
     SetSectorsAction,
     DashboardFilterParams,
+    ProgrammeSectorName,
 } from '../../redux/interface';
 
 import Map, { GeoJSON } from '../../components/Map';
@@ -388,6 +390,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
     renderProgrammeDetailInfo = () => {
         const { selectedProgrammeData: data } = this.props;
 
+
+        const { sectors = [] } = data;
+
         return (
             <div
                 className={styles.content}
@@ -418,6 +423,19 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 </div>
                 <div
                     className={styles.item}
+                    key="programmeSectorName"
+                >
+                    <div className={styles.label}>
+                        Sector
+                    </div>
+                    <ListView
+                        className={`${styles.value} ${styles.programme}`}
+                        data={sectors}
+                        modifier={this.renderProgrammeSectorName}
+                    />
+                </div>
+                <div
+                    className={styles.item}
                     key="description"
                 >
                     <div className={styles.label}>
@@ -434,6 +452,15 @@ export class Dashboard extends React.PureComponent<Props, State>{
     renderSectorDetailInfo = () => (
         <div className={styles.message}>
             <h3> Data Not Available</h3>
+        </div>
+    )
+
+    renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
+        <div
+            key={data.sectorId}
+            className={styles.programmeName}
+        >
+            <span className={styles.title}>{data.sectorName}</span>
         </div>
     )
 

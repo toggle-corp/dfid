@@ -41,6 +41,7 @@ const provinceSchema: SchemaGroup = [];
             gdp: { type: 'number', required: true },
             activeProgrammes: { type: 'array.programmeName', required: true },
             totalBudget: { type: 'number' },
+            description: { type: 'string' },
         },
     };
     provinceSchema.push({ name, schema });
