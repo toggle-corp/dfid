@@ -53,7 +53,7 @@
                 .item {
                     display: table-row;
 
-                    &:nth-child(odd){
+                    &:nth-child(odd) {
                         background-color: $color-background-row-alt;
                     }
 
@@ -115,76 +115,6 @@
             display: flex;
             height: 100%;
 
-            .popup {
-                display: flex;
-                position: absolute;
-                z-index: 1;
-
-                button {
-                    padding: $spacing-medium;
-                }
-            }
-
-            .filters {
-                display: flex;
-                position: absolute;
-                flex-direction: column;
-                z-index: 1;
-                background-color: $color-foreground-alt;
-                padding: $spacing-medium;
-                width: 300px;
-
-                >.title {
-                    display: flex;
-                    justify-content: space-between;
-                    border-bottom: $width-separator-thin solid $color-accent;
-                    padding: $spacing-medium;
-
-                    .close {
-                        &:hover {
-                            background-color: $color-background-hover;
-                        }
-                    }
-                }
-
-                .clear {
-                    display: flex;
-                    align-items: flex-end;
-                    justify-content: flex-end;
-                    margin: $spacing-small 0;
-
-                    button:hover {
-                        background-color: $color-background-hover;
-                    }
-                }
-
-
-                .left {
-                    display: flex;
-                    flex-direction: column;
-
-                    .province,
-                    .programme,
-                    .sector,
-                    {
-                        margin: $spacing-medium 0;
-                        padding: $spacing-small;
-                    }
-                }
-
-                .right {
-                    flex-shrink: 0;
-
-                    .indicator,
-                    .layers {
-                        margin: $spacing-medium 0;
-                        padding: $spacing-small;
-                    }
-                }
-
-            }
-
-
             .map {
                 flex-basis: 100%;
             }
@@ -198,7 +128,7 @@
                 flex-direction: column;
                 border: $width-separator-thin solid $color-accent;
                 background-color: $color-foreground-alt;
-                opacity: 0.6;
+                opacity: .6;
 
                 .province-name,
                 .program-name,

@@ -5,14 +5,11 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import Numeral from '../../vendor/react-store/components/View/Numeral';
-import ListView from '../../vendor/react-store/components/View/List/ListView';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
-import { RestRequest, FgRestBuilder } from '../../vendor/react-store/utils/rest';
-import schema from '../../schema';
+import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import {
-    createParamsForProvinces,
     createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
 } from '../../rest';
@@ -25,15 +22,12 @@ import {
     dashboardProvinceSelector,
     dashboardProgrammeSelector,
     dashboardSectorSelector,
-    dashboardProvinceDataSelector,
     dashboardProgrammeDataSelector,
 } from '../../redux';
 
 import {
     RootState,
-    ProvinceData,
     ProgrammeData,
-    ProgrammeName,
     Province,
     Programme,
     Sector,
@@ -45,23 +39,24 @@ import {
     DashboardFilterParams,
 } from '../../redux/interface';
 
+import Map, { GeoJSON } from '../../components/Map';
+
 import CountryDetails from '../Dashboard/CountryDetails';
 import Filter from './Filter';
-
-import Map, { GeoJSON } from '../../components/Map';
+import ProvinceDetailInfo from './ProvinceDetailInfo';
 
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataRequest from './requests/ProgrammesDataRequest';
+import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
 
 import styles from './styles.scss';
 
 interface OwnProps {}
 interface PropsFromState {
     selectedProvince: Province;
-    selectedProvinceData: ProvinceData;
     selectedProgramme: Programme;
     selectedProgrammeData: ProgrammeData;
     selectedSector: Sector;
@@ -143,38 +138,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         this.views = {
             province: {
-                component: () => {
-                    const { selectedProvince } = this.props;
-                    const { loadingProvinceData } = this.state;
-
-                    if (!selectedProvince.id) {
-                        return (
-                            <div className={styles.message}>
-                                <h3> Select a province </h3>
-                            </div>
-                        );
-                    }
-
-                    // tslint:disable-next-line variable-name
-                    const ProvinceDetailInfo = this.renderProvinceDetailInfo;
-                    // tslint:disable-next-line variable-name
-                    const LoadingMessage = () => (
-                        <div className={styles.content}>
-                            Loading Province Information ...
-                        </div>
-                    );
-
-
-                    return (
-                        <div className={styles.provinceDetails}>
-                            {
-                                loadingProvinceData ?
-                                    <LoadingMessage /> :
-                                    <ProvinceDetailInfo />
-                            }
-                        </div>
-                    );
-                },
+                component: () => (
+                        <ProvinceDetailInfo
+                            loading={this.state.loadingProvinceData}
+                        />
+                    ),
             },
 
             programme: {
@@ -329,6 +297,30 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.sectorRequest.start();
     }
 
+    startRequestForCountryGeoJson = (
+        url: string,
+        geoJsonIdKey: string,
+        geoJsonLabelKey: string,
+    ) => {
+        if (this.geoJsonRequest) {
+            this.geoJsonRequest.stop();
+        }
+        const geoJsonRequest = new CountryGeoJsonGetRequest({
+            setState: params => this.setState(params),
+            setGeoJsons: this.setGeoJsons,
+        });
+        this.geoJsonRequest = geoJsonRequest.create({
+            url,
+            geoJsonIdKey,
+            geoJsonLabelKey,
+        });
+        this.geoJsonRequest.start();
+    }
+
+    setGeoJsons = (url: string, geoJsons: GeoJSON) => {
+        this.geoJsons[url] = geoJsons;
+    }
+
     handleFilterChange = (oldValues: DashboardFilterParams, values: DashboardFilterParams) => {
         const { provinceId, programmeId, sectorId } = values;
         if (provinceId && oldValues.provinceId !== provinceId) {
@@ -383,32 +375,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             return;
         }
 
-        this.geoJsonRequest = this.createGeoJsonRequest(url, idKey, labelKey);
-        this.geoJsonRequest.start();
-    }
-
-    createGeoJsonRequest = (url: string, geoJsonIdKey: string, geoJsonLabelKey: string) => {
-        const request = new FgRestBuilder()
-            .url(url)
-            .params(createParamsForProvinces)
-            .preLoad(() => this.setState({ loadingGeoJson: true }))
-            .postLoad(() => this.setState({ loadingGeoJson: false }))
-            .success((response: GeoJSON) => {
-                schema.validate(response, 'countryGeoJson');
-                this.geoJsons[url] = response;
-                // Convert ids to strings to make things simpler later
-                response.features.forEach((acc: any) => {
-                    acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
-                });
-                this.setState({
-                    geoJsonIdKey,
-                    geoJsonLabelKey,
-                    geoJson: response,
-                    loadingGeoJson: false,
-                });
-            })
-            .build();
-        return request;
+        this.startRequestForCountryGeoJson(url, idKey, labelKey);
     }
 
     handleMapClick = (key: string) => {
@@ -417,208 +384,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
             this.handleProvinceChange(parseInt(key, 10));
         }
     }
-
-    renderProvinceDetailInfo = () => {
-        const { selectedProvinceData: data } = this.props;
-        const { activeProgrammes = [] } = data;
-
-        return (
-            <div
-                className={styles.content}
-            >
-                <div
-                    className={styles.item}
-                    key="province"
-                >
-                    <div className={styles.label}>
-                        Province
-                    </div>
-                    <div className={styles.value}>
-                        {data.province || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="totalPopulation"
-                >
-                    <div className={styles.label}>
-                        Total population
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        value={data.totalPopulation}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="district"
-                >
-                    <div className={styles.label}>
-                       No. of Districts
-                    </div>
-                    <div className={styles.value}>
-                        {data.district || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="area"
-                >
-                    <div className={styles.label}>
-                        Area (sq.km)
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        value={data.area}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="populationDensity"
-                >
-                    <div className={styles.label}>
-                        Population Density
-                    </div>
-                    <div className={styles.value}>
-                        {data.populationDensity || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="povertyRate"
-                >
-                    <div className={styles.label}>
-                        Poverty Rate
-                    </div>
-                    <div className={styles.value}>
-                        {data.povertyRate || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="populationUnderPovertyLine"
-                >
-                    <div className={styles.label}>
-                        Population Under Poverty
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        value={data.populationUnderPovertyLine}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="perCapitaIncome"
-                >
-                    <div className={styles.label}>
-                        Per Capita Income
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="$"
-                        value={data.perCapitaIncome}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="hhByLowestWealthQuantiles"
-                >
-                    <div className={styles.label}>
-                        HH By Lowest Wealth Quantiles
-                    </div>
-                    <div className={styles.value}>
-                        {data.hhByLowestWealthQuantiles || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="humanDevelopmentIndex"
-                >
-                    <div className={styles.label}>
-                        HDI
-                    </div>
-                    <div className={styles.value}>
-                        {data.humanDevelopmentIndex || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="minuteAccessTo"
-                >
-                    <div className={styles.label}>
-                        Minute Access To
-                    </div>
-                    <div className={styles.value}>
-                        {data.minuteAccessTo || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="vulnerabilityIndex"
-                >
-                    <div className={styles.label}>
-                        Vulnerability Index
-                    </div>
-                    <div className={styles.value}>
-                        {data.vulnerabilityIndex || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="gdp"
-                >
-                    <div className={styles.label}>
-                        GDP
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="$"
-                        value={data.gdp}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="programmeName"
-                >
-                    <div className={styles.label}>
-                        Active Programmes
-                    </div>
-                    <ListView
-                        className={`${styles.value} ${styles.programme}`}
-                        data={activeProgrammes}
-                        modifier={this.renderProgrammeName}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="totalBudget"
-                >
-                    <div className={styles.label}>
-                        Total Budget
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="£"
-                        value={data.totalBudget}
-                    />
-                </div>
-            </div>
-        );
-    }
-
-    renderProgrammeName = (k: undefined, data: ProgrammeName) => (
-        <div
-            key={data.programID}
-            className={styles.programmeName}
-        >
-            <span className={styles.marker}>•</span>
-            <span className={styles.title}>{data.programName}</span>
-        </div>
-    )
 
     renderProgrammeDetailInfo = () => {
         const { selectedProgrammeData: data } = this.props;
@@ -764,7 +529,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
 const mapStateToProps = (state: RootState) => ({
     selectedProvince: dashboardProvinceSelector(state),
-    selectedProvinceData: dashboardProvinceDataSelector(state),
     selectedProgramme: dashboardProgrammeSelector(state),
     selectedProgrammeData: dashboardProgrammeDataSelector(state),
     selectedSector: dashboardSectorSelector(state),

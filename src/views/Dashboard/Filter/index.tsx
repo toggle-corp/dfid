@@ -29,7 +29,7 @@ import {
     Schema,
 } from '../../../rest/interface';
 
-import styles from '../styles.scss';
+import styles from './styles.scss';
 
 interface OwnProps {
     disabled: boolean;
