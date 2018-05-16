@@ -36,6 +36,7 @@ export interface DomainData {
     sectors: Sector[];
     countriesData: CountryData[];
     dashboardFilter: DashboardFilter;
+    indicators: Indicator[];
 }
 
 export interface Notify {
@@ -160,11 +161,24 @@ export interface DashboardFilterParams {
     provinceId?: number;
     programmeId?: number;
     sectorId?: number;
+    indicatorId?: number;
 }
 
 export interface DashboardFilter {
     faramValues: DashboardFilterParams;
     faramErrors: FaramErrors;
+    isHidden: boolean;
 }
 
 export type SetDashboardFilterAction = Partial<DashboardFilter>;
+
+// Indicator
+
+export interface Indicator {
+    id: number;
+    name: string;
+}
+
+export interface SetIndicatorsAction {
+    indicators: Indicator[];
+}

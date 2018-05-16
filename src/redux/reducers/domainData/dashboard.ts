@@ -17,10 +17,11 @@ export const enum DASHBOARD_ACTION {
 // ACTION-CREATOR
 
 export const setDashboardFiltersAction = (
-    { faramValues, faramErrors }: SetDashboardFilterAction,
+    { faramValues, faramErrors, isHidden }: SetDashboardFilterAction,
 ) => ({
     faramValues,
     faramErrors,
+    isHidden,
     type: DASHBOARD_ACTION.setFilters,
 });
 
@@ -37,11 +38,13 @@ const setFilters = (state: DomainData, action: SetDashboardFilterAction) => {
     const {
         faramValues,
         faramErrors,
+        isHidden,
     } = action;
     const settings = {
         dashboardFilter: {
             faramValues: { $if: [faramValues, { $set: faramValues }] },
             faramErrors: { $if: [faramErrors, { $set: faramErrors }] },
+            isHidden: { $if: [isHidden !== undefined, { $set: isHidden }] },
         },
     };
     return update(state, settings);

@@ -18,6 +18,7 @@ import {
     setProgrammesAction,
     setProgrammesDataAction,
     setSectorsAction,
+    setIndicatorsAction,
     dashboardProvinceSelector,
     dashboardProgrammeSelector,
     dashboardSectorSelector,
@@ -35,6 +36,7 @@ import {
     SetProgrammesAction,
     SetProgrammesDataAction,
     SetSectorsAction,
+    SetIndicatorsAction,
     DashboardFilterParams,
 } from '../../redux/interface';
 
@@ -44,6 +46,7 @@ import CountryDetails from '../Dashboard/CountryDetails';
 import Filter from './Filter';
 import ProvinceDetailInfo from './ProvinceDetailInfo';
 import ProgrammeDetails from '../Dashboard/ProgrammeDetails';
+import SectorDetailInfo from '../Dashboard/SectorDetailInfo';
 
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
@@ -51,6 +54,7 @@ import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
+import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
 
 import styles from './styles.scss';
 
@@ -67,6 +71,7 @@ interface PropsFromDispatch {
     setProgrammes(params: SetProgrammesAction): void;
     setProgrammesData(params: SetProgrammesDataAction): void;
     setSectors(params: SetSectorsAction): void;
+    setIndicators(params: SetIndicatorsAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
@@ -79,6 +84,7 @@ interface State {
     loadingProgrammes: boolean;
     loadingSectors: boolean;
     loadingGeoJson: boolean;
+    loadingIndicators: boolean;
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
@@ -101,6 +107,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
     sectorRequest: RestRequest;
+    indicatorsRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
 
@@ -122,6 +129,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingSectorData: true,
             loadingProgrammes: true,
             loadingSectors: true,
+            loadingIndicators: true,
             loadingGeoJson: false,
             geoJson: undefined,
             geoJsonIdKey: 'id',
@@ -147,31 +155,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             programme: {
                 component: () => (
-                    <ProgrammeDetails />
+                    <ProgrammeDetails
+                        loading={this.state.loadingProgrammeData}
+                    />
                 ),
             },
 
             sector: {
-                component: () => {
-                    const { selectedSector } = this.props;
-
-                    if (!selectedSector.id) {
-                        return (
-                            <div className={styles.message}>
-                                <h3> Select a sector </h3>
-                            </div>
-                        );
-                    }
-
-                    // tslint:disable-next-line variable-name
-                    const SectorDetailInfo = this.renderSectorDetailInfo;
-
-                    return (
-                        <div className={styles.sectorDetails}>
-                            <SectorDetailInfo />
-                        </div>
-                    );
-                },
+                component: () => (
+                    <SectorDetailInfo
+                        loading={this.state.loadingSectorData}
+                    />
+                ),
             },
         };
 
@@ -185,6 +180,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.startRequestForProgrammes();
         this.startRequestForProgrammesData();
         this.startRequestForSectors();
+        this.startRequestForIndicators();
     }
 
     componentWillUnmount() {
@@ -205,6 +201,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.sectorRequest) {
             this.sectorRequest.stop();
+        }
+        if (this.indicatorsRequest) {
+            this.indicatorsRequest.stop();
         }
     }
 
@@ -266,6 +265,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
         this.sectorRequest = sectorRequest.create();
         this.sectorRequest.start();
+    }
+
+    startRequestForIndicators = () => {
+        if (this.indicatorsRequest) {
+            this.indicatorsRequest.stop();
+        }
+        const indicatorsRequest = new IndicatorsGetRequest({
+            setState: params => this.setState(params),
+            setIndicators: this.props.setIndicators,
+        });
+        this.indicatorsRequest = indicatorsRequest.create();
+        this.indicatorsRequest.start();
     }
 
     startRequestForCountryGeoJson = (
@@ -369,26 +380,29 @@ export class Dashboard extends React.PureComponent<Props, State>{
             selectedSector,
         } = this.props;
 
+        const showCountryDetails = !(
+            selectedProgramme.id || selectedProvince.id || selectedSector.id
+        );
+
+        if (showCountryDetails) {
+            return (
+                <CountryDetails />
+            );
+        }
+
         return (
-            <div className={styles.right}>
-                { (selectedProgramme.id || selectedProvince.id || selectedSector.id)  ?
-                <div className={styles.details} >
-                 <FixedTabs
+            <div className={styles.details} >
+                <FixedTabs
                     className={styles.tabs}
                     useHash
                     replaceHistory
                     tabs={this.routes}
                     defaultHash={this.defaultHash}
-                 />
-
-                <MultiViewContainer
-                     useHash
-                     views={this.views}
                 />
-                </div>
-                :
-                    <CountryDetails />
-                }
+                <MultiViewContainer
+                    useHash
+                    views={this.views}
+                />
             </div>
         );
     }
@@ -407,8 +421,21 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson,
             geoJsonLabelKey,
             geoJsonIdKey,
+            loadingProvinceData,
+            loadingProgrammeData,
+            // loadingSectorData,
+            loadingProvinces,
+            loadingProgrammes,
+            loadingSectors,
+            loadingIndicators,
             loadingGeoJson,
         } = this.state;
+
+        const loading = (
+            loadingProvinceData || loadingProgrammeData ||  loadingGeoJson ||
+            loadingProvinces || loadingProgrammes || loadingSectors ||
+            loadingIndicators // || loadingSectorData
+        );
 
         return (
             <div className={styles.dashboard}>
@@ -416,7 +443,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.mapContainer}>
                         {loadingGeoJson && <LoadingAnimation />}
                         <Filter
-                            disabled={loadingGeoJson}
+                            disabled={loading}
                             onChange={this.handleFilterChange}
                         />
                         <Map
@@ -446,7 +473,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         </div>
                     </div>
                 </div>
-                <Information />
+                <div className={styles.right}>
+                    <Information />
+                </div>
             </div>
         );
     }
@@ -466,6 +495,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setProgrammesData: (params: SetProgrammesDataAction) =>
         dispatch(setProgrammesDataAction(params)),
     setSectors: (params: SetSectorsAction) => dispatch(setSectorsAction(params)),
+    setIndicators: (params: SetIndicatorsAction) => dispatch(setIndicatorsAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

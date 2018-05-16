@@ -27,3 +27,4 @@ export * from './province';
 export * from './programmes';
 export * from './sectors';
 export * from './country';
+export * from './indicator';

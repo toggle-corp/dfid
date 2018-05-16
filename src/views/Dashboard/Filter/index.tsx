@@ -13,6 +13,7 @@ import {
     programmesSelector,
     provincesSelector,
     dashboardFilterSelector,
+    indicatorsSelector,
 } from '../../../redux';
 
 import {
@@ -20,6 +21,7 @@ import {
     Province,
     Programme,
     Sector,
+    Indicator,
     SetDashboardFilterAction,
     DashboardFilterParams,
     DashboardFilter,
@@ -40,6 +42,7 @@ interface PropsFromState {
     programmes: Programme[];
     provinces: Province[];
     sectors: Sector[];
+    indicators: Indicator[];
     faramState: DashboardFilter;
 }
 interface PropsFromDispatch {
@@ -48,9 +51,7 @@ interface PropsFromDispatch {
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
-interface State {
-    isHidden: boolean;
-}
+interface State {}
 
 interface Option {
     key: number;
@@ -68,19 +69,19 @@ export class Filter extends React.PureComponent<Props, State>{
     static programmeLabelExtractor = (p: Programme) => p.name;
     static sectorKeyExtractor = (p: Sector) => p.id;
     static sectorLabelExtractor = (p: Sector) => p.name;
+    static indicatorKeyExtractor = (p: Indicator) => p.id;
+    static indicatorLabelExtractor = (p: Indicator) => p.name;
+
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            isHidden: true,
-        };
 
         this.schema = {
             fields: {
                 provinceId: [],
                 programmeId: [],
                 sectorId: [],
+                indicatorId: [],
             },
         };
 
@@ -120,8 +121,8 @@ export class Filter extends React.PureComponent<Props, State>{
     }
 
     handleToggleHidden = () => {
-        this.setState({
-            isHidden: !this.state.isHidden,
+        this.props.setDashboardFilters({
+            isHidden: !this.props.faramState.isHidden,
         });
     }
 
@@ -149,15 +150,16 @@ export class Filter extends React.PureComponent<Props, State>{
         const {
             disabled,
             faramState,
+            provinces,
+            programmes,
+            sectors,
+            indicators,
         } = this.props;
-
-        const {
-            isHidden,
-        } = this.state;
 
         const {
             faramValues,
             faramErrors,
+            isHidden,
         } = faramState;
 
         if (isHidden) {
@@ -201,31 +203,28 @@ export class Filter extends React.PureComponent<Props, State>{
                         label="Province"
                         className={styles.province}
                         faramElementName="provinceId"
-                        options={this.props.provinces}
+                        options={provinces}
                         keySelector={Filter.provinceKeyExtractor}
                         labelSelector={Filter.provinceKeyExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Programme"
                         className={styles.programme}
-                        options={this.props.programmes}
+                        options={programmes}
                         faramElementName="programmeId"
                         keySelector={Filter.programmeKeyExtractor}
                         labelSelector={Filter.programmeLabelExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Sector"
                         className={styles.sector}
-                        options={this.props.sectors}
+                        options={sectors}
                         faramElementName="sectorId"
                         keySelector={Filter.sectorKeyExtractor}
                         labelSelector={Filter.sectorLabelExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                 </div>
                 <div className={styles.title}>
@@ -237,10 +236,11 @@ export class Filter extends React.PureComponent<Props, State>{
                     <SelectInput
                         label="Indicator"
                         className={styles.indicator}
-                        options={this.indicatorOptions}
+                        options={indicators}
+                        faramElementName="indicatorId"
+                        keySelector={Filter.indicatorKeyExtractor}
+                        labelSelector={Filter.indicatorLabelExtractor}
                         showHintAndError={false}
-                        onChange={noOp}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Map Layers"
@@ -248,7 +248,6 @@ export class Filter extends React.PureComponent<Props, State>{
                         options={this.indicatorOptions}
                         showHintAndError={false}
                         onChange={noOp}
-                        disabled={disabled}
                     />
                 </div>
             </Faram>
@@ -260,6 +259,7 @@ const mapStateToProps = (state: RootState) => ({
     sectors: sectorsSelector(state),
     programmes: programmesSelector(state),
     provinces: provincesSelector(state),
+    indicators: indicatorsSelector(state),
     faramState: dashboardFilterSelector(state),
 });
 
