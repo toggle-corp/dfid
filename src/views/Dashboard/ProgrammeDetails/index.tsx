@@ -1,32 +1,43 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import Numeral from '../../../vendor/react-store/components/View/Numeral';
+import ListView from '../../../vendor/react-store/components/View/List/ListView';
+
 import { RestRequest } from '../../../vendor/react-store/utils/rest';
+
+import {
+    dashboardProgrammeSelector,
+    dashboardProgrammeDataSelector,
+} from '../../../redux';
+
 
 import {
     RootState,
     ProgrammeData,
+    Programme,
     ProgrammeSectorName,
 } from '../../../redux/interface';
-import {
-    programmesDataSelector,
-} from '../../../redux';
 
-import Numeral from '../../../vendor/react-store/components/View/Numeral';
-import ListView from '../../../vendor/react-store/components/View/List/ListView';
+import styles from '../styles.scss';
 
-import styles from './styles.scss';
-
-interface OwnProps {}
+interface OwnProps {
+    loading?: boolean;
+}
 interface PropsFromState {
-    programmeData: ProgrammeData[];
+    selectedProgramme: Programme;
+    selectedProgrammeData: ProgrammeData;
 }
 type Props = OwnProps & PropsFromState ;
 
 interface State {
-    programmeData?: ProgrammeData;
-    loadingProgrammeData: boolean;
-    selectedProgramme?: number;
+    programmeData: object;
+}
+
+interface ProgrammeField {
+    key: string;
+    label: string;
+    value?: object | string | number;
 }
 
 export class ProgrammeDetails extends React.PureComponent<Props, State>{
@@ -34,131 +45,143 @@ export class ProgrammeDetails extends React.PureComponent<Props, State>{
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            loadingProgrammeData: true,
-            selectedProgramme: undefined,
-        };
-    }
-
-    renderProgrammeDetailInfo = () => {
-        const { programmeData } = this.props;
-        const { selectedProgramme } = this.state;
-
-        const data: Partial<ProgrammeData> = programmeData.find(d =>
-            d.programId === selectedProgramme,
-        ) || {};
-
-
-        const { sectors = [] } = data;
-
-        return (
-            <div
-                className={styles.content}
-            >
-                <div
-                    className={styles.item}
-                    key="program"
-                >
-                    <div className={styles.label}>
-                        Program
-                    </div>
-                    <div className={styles.value}>
-                        {data.program || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="programBudget"
-                >
-                    <div className={styles.label}>
-                       Budget
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        prefix="£"
-                        precision={0}
-                        value={data.programBudget}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="programmeSectorName"
-                >
-                    <div className={styles.label}>
-                        Sector
-                    </div>
-                    <ListView
-                        className={`${styles.value} ${styles.sector}`}
-                        data={sectors}
-                        modifier={this.renderProgrammeSectorName}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="description"
-                >
-                    <div className={styles.label}>
-                       Description
-                    </div>
-                    <div className={styles.value}>
-                        {data.description || '-'}
-                    </div>
-                </div>
-            </div>
+        const { selectedProgrammeData } = props;
+        const {
+            generateProgrammeDataDetailInfo,
+            getProgrammeFields,
+        } = ProgrammeDetails;
+        const programmeData = generateProgrammeDataDetailInfo(
+            getProgrammeFields(selectedProgrammeData),
+            selectedProgrammeData,
         );
+        this.state = { programmeData };
     }
 
-    renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
+    componentWillReceiveProps(nextProps: Props) {
+        const { selectedProgrammeData } = nextProps;
+        if (this.props.selectedProgrammeData !== selectedProgrammeData) {
+            const {
+                generateProgrammeDataDetailInfo,
+                getProgrammeFields,
+            } = ProgrammeDetails;
+            const programmeData = generateProgrammeDataDetailInfo(
+                getProgrammeFields(selectedProgrammeData),
+                selectedProgrammeData,
+            );
+            this.setState({ programmeData });
+        }
+    }
+
+    static generateProgrammeDataDetailInfo = (
+        items: ProgrammeField[], programmeData: ProgrammeData,
+    ) => (
+        items.map(item =>
+            ProgrammeDetails.renderProgrammeField({
+                key: item.key,
+                label: item.label,
+                value: item.value || programmeData[item.key],
+            }),
+        )
+    )
+
+    static getProgrammeFields = (data: ProgrammeData) => [
+        { key: 'program', label: 'Programme' },
+        {
+            key: 'programBudget',
+            label: 'Budget',
+            value: (
+                <Numeral
+                    className={styles.value}
+                    precision={0}
+                    value={data.programBudget}
+                />
+            ),
+        },
+        {
+            key: 'programmeSectorName',
+            label: 'Sector',
+            value: (
+                    <ListView
+                        className={`${styles.value} ${styles.programme}`}
+                        data={data.sectors}
+                        modifier={ProgrammeDetails.renderProgrammeSectorName}
+                    />
+            ),
+        },
+        {
+            key: 'description',
+            label: 'Desciription',
+        },
+    ]
+
+
+    static renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
         <div
             key={data.sectorId}
-            className={styles.sectorName}
+            className={styles.programmeName}
         >
             <span className={styles.title}>{data.sectorName}</span>
+        </div>
+    )
+
+    static renderProgrammeField = ({ key, label, value }: ProgrammeField) => (
+        <div
+            className={styles.item}
+            key={key}
+        >
+            <div className={styles.label}>
+                {label}
+            </div>
+            <div className={styles.value}>
+                {value || '-'}
+            </div>
+        </div>
+    )
+
+    static renderSelectProgrammeMessage = () => (
+        <div className={styles.message}>
+            <h3> Select a programme </h3>
+        </div>
+    )
+
+    static renderLoadingMessage = () => (
+        <div className={styles.message}>
+            Loading Programme Information ...
         </div>
     )
 
 
     render() {
         const {
+            loading,
             selectedProgramme,
-            loadingProgrammeData,
-        } = this.state;
+        } = this.props;
+        const { programmeData } = this.state;
 
-        if (!selectedProgramme) {
-            return (
-                <div className={styles.message}>
-                    <h3> Select a programme </h3>
-                </div>
-            );
+        if (!selectedProgramme.id) {
+            return ProgrammeDetails.renderSelectProgrammeMessage();
         }
 
-        // tslint:disable-next-line variable-name
-        const ProgrammeDetailInfo = this.renderProgrammeDetailInfo;
-        // tslint:disable-next-line variable-name
-        const LoadingMessage = () => (
-            <div className={styles.content}>
-            Loading Province Information ...
-            </div>
-        );
+        if (loading) {
+            return ProgrammeDetails.renderLoadingMessage();
+        }
 
         return (
             <div className={styles.programmeDetails}>
-            {
-                loadingProgrammeData ?
-                <LoadingMessage /> :
-                <ProgrammeDetailInfo />
-            }
+                <div
+                    className={styles.content}
+                >
+                    {programmeData}
+                </div>
             </div>
         );
-
     }
 }
-
 const mapStateToProps = (state: RootState) => ({
-    programmeData: programmesDataSelector(state),
+    selectedProgramme: dashboardProgrammeSelector(state),
+    selectedProgrammeData: dashboardProgrammeDataSelector(state),
 });
 
 export default connect<PropsFromState, OwnProps>(
     mapStateToProps,
 )(ProgrammeDetails);
-
