@@ -399,7 +399,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                         Program
                     </div>
-                    <div className={styles.value}>
+                    <div className={styles.data}>
                         {data.program || '-'} </div>
                 </div>
                 <div
@@ -410,7 +410,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                        Budget
                     </div>
                     <Numeral
-                        className={styles.value}
+                        className={styles.data}
                         prefix="£"
                         precision={0}
                         value={data.programBudget}
@@ -423,7 +423,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     <div className={styles.label}>
                        Description
                     </div>
-                    <div className={styles.value}>
+                    <div className={styles.data}>
                         {data.description || '-'}
                     </div>
                 </div>

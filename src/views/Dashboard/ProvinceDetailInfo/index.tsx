@@ -189,7 +189,7 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
             <div className={styles.label}>
                 {label}
             </div>
-            <div className={styles.value}>
+            <div className={styles.data}>
                 {value || '-'}
             </div>
         </div>

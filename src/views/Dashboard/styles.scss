@@ -59,28 +59,31 @@
 
                     .label {
                         display: table-cell;
-                        padding: $spacing-small $spacing-medium;
+                        padding: $spacing-small;
                         white-space: nowrap;
                         color: $color-text-label;
                     }
 
-                    .value {
+                    .data {
                         display: table-cell;
                         padding: $spacing-small $spacing-medium;
-                        font-size: $font-size-large;
 
-                        &.programme {
-                            .programme-name {
-                                display: flex;
+                        .value {
+                            padding: 0;
 
-                                .marker {
-                                    align-self: flex-start;
-                                    flex-shrink: 0;
-                                    margin-right: $spacing-extra-small-alt;
-                                }
+                            &.programme {
+                                .programme-name {
+                                    display: flex;
 
-                                >.title {
-                                    flex-grow: 1;
+                                    .marker {
+                                        align-self: flex-start;
+                                        flex-shrink: 0;
+                                        margin-right: $spacing-extra-small-alt;
+                                    }
+
+                                    >.title {
+                                        flex-grow: 1;
+                                    }
                                 }
                             }
                         }
