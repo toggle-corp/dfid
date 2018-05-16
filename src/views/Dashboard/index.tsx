@@ -19,6 +19,7 @@ import {
     setProgrammesDataAction,
     setSectorsAction,
     setIndicatorsAction,
+    setMapLayersAction,
     dashboardProvinceSelector,
     dashboardProgrammeSelector,
     dashboardSectorSelector,
@@ -37,6 +38,7 @@ import {
     SetProgrammesDataAction,
     SetSectorsAction,
     SetIndicatorsAction,
+    SetMapLayersAction,
     DashboardFilterParams,
 } from '../../redux/interface';
 
@@ -55,6 +57,7 @@ import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
 import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
+import MapLayersGetRequest from './requests/MapLayersGetRequest';
 
 import styles from './styles.scss';
 
@@ -72,6 +75,7 @@ interface PropsFromDispatch {
     setProgrammesData(params: SetProgrammesDataAction): void;
     setSectors(params: SetSectorsAction): void;
     setIndicators(params: SetIndicatorsAction): void;
+    setMapLayers(params: SetMapLayersAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
@@ -108,6 +112,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     programmeRequest: RestRequest;
     sectorRequest: RestRequest;
     indicatorsRequest: RestRequest;
+    mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
 
@@ -181,6 +186,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.startRequestForProgrammesData();
         this.startRequestForSectors();
         this.startRequestForIndicators();
+        this.startRequestForMapLayers();
     }
 
     componentWillUnmount() {
@@ -204,6 +210,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
         if (this.indicatorsRequest) {
             this.indicatorsRequest.stop();
+        }
+        if (this.mapLayersRequest) {
+            this.mapLayersRequest.stop();
         }
     }
 
@@ -277,6 +286,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
         this.indicatorsRequest = indicatorsRequest.create();
         this.indicatorsRequest.start();
+    }
+
+    startRequestForMapLayers = () => {
+        if (this.mapLayersRequest) {
+            this.mapLayersRequest.stop();
+        }
+        const mapLayersRequest = new MapLayersGetRequest({
+            setState: params => this.setState(params),
+            setMapLayers: this.props.setMapLayers,
+        });
+        this.mapLayersRequest = mapLayersRequest.create();
+        this.mapLayersRequest.start();
     }
 
     startRequestForCountryGeoJson = (
@@ -496,6 +517,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
         dispatch(setProgrammesDataAction(params)),
     setSectors: (params: SetSectorsAction) => dispatch(setSectorsAction(params)),
     setIndicators: (params: SetIndicatorsAction) => dispatch(setIndicatorsAction(params)),
+    setMapLayers: (params: SetMapLayersAction) => dispatch(setMapLayersAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

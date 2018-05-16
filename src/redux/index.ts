@@ -10,3 +10,4 @@ export * from './reducers/domainData/sector';
 export * from './reducers/domainData/country';
 export * from './reducers/domainData/dashboard';
 export * from './reducers/domainData/indicator';
+export * from './reducers/domainData/mapLayer';

@@ -37,6 +37,7 @@ export interface DomainData {
     countriesData: CountryData[];
     dashboardFilter: DashboardFilter;
     indicators: Indicator[];
+    mapLayers: MapLayer[];
 }
 
 export interface Notify {
@@ -162,6 +163,7 @@ export interface DashboardFilterParams {
     programmeId?: number;
     sectorId?: number;
     indicatorId?: number;
+    mapLayerId?: number;
 }
 
 export interface DashboardFilter {
@@ -181,4 +183,18 @@ export interface Indicator {
 
 export interface SetIndicatorsAction {
     indicators: Indicator[];
+}
+
+// Map Layer
+
+export interface MapLayer {
+    id: number;
+    layerName: string;
+    type: string;
+    file: string;
+    sectors: { code: string }[];
+}
+
+export interface SetMapLayersAction {
+    mapLayers: MapLayer[];
 }

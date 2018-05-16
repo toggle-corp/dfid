@@ -46,7 +46,6 @@ export default class CountryGeoJsonGetRequest implements Request<CountryGeoParam
                     geoJsonIdKey,
                     geoJsonLabelKey,
                     geoJson: response,
-                    loadingGeoJson: false,
                 });
             })
             .build();

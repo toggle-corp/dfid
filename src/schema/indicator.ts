@@ -1,6 +1,6 @@
 import { SchemaGroup } from './interface';
 
-const sectorsSchema: SchemaGroup = [];
+const indicatorSchema: SchemaGroup = [];
 
 {
     const name = 'indicator';
@@ -13,7 +13,7 @@ const sectorsSchema: SchemaGroup = [];
             name: { type: 'string', required: true },
         },
     };
-    sectorsSchema.push({ name, schema });
+    indicatorSchema.push({ name, schema });
 }
 
-export default sectorsSchema;
+export default indicatorSchema;

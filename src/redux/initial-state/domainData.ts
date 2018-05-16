@@ -17,6 +17,7 @@ const initialDomainDataState: DomainData = {
     },
 
     indicators: [],
+    mapLayers: [],
 };
 
 export default initialDomainDataState;

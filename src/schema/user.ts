@@ -9,9 +9,9 @@ const userSchema: SchemaGroup = [];
             name: 'User',
         },
         fields: {
-            id: { type: 'uint', required: 'true' },
-            username: { type: 'email', required: 'true' },
-            email: { type: 'email', required: 'true' },
+            id: { type: 'uint', required: true },
+            username: { type: 'email', required: true },
+            email: { type: 'email', required: true },
             firstName: { type: 'string' },
             lastName: { type: 'string' },
             displayName: { type: 'string' },
