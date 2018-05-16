@@ -140,7 +140,7 @@ export class Filter extends React.PureComponent<Props, State>{
             <PrimaryButton
                 title="Expand"
                 onClick={this.handleToggleHidden}
-                iconName={iconNames.expand}
+                iconName={iconNames.filter}
             />
         </div>
     )

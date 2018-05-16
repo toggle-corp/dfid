@@ -6,7 +6,7 @@ const iconNames: Readonly<{
     overflowHorizontal: 'ion-android-more-horizontal',
     logout: 'ion-log-out',
     close: 'ion-android-close',
-    expand: 'ion-arrow-expand',
+    filter: 'fa fa-filter',
 };
 
 export default iconNames;

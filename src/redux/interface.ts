@@ -58,6 +58,12 @@ export interface ProgrammeName {
     programName: string;
 }
 
+export interface ProgrammeSectorName {
+    sectorId: number;
+    sectorName: string;
+}
+
+
 export interface ProvinceData {
     id: number;
     province: string;
@@ -75,6 +81,7 @@ export interface ProvinceData {
     gdp: number;
     activeProgrammes: ProgrammeName[];
     totalBudget: number;
+    description: string;
 }
 
 export interface ProgrammeData {
@@ -83,6 +90,7 @@ export interface ProgrammeData {
     programBudget: number;
     description: string;
     programId: number;
+    sectors: ProgrammeSectorName[];
 }
 
 // Province

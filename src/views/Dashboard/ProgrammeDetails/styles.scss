@@ -1,0 +1,67 @@
+@import '../../../stylesheets/base';
+
+%base {
+    border-bottom: $width-separator-thin solid $color-separator;
+
+    .title {
+        flex-shrink: 0;
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: $spacing-medium;
+    }
+
+    .content {
+        display: table;
+        padding: $spacing-small;
+        width: 100%;
+        font-size: $font-size-medium-alt;
+    }
+}
+
+.message {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    justify-content: center;
+    color: $color-text-disabled;
+}
+
+
+.programme-details {
+    @extend %base;
+    .item {
+        display: table-row;
+
+        &:nth-child(odd){
+            background-color: $color-background-row-alt;
+        }
+
+        .label {
+            display: table-cell;
+            padding: $spacing-small $spacing-medium;
+            white-space: nowrap;
+            color: $color-text-label;
+        }
+
+        .value {
+            display: table-cell;
+            padding: $spacing-small $spacing-medium;
+            font-size: $font-size-large;
+
+            &.sector {
+                .sector-name {
+                    display: flex;
+
+                    .marker {
+                        align-self: flex-start;
+                        flex-shrink: 0;
+                        margin-right: $spacing-extra-small-alt;
+                    }
+
+                    >.title {
+                        flex-grow: 1;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -84,7 +84,7 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
         { key: 'province', label: 'Province' },
         {
             key: 'totalPopulation',
-            label: 'Province',
+            label: 'Total Population',
             value: (
                 <Numeral
                     className={styles.value}
@@ -189,7 +189,7 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
             <div className={styles.label}>
                 {label}
             </div>
-            <div className={styles.data}>
+            <div className={styles.value}>
                 {value || '-'}
             </div>
         </div>
@@ -223,7 +223,6 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
         }
 
         return (
-            // TODO: Fix the styles
             <div className={styles.provinceDetails}>
                 <div
                     className={styles.content}
