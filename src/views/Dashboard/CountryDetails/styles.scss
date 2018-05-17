@@ -1,44 +1,17 @@
 @import '../../../stylesheets/base';
 
-%base {
-    border-bottom: $width-separator-thin solid $color-separator;
+.country-details {
+    border-left: $width-separator-thin solid $color-separator;
 
     .title {
         flex-shrink: 0;
         border-bottom: $width-separator-thin solid $color-accent;
-        padding: $spacing-medium;
+        padding: $spacing-small $spacing-medium;
     }
 
     .content {
         display: table;
-        padding: $spacing-small;
         width: 100%;
         font-size: $font-size-medium-alt;
     }
-}
-
-
-.country-details {
-    @extend %base;
-    .item {
-        display: table-row;
-
-        &:nth-child(odd){
-            background-color: $color-background-row-alt;
-        }
-
-        .label {
-            display: table-cell;
-            padding: $spacing-small $spacing-medium;
-            white-space: nowrap;
-            color: $color-text-label;
-        }
-
-        .value {
-            display: table-cell;
-            padding: $spacing-small $spacing-medium;
-            font-size: $font-size-large;
-        }
-    }
-
 }

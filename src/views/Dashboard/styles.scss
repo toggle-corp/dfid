@@ -1,146 +1,26 @@
 @import '../../stylesheets/base';
 
+$width-right-panel: 460px;
+
 .dashboard {
+    @extend %main-content;
     display: flex;
-    width: 100%;
-    height: 100%;
+
+    >.left {
+        flex-grow: 1;
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+    }
 
     >.right {
         display: flex;
-        flex-basis: 30%;
+        flex-basis: $width-right-panel;
         flex-direction: column;
-        background-color: $color-foreground-alt;
-        width: 100%;
-
-        %base {
-            border-bottom: $width-separator-thin solid $color-separator;
-
-            >.title {
-                flex-shrink: 0;
-                border-bottom: $width-separator-thin solid $color-accent;
-                padding: $spacing-medium;
-            }
-
-            .content {
-                display: table;
-                width: 100%;
-                font-size: $font-size-medium-alt;
-            }
-        }
-
-        .details {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-
-            .tabs {
-                flex-shrink: 0;
-            }
-
-            .message {
-                display: flex;
-                align-items: center;
-                flex-grow: 1;
-                justify-content: center;
-                color: $color-text-disabled;
-            }
-
-            .province-details,
-            .programme-details {
-                @extend %base;
-
-                .item {
-                    display: table-row;
-
-                    &:nth-child(odd) {
-                        background-color: $color-background-row-alt;
-                    }
-
-                    .label {
-                        display: table-cell;
-                        padding: $spacing-small;
-                        white-space: nowrap;
-                        color: $color-text-label;
-                    }
-
-                    .data {
-                        display: table-cell;
-                        padding: $spacing-small $spacing-medium;
-
-                        .value {
-                            padding: 0;
-
-                            &.programme {
-                                .programme-name {
-                                    display: flex;
-
-                                    .marker {
-                                        align-self: flex-start;
-                                        flex-shrink: 0;
-                                        margin-right: $spacing-extra-small-alt;
-                                    }
-
-                                    >.title {
-                                        flex-grow: 1;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-
-            .sector-details {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-                height: 100%;
-
-                .message {
-                    display: flex;
-                    align-items: center;
-                    flex-grow: 1;
-                    justify-content: center;
-                    color: $color-text-disabled;
-                }
-
-            }
-        }
-
-    }
-
-    >.left {
-        flex-basis: 70%;
-
-        .map-container {
-            display: flex;
-            height: 100%;
-
-            .map {
-                flex-basis: 100%;
-            }
-
-            .overlay {
-                @include shadow-medium;
-                display: flex;
-                position: absolute;
-                top: 5%;
-                left: 40%;
-                flex-direction: column;
-                border: $width-separator-thin solid $color-accent;
-                background-color: $color-foreground-alt;
-                opacity: .6;
-
-                .province-name,
-                .program-name,
-                .sector-name {
-                    padding: $spacing-small;
-                    font-size: $font-size-large;
-                    font-weight: $font-weight-bold;
-                }
-            }
-        }
+        flex-grow: 0;
+        flex-shrink: 0;
+        background-color: $color-foreground;
     }
 }

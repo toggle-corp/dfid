@@ -1,14 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { dashboardSectorSelector } from '../../../redux';
+import Message from '../../../vendor/react-store/components/View/Message';
 
+import { dashboardSectorSelector } from '../../../redux';
 import {
     RootState,
     Sector,
 } from '../../../redux/interface';
 
-import styles from '../styles.scss';
+import styles from './styles.scss';
 
 interface OwnProps {
     loading?: boolean;
@@ -24,19 +25,6 @@ interface State {
 }
 
 export class SectorDetailInfo extends React.PureComponent<Props, State>{
-
-    static renderLoadingMessage = () => (
-        <div className={styles.message}>
-            <h3> Loading... </h3>
-        </div>
-    )
-
-    static renderSelectSectorMessage = () => (
-        <div className={styles.message}>
-            <h3> Select a sector </h3>
-        </div>
-    )
-
     render() {
         const {
             // loading,
@@ -44,19 +32,27 @@ export class SectorDetailInfo extends React.PureComponent<Props, State>{
         } = this.props;
 
         if (!selectedSector.id) {
-            return SectorDetailInfo.renderSelectSectorMessage();
+            return (
+                <Message className={styles.message}>
+                    Select a sector
+                </Message>
+            );
         }
 
         /*
         if (loading) {
-            return SectorDetailInfo.renderLoadingMessage();
+            return (
+                <Message className={styles.message}>
+                    Loading...
+                </Message>
+            );
         }
         */
 
         return (
-            <div className={styles.message}>
-                <h3> Data Not Available</h3>
-            </div>
+            <Message className={styles.message}>
+                Data not available
+            </Message>
         );
     }
 }

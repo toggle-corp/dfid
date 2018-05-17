@@ -37,7 +37,7 @@ interface Data {
     municipalitiesCovered: number;
     totalProjects: number;
     totalSectors: number;
-    totalBudget: number;
+    totalBudget: string;
 }
 
 interface Item {
@@ -64,50 +64,50 @@ export class Landing extends React.PureComponent<Props, State> {
                 id: 1,
                 name: 'Province 1',
                 image: province1Image,
-                noOfActiveProjects: 2,
-                totalBudget: 2759366,
+                noOfActiveProjects: 5,
+                totalBudget: undefined,
             },
             2: {
                 id: 2,
                 name: 'Province 2',
                 image: province2Image,
                 noOfActiveProjects: 3,
-                totalBudget: 38342,
+                totalBudget: undefined,
             },
             3: {
                 id: 3,
                 name: 'Province 3',
                 image: province3Image,
-                noOfActiveProjects: 4,
-                totalBudget: 8464567,
+                noOfActiveProjects: 3,
+                totalBudget: undefined,
             },
             4: {
                 id: 4,
                 name: 'Province 4',
                 image: province4Image,
-                noOfActiveProjects: 1,
-                totalBudget: 263947,
+                noOfActiveProjects: 2,
+                totalBudget: undefined,
             },
             5: {
                 id: 5,
                 name: 'Province 5',
                 image: province5Image,
-                noOfActiveProjects: 1,
-                totalBudget: 1937492,
+                noOfActiveProjects: 3,
+                totalBudget: undefined,
             },
             6: {
                 id: 6,
                 name: 'Province 6',
                 image: province6Image,
-                noOfActiveProjects: 4,
-                totalBudget: 173933,
+                noOfActiveProjects: 2,
+                totalBudget: undefined,
             },
             7: {
                 id: 7,
                 name: 'Province 7',
                 image: province7Image,
-                noOfActiveProjects: 6,
-                totalBudget: 1331321,
+                noOfActiveProjects: 1,
+                totalBudget: undefined,
             },
         };
 
@@ -117,7 +117,7 @@ export class Landing extends React.PureComponent<Props, State> {
             municipalitiesCovered:756,
             totalProjects: 12,
             totalSectors: 11,
-            totalBudget: 49793430,
+            totalBudget: '4.98 M',
         };
     }
 
@@ -222,10 +222,7 @@ export class Landing extends React.PureComponent<Props, State> {
             className={styles.item}
         >
             <div className={styles.value}>
-                <Numeral
-                    value={data.value}
-                    precision={0}
-                />
+                {data.value || '-'}
             </div>
             <div className={styles.label}>
                 {data.label || '-'}

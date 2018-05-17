@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 
 import { iconNames } from '../../../constants';
 import SelectInput from '../../../vendor/react-store/components/Input/SelectInput';
+import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
+import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 
@@ -161,7 +163,7 @@ export class Filter extends React.PureComponent<Props, State>{
 
         return (
             <Faram
-                className={styles.filters}
+                className={styles.filtersContainer}
                 onChange={this.handleFaramChange}
                 onValidationFailure={this.handleFaramFailure}
                 onValidationSuccess={this.handleFaramSuccess}
@@ -170,80 +172,80 @@ export class Filter extends React.PureComponent<Props, State>{
                 error={faramErrors}
                 disabled={disabled}
             >
-                <div className={styles.title}>
-                    <h3>
-                        filters
-                    </h3>
-                    <PrimaryButton
+                <header className={styles.header}>
+                    <DangerButton
                         title="Close"
                         onClick={this.handleToggleHidden}
                         iconName={iconNames.close}
                         className={styles.close}
                         transparent
                     />
-                </div>
-                <div className={styles.clear}>
-                    <PrimaryButton
-                        title="Clear Filter"
+                    <WarningButton
+                        title="Clear all"
                         onClick={this.handleClearFilter}
                         transparent
                     >
-                        Clear Filter
-                    </PrimaryButton>
+                        Clear all
+                    </WarningButton>
+                </header>
+                <div className={styles.filters}>
+                    <h4 className={styles.heading}>
+                        Filters
+                    </h4>
+                    <div className={styles.content}>
+                        <SelectInput
+                            label="Province"
+                            className={styles.input}
+                            faramElementName="provinceId"
+                            options={provinces}
+                            keySelector={Filter.provinceKeyExtractor}
+                            labelSelector={Filter.provinceKeyExtractor}
+                            showHintAndError={false}
+                        />
+                        <SelectInput
+                            label="Programme"
+                            className={styles.input}
+                            options={programmes}
+                            faramElementName="programmeId"
+                            keySelector={Filter.programmeKeyExtractor}
+                            labelSelector={Filter.programmeLabelExtractor}
+                            showHintAndError={false}
+                        />
+                        <SelectInput
+                            label="Sector"
+                            className={styles.input}
+                            options={sectors}
+                            faramElementName="sectorId"
+                            keySelector={Filter.sectorKeyExtractor}
+                            labelSelector={Filter.sectorLabelExtractor}
+                            showHintAndError={false}
+                        />
+                    </div>
                 </div>
-                <div className={styles.left}>
-                    <SelectInput
-                        label="Province"
-                        className={styles.province}
-                        faramElementName="provinceId"
-                        options={provinces}
-                        keySelector={Filter.provinceKeyExtractor}
-                        labelSelector={Filter.provinceKeyExtractor}
-                        showHintAndError={false}
-                    />
-                    <SelectInput
-                        label="Programme"
-                        className={styles.programme}
-                        options={programmes}
-                        faramElementName="programmeId"
-                        keySelector={Filter.programmeKeyExtractor}
-                        labelSelector={Filter.programmeLabelExtractor}
-                        showHintAndError={false}
-                    />
-                    <SelectInput
-                        label="Sector"
-                        className={styles.sector}
-                        options={sectors}
-                        faramElementName="sectorId"
-                        keySelector={Filter.sectorKeyExtractor}
-                        labelSelector={Filter.sectorLabelExtractor}
-                        showHintAndError={false}
-                    />
-                </div>
-                <div className={styles.title}>
-                    <h3>
-                        Sub-filters
-                    </h3>
-                </div>
-                <div className={styles.right}>
-                    <SelectInput
-                        label="Indicator"
-                        className={styles.indicator}
-                        options={indicators}
-                        faramElementName="indicatorId"
-                        keySelector={Filter.indicatorKeyExtractor}
-                        labelSelector={Filter.indicatorLabelExtractor}
-                        showHintAndError={false}
-                    />
-                    <SelectInput
-                        label="Map Layers"
-                        className={styles.layers}
-                        options={mapLayers}
-                        faramElementName="mapLayerId"
-                        keySelector={Filter.mapLayerKeyExtractor}
-                        labelSelector={Filter.mapLayerLabelExtractor}
-                        showHintAndError={false}
-                    />
+                <div className={styles.layers}>
+                    <h4 className={styles.heading}>
+                        Layers
+                    </h4>
+                    <div className={styles.content}>
+                        <SelectInput
+                            label="Indicator"
+                            className={styles.input}
+                            options={indicators}
+                            faramElementName="indicatorId"
+                            keySelector={Filter.indicatorKeyExtractor}
+                            labelSelector={Filter.indicatorLabelExtractor}
+                            showHintAndError={false}
+                        />
+                        <SelectInput
+                            label="Map Layers"
+                            className={styles.input}
+                            options={mapLayers}
+                            faramElementName="mapLayerId"
+                            keySelector={Filter.mapLayerKeyExtractor}
+                            labelSelector={Filter.mapLayerLabelExtractor}
+                            showHintAndError={false}
+                        />
+                    </div>
                 </div>
             </Faram>
         );

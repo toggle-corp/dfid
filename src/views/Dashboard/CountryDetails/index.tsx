@@ -14,13 +14,16 @@ import {
     setCountriesDataAction,
 } from '../../../redux';
 
-import Numeral from '../../../vendor/react-store/components/View/Numeral';
+// import Numeral from '../../../vendor/react-store/components/View/Numeral';
 
 import CountriesDataGetRequest from '../requests/CountriesDataGetRequest';
+import Item from '../Item';
 
-import * as styles from './styles.scss';
+import styles from './styles.scss';
 
-interface OwnProps {}
+interface OwnProps {
+    className?: string;
+}
 interface PropsFromState {
     countryData: CountryData;
 }
@@ -74,147 +77,71 @@ export class CountryDetails extends React.PureComponent<Props, State>{
             <div
                 className={styles.content}
             >
-                <div
-                    className={styles.item}
-                    key="provinces"
-                >
-                    <div className={styles.label}>
-                        Provinces
-                    </div>
-                    <div className={styles.value}>
-                        {data.provinces || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="municipalities"
-                >
-                    <div className={styles.label}>
-                       Municipalities
-                    </div>
-                    <div className={styles.value}>
-                        {data.municipalities || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="paalikas"
-                >
-                    <div className={styles.label}>
-                       Paalikas
-                    </div>
-                    <div className={styles.value}>
-                        {data.paalikas || '-'} </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="totalPopulation"
-                >
-                    <div className={styles.label}>
-                        Total population
-                    </div>
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        value={data.totalPopulation}
-                    />
-                </div>
-                <div
-                    className={styles.item}
-                    key="area"
-                >
-                    <div className={styles.label}>
-                        Area (sq.km)
-                    </div>
-                    <div className={styles.value}>
-                        {data.area || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="populationDensity"
-                >
-                    <div className={styles.label}>
-                        Population Density
-                    </div>
-                    <div className={styles.value}>
-                        {data.populationDensity || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="povertyRate"
-                >
-                    <div className={styles.label}>
-                        Poverty Rate
-                    </div>
-                    <div className={styles.value}>
-                        {data.povertyRate || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="literacyRate"
-                >
-                    <div className={styles.label}>
-                        Literacy Rate
-                    </div>
-                    <div className={styles.value}>
-                        {data.literacyRate || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="populationUnderPovertyLine"
-                >
-                    <div className={styles.label}>
-                        Population Under Poverty
-                    </div>
-                    <div className={styles.value}>
-                        {data.populationUnderPovertyLine || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="perCapitaIncome"
-                >
-                    <div className={styles.label}>
-                        Per Capita Income
-                    </div>
-                    <div className={styles.value}>
-                        {data.perCapitaIncome || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="humanDevelopmentIndex"
-                >
-                    <div className={styles.label}>
-                        HDI
-                    </div>
-                    <div className={styles.value}>
-                        {data.humanDevelopmentIndex || '-'}
-                    </div>
-                </div>
-                <div
-                    className={styles.item}
-                    key="gdp"
-                >
-                    <div className={styles.label}>
-                        GDP
-                    </div>
-                    <div className={styles.value}>
-                        {data.gdp || '-'}
-                    </div>
-                </div>
+                <Item
+                    label="Provinces"
+                    value={data.provinces}
+                />
+                <Item
+                    label="Municipalities"
+                    value={data.municipalities}
+                />
+                <Item
+                    label="Paalikas"
+                    value={data.paalikas}
+                />
+                <Item
+                    label="Total population"
+                    value={data.totalPopulation}
+                />
+                <Item
+                    label="Area (sq.km)"
+                    value={data.area}
+                />
+                <Item
+                    label="Population Density"
+                    value={data.populationDensity}
+                />
+                <Item
+                    label="Poverty Rate"
+                    value={data.povertyRate}
+                />
+                <Item
+                    label="Literacy Rate"
+                    value={data.literacyRate}
+                />
+                <Item
+                    label="Population Under Poverty"
+                    value={data.populationUnderPovertyLine}
+                />
+                <Item
+                    label="Per Capita Income"
+                    value={data.perCapitaIncome}
+                />
+                <Item
+                    label="HDI"
+                    value={data.humanDevelopmentIndex}
+                />
+                <Item
+                    label="GDP"
+                    value={data.gdp}
+                />
             </div>
         );
     }
 
     render() {
+        const { className } = this.props;
+
         // tslint:disable-next-line variable-name
         const Details = this.renderCountryDetailInfo;
 
+        const classNames = [
+            className,
+            styles.countryDetails,
+        ];
+
         return (
-            <div className={styles.countryDetails}>
+            <div className={classNames.join(' ')}>
                 <h3 className={styles.title}>
                     Country details
                 </h3>

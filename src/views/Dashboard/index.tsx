@@ -144,18 +144,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.defaultHash = 'province';
 
         this.routes = {
-            province: 'Province Details',
-            programme: 'Programme Details',
-            sector: 'Sector Details',
+            province: 'Province',
+            programme: 'Programme',
+            sector: 'Sector',
         };
 
         this.views = {
             province: {
                 component: () => (
-                        <ProvinceDetailInfo
-                            loading={this.state.loadingProvinceData}
-                        />
-                    ),
+                    <ProvinceDetailInfo
+                        loading={this.state.loadingProvinceData}
+                    />
+                ),
             },
 
             programme: {
@@ -388,12 +388,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
-    renderSectorDetailInfo = () => (
-        <div className={styles.message}>
-            <h3> Data Not Available</h3>
-        </div>
-    )
-
     renderInformation = () => {
         const {
             selectedProvince,
@@ -402,19 +396,20 @@ export class Dashboard extends React.PureComponent<Props, State>{
         } = this.props;
 
         const showCountryDetails = !(
-            selectedProgramme.id || selectedProvince.id || selectedSector.id
+            selectedProgramme.id
+            || selectedProvince.id
+            || selectedSector.id
         );
 
         if (showCountryDetails) {
             return (
-                <CountryDetails />
+                <CountryDetails className={styles.right} />
             );
         }
 
         return (
-            <div className={styles.details} >
+            <div className={styles.right} >
                 <FixedTabs
-                    className={styles.tabs}
                     useHash
                     replaceHistory
                     tabs={this.routes}
@@ -431,12 +426,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
     render() {
         // tslint:disable-next-line variable-name
         const Information = this.renderInformation;
-
-        const {
-            selectedProvince,
-            selectedProgramme,
-            selectedSector,
-        } = this.props;
 
         const {
             geoJson,
@@ -461,42 +450,20 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
-                    <div className={styles.mapContainer}>
-                        {loadingGeoJson && <LoadingAnimation />}
-                        <Filter
-                            disabled={loading}
-                            onChange={this.handleFilterChange}
-                        />
-                        <Map
-                            className={styles.map}
-                            geojson={geoJson}
-                            idKey={geoJsonIdKey}
-                            labelKey={geoJsonLabelKey}
-                            onClick={this.handleMapClick}
-                        />
-
-                        <div className={styles.overlay}>
-                            { selectedProvince.id &&
-                                <span className={styles.provinceName}>
-                                    {selectedProvince.name}
-                                </span>
-                            }
-                            { selectedProgramme.id &&
-                                    <span className={styles.programName}>
-                                    {selectedProgramme.name}
-                                    </span>
-                            }
-                            { selectedSector.id &&
-                                    <span className={styles.sectorName}>
-                                    {selectedSector.name}
-                                    </span>
-                            }
-                        </div>
-                    </div>
+                    {loadingGeoJson && <LoadingAnimation />}
+                    <Filter
+                        disabled={loading}
+                        onChange={this.handleFilterChange}
+                    />
+                    <Map
+                        className={styles.map}
+                        geojson={geoJson}
+                        idKey={geoJsonIdKey}
+                        labelKey={geoJsonLabelKey}
+                        onClick={this.handleMapClick}
+                    />
                 </div>
-                <div className={styles.right}>
-                    <Information />
-                </div>
+                <Information />
             </div>
         );
     }
