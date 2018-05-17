@@ -10,9 +10,13 @@
         flex-basis: 70%;
         flex-direction: column;
         background-color: $color-foreground;
+        background-image: url('../../resources/img/background.png');
 
         .overview {
             background-color: $color-background-alt;
+            background-image: url('../../resources/img/background.png');
+            flex-grow: 1;
+
             .logo {
                 display: block;
                 align-self: flex-start;
@@ -21,6 +25,8 @@
             }
 
             .content {
+                @include transition-medium;
+                @include shadow-small;
                 display: flex;
                 align-content: center;
                 align-items: center;
@@ -29,21 +35,31 @@
                 justify-content: center;
 
                 .item {
-                    flex-basis: calc(calc(100% / 3) - #{2 * $spacing-extra-large}); 
+                    flex-basis: calc(calc(100% / 3) - #{2 * $spacing-extra-large} - 40px); 
                     margin: $spacing-extra-large;
                     border: $width-separator-thin solid $color-accent;
                     padding: $spacing-extra-large;
+                    background-color: rgba(0,0,0, 0.5);
+                    color: $color-text-on-dark;
 
                     .label {
                         color: $color-text-label;
                         font-size: $font-size-large;
                         font-weight: $font-weight-bold;
+                        color: $color-text-on-dark;
                     }
 
                     .value {
                         color: $color-accent;
                         font-size: $font-size-ultra-large-alt;
                         font-weight: $font-weight-light;
+                        color: $color-text-on-dark;
+                    }
+
+                    &:hover {
+                        @include transition-medium;
+                        @include shadow-medium;
+                        opacity: 1;
                     }
                 }
             }
@@ -52,12 +68,14 @@
         .bottom-content {
             display: flex;
             border-top: $width-separator-thin solid $color-separator;
-            background-color: $color-background-alt;
-            padding: $spacing-medium 0;
+            background-color: rgba(0,0,0, 0.9);
+            color: $color-text-on-dark;
+            flex-shrink: 0;
 
             .about {
+                padding: $spacing-medium 0;
                 flex-basis: 50%;
-                border-right: $width-separator-thin solid $color-separator;
+                border-right: $width-separator-thin solid $color-accent;
 
                 .title {
                     padding: $spacing-medium;
@@ -65,7 +83,7 @@
 
                 .content {
                     padding: $spacing-medium;
-                    line-height: 1.5;
+                    line-height: 1.6;
                 }
             }
 
@@ -85,7 +103,6 @@
 
     .right {
         flex-basis: 30%;
-        background-color: $color-foreground-alt;
 
         >.title {
             border-bottom: $width-separator-thin solid $color-accent;
@@ -99,12 +116,12 @@
                 display: flex;
                 align-items: center;
                 border-bottom: $width-separator-thin solid $color-separator;
-                border-left: $width-separator-medium solid $color-separator;
+                border-left: $width-separator-thick solid $color-separator;
                 text-transform: none;
 
                 &:hover {
                     border-left-color: $color-accent;
-                    background-color: $color-background-hover;
+                    background-color: darken($color-background-hover, 20%);
                 }
 
                 .image {
@@ -160,10 +177,11 @@
     .footer {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         flex-basis: 100%;
-        background-color: #414141;
+        background-color: $color-foreground-dark;
         padding: 0 $spacing-medium;
-        height: 158px;
+        height: 100px;
         color: $color-text-on-dark;
 
         .title {
