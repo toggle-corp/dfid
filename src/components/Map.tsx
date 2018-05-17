@@ -9,6 +9,12 @@ interface MapMouseEvent extends mapboxgl.MapMouseEvent {
     features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
 }
 
+export interface Layer {
+    geoJson: GeoJSON;
+    type: string;
+    key: string;
+}
+
 interface OwnProps {
     className: string;
     geojson: GeoJSON;
@@ -23,6 +29,8 @@ interface OwnProps {
 
     selections?: Selections;
     onClick?(key: string): void;
+
+    layers?: Layer[];
 }
 
 type Props = OwnProps;
@@ -43,6 +51,7 @@ const defaultProps = {
 
     selections: [],
     onClick: undefined,
+    layers: [],
 };
 
 const getInFilter = (key: string, values?: Selections) => {
@@ -56,6 +65,27 @@ const getInFilter = (key: string, values?: Selections) => {
     return ['in', key, ...values];
 };
 
+const sameArrays = (a1?: any[], a2?: any[]) => {
+    if (a1 === a2) {
+        return false;
+    }
+
+    if (!a1 || !a2) {
+        return false;
+    }
+
+    if (a1.length !== a2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < a1.length; i += 1) {
+        if (a1[i] !== a2[i]) {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 export default class Map extends React.PureComponent<Props, States> {
     mounted: boolean;
@@ -104,7 +134,8 @@ export default class Map extends React.PureComponent<Props, States> {
     }
 
     componentWillReceiveProps(nextProps: Props) {
-        if (this.props.geojson !== nextProps.geojson) {
+        if (this.props.geojson !== nextProps.geojson ||
+            !sameArrays(this.props.layers, nextProps.layers)) {
             this.loadMapLayers(nextProps);
             return;
         }
@@ -236,6 +267,7 @@ export default class Map extends React.PureComponent<Props, States> {
             colorMapping,
             geojson, idKey, selections,
             strokeColor,
+            layers,
         } = props;
 
         if (!map || !geojson) {
@@ -304,12 +336,43 @@ export default class Map extends React.PureComponent<Props, States> {
         });
 
         this.layers = [
-            ...this.layers,
             'geojson-stroke',
             'geojson-fill',
             'geojson-hover',
             'geojson-selected',
         ];
+
+        if (layers) {
+            layers.forEach((layer) => {
+                map.addSource(layer.key, {
+                    type: 'geojson',
+                    data: layer.geoJson,
+                });
+                this.sources.push(layer.key);
+
+                if (layer.type === 'Polygon') {
+                    map.addLayer({
+                        id: layer.key,
+                        type: 'line',
+                        source: layer.key,
+                        paint: {
+                            'line-color': '#FFA80D',
+                            'line-width': 2,
+                        },
+                    });
+                } else {
+                    map.addLayer({
+                        id: layer.key,
+                        type: 'circle',
+                        source: layer.key,
+                        paint: {
+                            'circle-color': '#FFA80D',
+                        },
+                    });
+                }
+                this.layers.push(layer.key);
+            });
+        }
     }
 
     flyToBounds = (geoJson: GeoJSON) => {
