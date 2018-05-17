@@ -51,6 +51,10 @@ export interface ErrorsFromForm {
     formErrors: FormErrors;
 }
 
+export interface ErrorsFromFaram {
+    faramErrors: FaramErrors;
+}
+
 export interface ValuesFromForm {
     [key: string]: any; // tslint:disable-line no-any
 }

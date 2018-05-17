@@ -1,6 +1,6 @@
 import { SpecificMiddleware, MiddlewareAPI, Action, Dispatch } from 'redux';
 import Manager from './Manager';
-import TokenRefresher from './tasks/TokenRefresher';
+// import TokenRefresher from './tasks/TokenRefresher';
 import { RootState } from '../../../redux/interface';
 
 export const enum TASK_MANAGER_ACTION {
@@ -21,8 +21,8 @@ interface MyAction extends Action {
 const taskManager: SpecificMiddleware<RootState> = (store: MiddlewareAPI<RootState>) => {
     const manager = new Manager('background');
 
-    const tokenRefresher = new TokenRefresher(store);
-    manager.add(tokenRefresher);
+    // const tokenRefresher = new TokenRefresher(store);
+    // manager.add(tokenRefresher);
 
     return (next: Dispatch<RootState>) => <A extends MyAction>(action: A): A => {
         switch (action.type) {

@@ -20,7 +20,7 @@ import Multiplexer from './Multiplexer';
 
 interface OwnProps {}
 interface PropsFromDispatch {
-    setAccessToken(access: string): void;
+    setAccessToken(access: string, userId: number): void;
     startTasks(): void;
 }
 interface State {
@@ -39,15 +39,17 @@ export class App extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { pending: true };
+        this.state = { pending: false };
     }
 
+    /*
     componentWillMount() {
         if (this.props.authenticated) {
             this.refreshRequest = this.createRequestForRefresh();
             this.refreshRequest.start();
         }
     }
+    */
 
     componentWillUnmount() {
         if (this.refreshRequest) {
@@ -61,12 +63,12 @@ export class App extends React.PureComponent<Props, State> {
         const refreshRequest = new FgRestBuilder()
             .url(urlForTokenRefresh)
             .params(() => createParamsForTokenRefresh({ refresh }))
-            .success((response: { access: string }) => {
+            .success((response: { access: string, userId: number }) => {
                 try {
                     schema.validate(response, 'tokenRefreshResponse');
-                    const { access } = response;
+                    const { access, userId } = response;
                     this.props.startTasks();
-                    this.props.setAccessToken(access);
+                    this.props.setAccessToken(access, userId);
                     this.setState({ pending: false });
                 } catch (er) {
                     console.error(er);
@@ -107,7 +109,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
-    setAccessToken: (access: string) => dispatch(setAccessTokenAction(access)),
+    setAccessToken: (access: string, userId: number) =>
+        dispatch(setAccessTokenAction(access, userId)),
     startTasks: () => dispatch(startTasksAction()),
 });
 

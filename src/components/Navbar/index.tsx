@@ -16,7 +16,7 @@ import {
 import { CloakSettings } from '../../constants/routes/interface';
 
 import NavMenu from './NavMenu';
-// import NavDrop from './NavDrop';
+import NavDrop from './NavDrop';
 import * as styles from './styles.scss';
 
 const defaultProps = {
@@ -128,12 +128,10 @@ class Navbar extends React.PureComponent<Props, State> {
                     links={this.validNavLinks}
                     className={styles.mainMenu}
                 />
-                {/* FIXME: commented out for now
                 <NavDrop
                     links={this.validDropLinks}
                     className={styles.userMenu}
                 />
-                */}
             </nav>
         );
     }

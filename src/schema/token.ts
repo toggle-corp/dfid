@@ -28,8 +28,9 @@ const tokenSchema: SchemaGroup = [];
             description: 'Response for POST /token/',
         },
         fields: {
-            access: { type: 'string', required: 'true' },
-            refresh: { type: 'string', required: 'true' },
+            email: { type: 'string' },
+            token: { type: 'string', required: true },
+            userId: { type: 'uint', required: true },
         },
     };
     tokenSchema.push({ name, schema });

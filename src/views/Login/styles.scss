@@ -25,7 +25,7 @@ $color-text-on-primary: get-text-color($color-primary);
         }
     }
 
-    .login-form-container {
+    .login-faram-container {
         display: flex;
         position: relative;
         flex-direction: column;
@@ -81,7 +81,7 @@ $color-text-on-primary: get-text-color($color-primary);
             }
         }
 
-        .login-form {
+        .login-faram {
             @include background-color($color-foreground);
             padding: $spacing-small $spacing-large $spacing-large;
             width: 100%;

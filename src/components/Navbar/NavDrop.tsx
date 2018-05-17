@@ -102,12 +102,9 @@ class NavDrop extends React.PureComponent<Props, State> {
 
     render() {
         const {
-            activeUser,
             links,
             className,
         } = this.props;
-
-        const userName = activeUser.displayName || 'Anon';
 
         const renderFn = () => (
             <DropdownGroup>
@@ -125,7 +122,6 @@ class NavDrop extends React.PureComponent<Props, State> {
             <DropdownMenu
                 className={className}
                 iconName={iconNames.person}
-                title={userName}
             >
                 <DropdownGroup>
                     <List

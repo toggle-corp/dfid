@@ -12,6 +12,7 @@ export interface Notification {
 export interface Token {
     access?: string;
     refresh?: string;
+    userId?: number;
 }
 
 export interface ActiveUser {
