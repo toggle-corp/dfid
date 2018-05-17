@@ -20,10 +20,10 @@
 .filters-container {
     @extend %float-position;
     position: absolute;
+    opacity: .9;
     z-index: 1;
     background-color: $color-foreground-alt;
     width: 292px;
-    opacity: .9;
 
     .header {
         display: flex;

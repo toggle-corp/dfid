@@ -41,7 +41,6 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface States {
     faramErrors: FaramErrors;
-    faramFieldErrors: FaramErrors;
     faramValues: AuthParams;
     pending: boolean;
     pristine: boolean;
@@ -61,7 +60,6 @@ export class Login extends React.PureComponent<Props, States> {
 
         this.state = {
             faramErrors: {},
-            faramFieldErrors: {},
             faramValues: {} as AuthParams,
             pending: false,
             pristine: false,
@@ -90,20 +88,18 @@ export class Login extends React.PureComponent<Props, States> {
     // FORM RELATED
 
     handleFaramChange = (
-        values: AuthParams, faramFieldErrors: FaramErrors, faramErrors: FaramErrors,
+        values: AuthParams, faramErrors: FaramErrors,
     ) => {
         this.setState({
             faramErrors,
-            faramFieldErrors,
             faramValues: values,
             pristine: true,
         });
     }
 
-    handleFaramError = (faramFieldErrors: FaramErrors, faramErrors: FaramErrors) => {
+    handleFaramError = (faramErrors: FaramErrors) => {
         this.setState({
             faramErrors,
-            faramFieldErrors,
             pristine: true,
         });
     }
