@@ -8,6 +8,8 @@ import {
     Sector,
     CountryData,
     DashboardFilter,
+    Indicator,
+    MapLayer,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -44,6 +46,14 @@ export const countriesDataSelector = ({ domainData }: RootState): CountryData[] 
 
 export const dashboardFilterSelector = ({ domainData }: RootState): DashboardFilter => (
     domainData.dashboardFilter || emptyFaram
+);
+
+export const indicatorsSelector = ({ domainData }: RootState): Indicator[] => (
+    domainData.indicators || emptyArray
+);
+
+export const mapLayersSelector = ({ domainData }: RootState): MapLayer[] => (
+    domainData.mapLayers || emptyArray
 );
 
 // NOTE: Server sends array of country in which first is always Nepal.

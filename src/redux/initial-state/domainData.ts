@@ -13,7 +13,11 @@ const initialDomainDataState: DomainData = {
     dashboardFilter: {
         faramValues: {},
         faramErrors: {},
+        isHidden: false,
     },
+
+    indicators: [],
+    mapLayers: [],
 };
 
 export default initialDomainDataState;

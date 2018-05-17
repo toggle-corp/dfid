@@ -13,6 +13,8 @@ import {
     programmesSelector,
     provincesSelector,
     dashboardFilterSelector,
+    indicatorsSelector,
+    mapLayersSelector,
 } from '../../../redux';
 
 import {
@@ -20,6 +22,8 @@ import {
     Province,
     Programme,
     Sector,
+    Indicator,
+    MapLayer,
     SetDashboardFilterAction,
     DashboardFilterParams,
     DashboardFilter,
@@ -40,6 +44,8 @@ interface PropsFromState {
     programmes: Programme[];
     provinces: Province[];
     sectors: Sector[];
+    indicators: Indicator[];
+    mapLayers: MapLayer[];
     faramState: DashboardFilter;
 }
 interface PropsFromDispatch {
@@ -48,46 +54,33 @@ interface PropsFromDispatch {
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
-interface State {
-    isHidden: boolean;
-}
-
-interface Option {
-    key: number;
-    label: string;
-}
-
-const noOp = () => {};
+interface State {}
 
 export class Filter extends React.PureComponent<Props, State>{
     schema: Schema;
 
-    indicatorOptions: Option[];
     static provinceKeyExtractor = (p: Province) => p.id;
     static programmeKeyExtractor = (p: Programme) => p.id;
     static programmeLabelExtractor = (p: Programme) => p.name;
     static sectorKeyExtractor = (p: Sector) => p.id;
     static sectorLabelExtractor = (p: Sector) => p.name;
+    static indicatorKeyExtractor = (p: Indicator) => p.id;
+    static indicatorLabelExtractor = (p: Indicator) => p.name;
+    static mapLayerKeyExtractor = (p: MapLayer) => p.id;
+    static mapLayerLabelExtractor = (p: MapLayer) => p.layerName;
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            isHidden: true,
-        };
 
         this.schema = {
             fields: {
                 provinceId: [],
                 programmeId: [],
                 sectorId: [],
+                indicatorId: [],
+                mapLayerId: [],
             },
         };
-
-        this.indicatorOptions = [
-            { key: 1, label: 'HDI' },
-            { key: 2, label: 'Population density' },
-        ];
     }
 
     componentWillReceiveProps(nextProps: Props) {
@@ -120,8 +113,8 @@ export class Filter extends React.PureComponent<Props, State>{
     }
 
     handleToggleHidden = () => {
-        this.setState({
-            isHidden: !this.state.isHidden,
+        this.props.setDashboardFilters({
+            isHidden: !this.props.faramState.isHidden,
         });
     }
 
@@ -149,15 +142,17 @@ export class Filter extends React.PureComponent<Props, State>{
         const {
             disabled,
             faramState,
+            provinces,
+            programmes,
+            sectors,
+            indicators,
+            mapLayers,
         } = this.props;
-
-        const {
-            isHidden,
-        } = this.state;
 
         const {
             faramValues,
             faramErrors,
+            isHidden,
         } = faramState;
 
         if (isHidden) {
@@ -201,31 +196,28 @@ export class Filter extends React.PureComponent<Props, State>{
                         label="Province"
                         className={styles.province}
                         faramElementName="provinceId"
-                        options={this.props.provinces}
+                        options={provinces}
                         keySelector={Filter.provinceKeyExtractor}
                         labelSelector={Filter.provinceKeyExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Programme"
                         className={styles.programme}
-                        options={this.props.programmes}
+                        options={programmes}
                         faramElementName="programmeId"
                         keySelector={Filter.programmeKeyExtractor}
                         labelSelector={Filter.programmeLabelExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Sector"
                         className={styles.sector}
-                        options={this.props.sectors}
+                        options={sectors}
                         faramElementName="sectorId"
                         keySelector={Filter.sectorKeyExtractor}
                         labelSelector={Filter.sectorLabelExtractor}
                         showHintAndError={false}
-                        disabled={disabled}
                     />
                 </div>
                 <div className={styles.title}>
@@ -237,18 +229,20 @@ export class Filter extends React.PureComponent<Props, State>{
                     <SelectInput
                         label="Indicator"
                         className={styles.indicator}
-                        options={this.indicatorOptions}
+                        options={indicators}
+                        faramElementName="indicatorId"
+                        keySelector={Filter.indicatorKeyExtractor}
+                        labelSelector={Filter.indicatorLabelExtractor}
                         showHintAndError={false}
-                        onChange={noOp}
-                        disabled={disabled}
                     />
                     <SelectInput
                         label="Map Layers"
                         className={styles.layers}
-                        options={this.indicatorOptions}
+                        options={mapLayers}
+                        faramElementName="mapLayerId"
+                        keySelector={Filter.mapLayerKeyExtractor}
+                        labelSelector={Filter.mapLayerLabelExtractor}
                         showHintAndError={false}
-                        onChange={noOp}
-                        disabled={disabled}
                     />
                 </div>
             </Faram>
@@ -260,6 +254,8 @@ const mapStateToProps = (state: RootState) => ({
     sectors: sectorsSelector(state),
     programmes: programmesSelector(state),
     provinces: provincesSelector(state),
+    indicators: indicatorsSelector(state),
+    mapLayers: mapLayersSelector(state),
     faramState: dashboardFilterSelector(state),
 });
 
