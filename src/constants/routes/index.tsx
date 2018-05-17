@@ -28,8 +28,7 @@ export const routes: Map<RouteSetting> = {
 
     landing: {
         order: 3,
-        // type: ROUTE.private, FIXME:
-        type: ROUTE.public,
+        type: ROUTE.private,
         path: '/',
         loader: () => import('../../views/Landing'),
         links: allLinks,
@@ -37,8 +36,7 @@ export const routes: Map<RouteSetting> = {
 
     dashboard: {
         order: 4,
-        // type: ROUTE.private, FIXME:
-        type: ROUTE.public,
+        type: ROUTE.private,
         path: '/dashboard',
         loader: () => import('../../views/Dashboard'),
         links: allLinks,
@@ -46,8 +44,7 @@ export const routes: Map<RouteSetting> = {
 
     explore: {
         order: 5,
-        // type: ROUTE.private, FIXME:
-        type: ROUTE.public,
+        type: ROUTE.private,
         path: '/explore',
         loader: () => import('../../views/Explore'),
         links: allLinks,

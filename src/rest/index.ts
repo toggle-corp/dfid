@@ -1,4 +1,8 @@
-import { ErrorsFromServer, ErrorsFromForm } from './interface';
+import {
+    ErrorsFromServer,
+    ErrorsFromForm,
+    FaramErrors,
+} from './interface';
 
 export const transformResponseErrorToFormError = (errors: ErrorsFromServer): ErrorsFromForm => {
     const {
@@ -20,6 +24,30 @@ export const transformResponseErrorToFormError = (errors: ErrorsFromServer): Err
     );
     return { formFieldErrors, formErrors };
 };
+
+interface ServerError {
+    [key: string]: string[];
+}
+
+// XXX: Uses Faram API
+export const alterResponseErrorToFaramError = (errors: ServerError): FaramErrors => {
+    const { nonFieldErrors = [], ...formFieldErrorList } = errors;
+
+    return Object.keys(formFieldErrorList).reduce(
+        (acc, key) => {
+            acc[key] = formFieldErrorList[key].join(' ');
+            return acc;
+        },
+        {
+            $internal: nonFieldErrors,
+        },
+    );
+};
+
+// XXX: Uses Faram API
+export const alterAndCombineResponseError = (errors: ServerError) => (
+    Object.values(alterResponseErrorToFaramError(errors))
+);
 
 export * from './token';
 export * from './user';

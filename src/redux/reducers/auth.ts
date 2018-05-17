@@ -1,11 +1,16 @@
-import jwtDecode from 'jwt-decode';
+// import jwtDecode from 'jwt-decode';
 
 import update from '../../vendor/react-store/utils/immutable-update';
 import createReducerWithMap from '../../utils/createReducerWithMap';
 
-import { Auth, Token, ActiveUser, ReducerGroup } from '../interface';
+import {
+    Auth,
+    Token,
+    // ActiveUser,
+    ReducerGroup,
+} from '../interface';
 import initialAuthState from '../initial-state/auth';
-import schema from '../../schema';
+// import schema from '../../schema';
 
 // ACTION-TYPE
 
@@ -18,9 +23,10 @@ export const enum AUTH_ACTION {
 
 // ACTION-CREATOR
 
-export const loginAction = ({ access, refresh }: Token) => ({
+export const loginAction = ({ access, refresh, userId }: Token) => ({
     access,
     refresh,
+    userId,
     type: AUTH_ACTION.login,
 });
 
@@ -32,13 +38,15 @@ export const logoutAction = () => ({
     type: AUTH_ACTION.logout,
 });
 
-export const setAccessTokenAction = (access: string) => ({
+export const setAccessTokenAction = (access: string, userId: number) => ({
     access,
+    userId,
     type: AUTH_ACTION.setAccessToken,
 });
 
 // HELPER
 
+/*
 const decodeAccessToken = (access: string) => {
     const decodedToken: ActiveUser = jwtDecode(access);
     try {
@@ -55,18 +63,24 @@ const decodeAccessToken = (access: string) => {
         return {};
     }
 };
+ */
 
 // REDUCER
 
-const login = (state: Auth, action: { type: string, access: string, refresh: string}) => {
-    const { access, refresh } = action;
-    const decodedToken = decodeAccessToken(access);
+const login = (
+    state: Auth,
+    action: { userId: number, access: string, refresh: string},
+) => {
+    const { access, refresh, userId } = action;
+    // const decodedToken = decodeAccessToken(access);
     const settings = {
         token: { $set: {
             access,
             refresh,
         } },
-        activeUser: { $set: decodedToken },
+        activeUser: { $auto: {
+            userId: { $set: userId },
+        } },
     };
     return update(state, settings);
 };
@@ -80,14 +94,16 @@ const authenticate = (state: Auth) => {
 
 const logout = () => initialAuthState;
 
-const setAccessToken = (state: Auth, action: { type: string, access: string }) => {
-    const { access } = action;
-    const decodedToken = decodeAccessToken(access);
+const setAccessToken = (state: Auth, action: { userId: number, access: string }) => {
+    const { access, userId } = action;
+    // const decodedToken = decodeAccessToken(access);
     const settings = {
         token: { $merge: {
             access,
         } },
-        activeUser: { $set: decodedToken },
+        activeUser: { $auto: {
+            userId: { $set: userId },
+        } },
     };
     return update(state, settings);
 };

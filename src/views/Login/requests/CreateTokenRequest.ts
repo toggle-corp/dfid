@@ -7,7 +7,7 @@ import { Login } from '../index';
 import { Token } from '../../../redux/interface';
 import {
     createParamsForTokenCreate,
-    transformResponseErrorToFormError,
+    alterResponseErrorToFaramError,
     urlForTokenCreate,
 } from '../../../rest';
 import { ErrorsFromServer } from '../../../rest/interface';
@@ -48,11 +48,11 @@ export default class CreateTokenRequest implements Request<AuthParams> {
             .preLoad(() => {
                 this.props.setState({ pending: true, pristine: false });
             })
-            .success((response: { access: string, refresh: string }) => {
+            .success((response: { token: string, refresh: string, userId: number }) => {
                 try {
                     schema.validate(response, 'tokenGetResponse');
-                    const { refresh, access } = response;
-                    this.props.login({ refresh, access });
+                    const { refresh, token: access, userId } = response;
+                    this.props.login({ refresh, access, userId });
                     // TODO: call refresher here
                     this.props.setState({ pending: false });
 
@@ -64,19 +64,15 @@ export default class CreateTokenRequest implements Request<AuthParams> {
                 }
             })
             .failure((response: { errors: ErrorsFromServer }) => {
-                const {
-                    formFieldErrors,
-                    formErrors,
-                } = transformResponseErrorToFormError(response.errors);
+                const faramErrors = alterResponseErrorToFaramError(response.errors);
                 this.props.setState({
-                    formErrors,
-                    formFieldErrors,
+                    faramErrors,
                     pending: false,
                 });
             })
             .fatal(() => {
                 this.props.setState({
-                    formErrors: { errors: ['Some error occured.'] },
+                    faramErrors: { $internal: ['Some error occured.'] },
                     pending: false,
                 });
             })

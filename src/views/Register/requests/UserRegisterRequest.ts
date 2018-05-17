@@ -6,7 +6,7 @@ import {
 import { Register } from '../index';
 import {
     createParamsForUserRegister,
-    transformResponseErrorToFormError,
+    alterResponseErrorToFaramError,
     urlForUsers,
 } from '../../../rest';
 import { ErrorsFromServer } from '../../../rest/interface';
@@ -20,7 +20,7 @@ interface Request<T> {
 export interface RegisterParams {
     firstName: string;
     lastName: string;
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -35,43 +35,49 @@ export default class UserRegisterRequest implements Request<RegisterParams> {
         this.props = props;
     }
 
+    success = (response: { access: string, refresh: string }) => {
+        try {
+            schema.validate(response, 'userPostResponse');
+            this.props.setState({ success: true });
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    failure = (response: { errors: ErrorsFromServer }) => {
+        try {
+            const faramErrors = alterResponseErrorToFaramError(response.errors);
+            this.props.setState({
+                faramErrors,
+                pending: false,
+            });
+        } catch {
+            this.fatal();
+        }
+    }
+
+    fatal = () => {
+        this.props.setState({
+            faramErrors: { $internal: ['Some error occured.'] },
+            pending: false,
+        });
+    }
+
     // REGISTER REST API
-    create = ({ firstName, lastName, username, password }: RegisterParams): RestRequest => {
+    create = ({ firstName, lastName, email, password }: RegisterParams): RestRequest => {
         const userLoginRequest = new FgRestBuilder()
             .url(urlForUsers)
             .params(createParamsForUserRegister({
                 firstName,
                 lastName,
                 password,
-                username,
+                email,
             }))
             .preLoad(() => { this.props.setState({ pending: true }); })
             .postLoad(() => { this.props.setState({ pending: false }); })
-            .success((response: { access: string, refresh: string }) => {
-                try {
-                    schema.validate(response, 'userPostResponse');
-                    this.props.setState({ success: true });
-                } catch (err) {
-                    console.error(err);
-                }
-            })
-            .failure((response: { errors: ErrorsFromServer }) => {
-                const {
-                    formFieldErrors,
-                    formErrors,
-                } = transformResponseErrorToFormError(response.errors);
-                this.props.setState({
-                    formErrors,
-                    formFieldErrors,
-                    pending: false,
-                });
-            })
-            .fatal(() => {
-                this.props.setState({
-                    formErrors: { errors: ['Some error occured.'] },
-                    pending: false,
-                });
-            })
+            .success(this.success)
+            .failure(this.failure)
+            .fatal(this.fatal)
             .build();
         return userLoginRequest;
     }

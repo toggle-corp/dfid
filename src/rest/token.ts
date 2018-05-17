@@ -5,7 +5,7 @@ import {
 } from '../config/rest';
 import { RestPostBody } from './interface';
 
-export const urlForTokenCreate: string = `${wsEndpoint}/token/`;
+export const urlForTokenCreate: string = `${wsEndpoint}/api-token-auth/`;
 export const createParamsForTokenCreate = (
     { username, password }:
     { username: string, password: string },

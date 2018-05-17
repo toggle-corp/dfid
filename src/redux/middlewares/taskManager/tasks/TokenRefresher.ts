@@ -55,11 +55,11 @@ export default class TokenRefresher implements AbstractTask {
         const refreshRequest = new BgRestBuilder()
             .url(urlForTokenRefresh)
             .params(() => createParamsForTokenRefresh({ refresh }))
-            .success((response: { access: string }) => {
+            .success((response: { access: string, userId: number }) => {
                 try {
                     schema.validate(response, 'tokenRefreshResponse');
-                    const { access } = response;
-                    store.dispatch(setAccessTokenAction(access));
+                    const { access, userId } = response;
+                    store.dispatch(setAccessTokenAction(access, userId));
 
                     // call itself again
                     this.scheduleRefreshCheck();
