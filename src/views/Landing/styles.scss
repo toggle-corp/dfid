@@ -4,17 +4,14 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    background-image: url('../../resources/img/background.png');
 
     .left {
         display: flex;
         flex-basis: 70%;
         flex-direction: column;
-        background-color: $color-foreground;
-        background-image: url('../../resources/img/background.png');
 
         .overview {
-            background-color: $color-background-alt;
-            background-image: url('../../resources/img/background.png');
             flex-grow: 1;
 
             .logo {
@@ -39,7 +36,7 @@
                     margin: $spacing-extra-large;
                     border: $width-separator-thin solid $color-accent;
                     padding: $spacing-extra-large;
-                    background-color: rgba(0,0,0, 0.5);
+                    background-color: rgba(0, 0, 0, 0.77);
                     color: $color-text-on-dark;
 
                     .label {
@@ -68,7 +65,7 @@
         .bottom-content {
             display: flex;
             border-top: $width-separator-thin solid $color-separator;
-            background-color: rgba(0,0,0, 0.9);
+            background-color: rgba(0, 0, 0, 0.77);
             color: $color-text-on-dark;
             flex-shrink: 0;
 
@@ -103,9 +100,11 @@
 
     .right {
         flex-basis: 30%;
+        background-color: $color-background;
 
         >.title {
             border-bottom: $width-separator-thin solid $color-accent;
+            background-color: $color-foreground;
             padding: $spacing-medium;
         }
 

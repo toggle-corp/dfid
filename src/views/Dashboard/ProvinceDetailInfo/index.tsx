@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import ListView from '../../../vendor/react-store/components/View/List/ListView';
+import Message from '../../../vendor/react-store/components/View/Message';
 import {
     dashboardProvinceDataSelector,
     dashboardProvinceSelector,
@@ -15,7 +16,9 @@ import {
     ProgrammeName,
 } from '../../../redux/interface';
 
-import styles from '../styles.scss';
+import Item from '../Item'; 
+
+import styles from './styles.scss';
 
 interface OwnProps {
     loading?: boolean;
@@ -28,207 +31,164 @@ interface PropsFromState {
 type Props = OwnProps & PropsFromState;
 
 interface State {
-    provinceData: object;
 }
 
-interface ProvinceField {
-    key: string;
-    label: string;
-    value?: object | string | number;
-}
+const marker = '•';
+
+const renderProgrammeName = (k: undefined, data: ProgrammeName) => (
+    <div
+        key={data.programID}
+        className={styles.programmeName}
+    >
+        <span className={styles.marker}>
+            {marker}
+        </span>
+        <span className={styles.title}>
+            {data.programName}
+        </span>
+    </div>
+);
+const renderActiveProgrammes = (data = []) => (
+    <ListView
+        className={styles.programme}
+        data={data}
+        modifier={renderProgrammeName}
+    />
+);
+
+const renderPound = (data: number) => (
+    <Numeral
+        precision={0}
+        value={data}
+        prefix="£"
+    />
+);
+const renderDollar = (data: number) => (
+    <Numeral
+        precision={0}
+        value={data}
+        prefix="$"
+    />
+);
+const renderNumeral = (data: number) => (
+    <Numeral
+        precision={0}
+        value={data}
+    />
+);
 
 export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
-    constructor(props: Props) {
-        super(props);
-
-        const { selectedProvinceData } = props;
-        const {
-            generateProvinceDataDetailInfo,
-            getProvinceFields,
-        } = ProvinceDetailInfo;
-        const provinceData = generateProvinceDataDetailInfo(
-            getProvinceFields(selectedProvinceData),
-            selectedProvinceData,
-        );
-        this.state = { provinceData };
-    }
-
-    componentWillReceiveProps(nextProps: Props) {
-        const { selectedProvinceData } = nextProps;
-        if (this.props.selectedProvinceData !== selectedProvinceData) {
-            const {
-                generateProvinceDataDetailInfo,
-                getProvinceFields,
-            } = ProvinceDetailInfo;
-            const provinceData = generateProvinceDataDetailInfo(
-                getProvinceFields(selectedProvinceData),
-                selectedProvinceData,
-            );
-            this.setState({ provinceData });
-        }
-    }
-
-    static generateProvinceDataDetailInfo = (
-        items: ProvinceField[], provinceData: ProvinceData,
-    ) => (
-        items.map(item =>
-            ProvinceDetailInfo.renderProvinceField({
-                key: item.key,
-                label: item.label,
-                value: item.value || provinceData[item.key],
-            }),
-        )
-    )
-
-    static getProvinceFields = (data: ProvinceData) => [
-        { key: 'province', label: 'Province' },
-        {
-            key: 'totalPopulation',
-            label: 'Total Population',
-            value: (
-                <Numeral
-                    className={styles.value}
-                    precision={0}
-                    value={data.totalPopulation}
-                />
-            ),
-        },
-        { key: 'district', label: 'No. of Districts' },
-        {
-            key: 'area',
-            label: 'Area (sq.km)',
-            value: (
-                <Numeral
-                    className={styles.value}
-                    precision={0}
-                    value={data.area}
-                />
-            ),
-        },
-        { key: 'populationDensity', label: 'Population Density' },
-        { key: 'povertyRate', label: 'Poverty Rate' },
-        {
-            key: 'populationUnderPovertyLine',
-            label: 'Population Under Poverty',
-            value: (
-                <Numeral
-                    className={styles.value}
-                    precision={0}
-                    value={data.populationUnderPovertyLine}
-                />
-            ),
-        },
-        {
-            key: 'perCapitaIncome',
-            label: 'No. of Districts',
-            value: (
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="$"
-                        value={data.perCapitaIncome}
-                    />
-            ),
-        },
-        { key: 'hhByLowestWealthQuantiles', label: 'HH By Lowest Wealth Quantiles' },
-        { key: 'humanDevelopmentIndex', label: 'HDI' },
-        { key: 'minuteAccessTo', label: 'Minute Access To' },
-        { key: 'vulnerabilityIndex', label: 'Vulnerability Index' },
-        {
-            key: 'gdp',
-            label: 'GDP',
-            value: (
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="$"
-                        value={data.gdp}
-                    />
-            ),
-        },
-        {
-            key: 'programmeName',
-            label: 'Active Programmes',
-            value: (
-                    <ListView
-                        className={`${styles.value} ${styles.programme}`}
-                        data={data.activeProgrammes}
-                        modifier={ProvinceDetailInfo.renderProgrammeName}
-                    />
-            ),
-        },
-        {
-            key: 'totalBudget',
-            label: 'Total Budget',
-            value: (
-                    <Numeral
-                        className={styles.value}
-                        precision={0}
-                        prefix="£"
-                        value={data.totalBudget}
-                    />
-            ),
-        },
-    ]
-
-    static renderProgrammeName = (k: undefined, data: ProgrammeName) => (
-        <div
-            key={data.programID}
-            className={styles.programmeName}
-        >
-            <span className={styles.marker}>•</span>
-            <span className={styles.title}>{data.programName}</span>
-        </div>
-    )
-
-    static renderProvinceField = ({ key, label, value }: ProvinceField) => (
-        <div
-            className={styles.item}
-            key={key}
-        >
-            <div className={styles.label}>
-                {label}
-            </div>
-            <div className={styles.value}>
-                {value || '-'}
-            </div>
-        </div>
-    )
-
-    static renderSelectProvinceMessage = () => (
-        <div className={styles.message}>
-            <h3> Select a province </h3>
-        </div>
-    )
-
-    static renderLoadingMessage = () => (
-        <div className={styles.message}>
-            Loading Province Information ...
-        </div>
-    )
-
     render() {
         const {
             loading,
             selectedProvince,
+            selectedProvinceData,
         } = this.props;
-        const { provinceData } = this.state;
 
         if (!selectedProvince.id) {
-            return ProvinceDetailInfo.renderSelectProvinceMessage();
+            return (
+                <Message>
+                    Select a province
+                </Message>
+            );
         }
 
         if (loading) {
-            return ProvinceDetailInfo.renderLoadingMessage();
+            return (
+                <Message>
+                    Loading province information...
+                </Message>
+            );
         }
+
+        const {
+            province,
+            totalPopulation,
+            district,
+            area,
+            populationDensity,
+            // programmeName,
+            povertyRate,
+            populationUnderPovertyLine,
+            perCapitaIncome,
+            hhByLowestWealthQuantiles,
+            humanDevelopmentIndex,
+            minuteAccessTo,
+            vulnerabilityIndex,
+            gdp,
+            totalBudget,
+            activeProgrammes,
+        } = selectedProvinceData;
 
         return (
             <div className={styles.provinceDetails}>
-                <div
-                    className={styles.content}
-                >
-                    {provinceData}
-                </div>
+                <Item
+                    label="Province"
+                    value={province}
+                />
+                <Item
+                    label="Total population"
+                    value={totalPopulation}
+                    valueModifier={renderNumeral}
+                />
+                <Item
+                    label="No. of districts"
+                    value={district}
+                />
+                <Item
+                    label="Area (sq.km)"
+                    value={area}
+                    valueModifier={renderNumeral}
+                />
+                <Item
+                    label="Population density"
+                    value={populationDensity}
+                />
+                <Item
+                    label="Poverty rate"
+                    value={povertyRate}
+                />
+                <Item
+                    label="Population under poverty"
+                    value={populationUnderPovertyLine}
+                    valueModifier={renderNumeral}
+                />
+                <Item
+                    label="Per capita income"
+                    value={perCapitaIncome}
+                    valueModifier={renderDollar}
+                />
+                <Item
+                    label="HH by lowest wealth quantiles"
+                    value={hhByLowestWealthQuantiles}
+                />
+                <Item
+                    label="HDI"
+                    value={humanDevelopmentIndex}
+                />
+                <Item
+                    label="Minute access to"
+                    value={minuteAccessTo}
+                />
+                <Item
+                    label="Vulnerability index"
+                    value={vulnerabilityIndex}
+                />
+                <Item
+                    label="GDP"
+                    value={gdp}
+                    valueModifier={renderDollar}
+                />
+                <Item
+                    label="Active programmes"
+                    value={activeProgrammes}
+                    valueModifier={renderActiveProgrammes}
+                />
+                <Item
+                    label="Total budget"
+                    value={totalBudget}
+                    valueModifier={renderPound}
+                />
             </div>
         );
     }

@@ -61,7 +61,6 @@ body {
             @include background-color($color-background);
             position: relative;
             perspective: 1000px;
-            padding: $spacing-small-alt;
             height: calc(100vh - #{$height-navbar});
             overflow-y: auto;
         }

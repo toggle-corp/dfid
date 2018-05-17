@@ -1,6 +1,13 @@
 @import '../../../stylesheets/base';
 
+%float-position {
+    top: $spacing-medium;
+    left: $spacing-medium;
+    box-shadow: 0 $spacing-extra-small $radius-blur-large $radius-spread-medium $color-shadow-medium;
+}
+
 .popup {
+    @extend %float-position;
     display: flex;
     position: absolute;
     z-index: 1;
@@ -10,60 +17,53 @@
     }
 }
 
-.filters {
-    display: flex;
+.filters-container {
+    @extend %float-position;
     position: absolute;
-    flex-direction: column;
     z-index: 1;
     background-color: $color-foreground-alt;
-    padding: $spacing-medium;
-    width: 300px;
+    width: 292px;
+    opacity: .9;
 
-    >.title {
+    .header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        border-bottom: $width-separator-thin solid $color-accent;
-        padding: $spacing-medium;
 
         .close {
+            padding: $spacing-small $spacing-medium;
+            font-size: $font-size-large;
+
             &:hover {
                 background-color: $color-background-hover;
             }
         }
     }
 
-    .clear {
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
-        margin: $spacing-small 0;
+    %content {
+        border-top: $width-separator-thin solid $color-separator;
 
-        button:hover {
-            background-color: $color-background-hover;
+        .heading {
+            background-color: $color-background-header;
+            padding: $spacing-small $spacing-medium;
+        }
+
+        .content {
+            padding: $spacing-medium;
+            padding-top: 0;
+
+            .input {
+                margin: $spacing-small 0;
+            }
         }
     }
 
-
-    .left {
-        display: flex;
-        flex-direction: column;
-
-        .province,
-        .programme,
-        .sector, {
-            margin: $spacing-medium 0;
-            padding: $spacing-small;
-        }
+    .layers {
+        @extend %content;
     }
 
-    .right {
-        flex-shrink: 0;
-
-        .indicator,
-        .layers {
-            margin: $spacing-medium 0;
-            padding: $spacing-small;
-        }
+    .filters {
+        @extend %content;
     }
 
 }

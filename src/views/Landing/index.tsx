@@ -37,7 +37,7 @@ interface Data {
     municipalitiesCovered: number;
     totalProjects: number;
     totalSectors: number;
-    totalBudget: number;
+    totalBudget: string;
 }
 
 interface Item {
@@ -117,7 +117,7 @@ export class Landing extends React.PureComponent<Props, State> {
             municipalitiesCovered:756,
             totalProjects: 12,
             totalSectors: 11,
-            totalBudget: 49793430,
+            totalBudget: '4.98 M',
         };
     }
 
@@ -222,10 +222,7 @@ export class Landing extends React.PureComponent<Props, State> {
             className={styles.item}
         >
             <div className={styles.value}>
-                <Numeral
-                    value={data.value}
-                    precision={0}
-                />
+                {data.value || '-'}
             </div>
             <div className={styles.label}>
                 {data.label || '-'}
