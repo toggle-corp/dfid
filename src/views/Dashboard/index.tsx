@@ -98,8 +98,10 @@ interface State {
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
-    mapLayerGeoJson?: GeoJSON;
-    mapLayerType: string;
+
+    mapLayers: {
+        [key: string]: Layer;
+    };
 }
 
 interface Routes {
@@ -123,7 +125,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
     mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
-    mapLayerGeoJsonRequest: RestRequest;
+    mapLayerGeoJsonRequests: {
+        [key: string]: RestRequest;
+    };
 
     geoJsons: {
         [key: string]: GeoJSON,
@@ -148,8 +152,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
-            mapLayerGeoJson: undefined,
-            mapLayerType: '',
+            mapLayers: {},
         };
 
         this.defaultHash = 'province';
@@ -181,13 +184,16 @@ export class Dashboard extends React.PureComponent<Props, State>{
         };
 
         this.geoJsons = {};
+        this.mapLayerGeoJsonRequests = {};
     }
 
     componentDidMount() {
         this.startRequestForProvinceData();
         this.startRequestForProvinces();
         this.reloadGeoJson();
+        this.reloadMunicipalities();
         this.reloadMapLayer();
+        this.reloadProgramLayer();
         this.startRequestForProgrammes();
         this.startRequestForProgrammesData();
         this.startRequestForSectors();
@@ -211,9 +217,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
         }
-        if (this.mapLayerGeoJsonRequest) {
-            this.mapLayerGeoJsonRequest.stop();
-        }
+        Object.values(this.mapLayerGeoJsonRequests).forEach(
+            r => r.stop(),
+        );
         if (this.sectorRequest) {
             this.sectorRequest.stop();
         }
@@ -330,23 +336,33 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     startRequestForMapLayerGeoJson = (
+        key: string,
         url: string,
         type: string,
+        color?: string,
+        highlightKey?: string,
     ) => {
-        if (this.mapLayerGeoJsonRequest) {
-            this.mapLayerGeoJsonRequest.stop();
+        if (this.mapLayerGeoJsonRequests[key]) {
+            this.mapLayerGeoJsonRequests[key].stop();
         }
 
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
-            setState: params => this.setState(params),
+            setMapLayerGeoJson: (geoJson: GeoJSON) => {
+                const mapLayers = { ...this.state.mapLayers };
+                mapLayers[key] = {
+                    key,
+                    geoJson,
+                    type,
+                    color,
+                    highlightKey,
+                };
+                this.setState({ mapLayers });
+            },
             setGeoJsons: this.setGeoJsons,
         });
 
-        this.mapLayerGeoJsonRequest = mapLayerGeoJsonRequest.create({
-            url,
-            type,
-        });
-        this.mapLayerGeoJsonRequest.start();
+        this.mapLayerGeoJsonRequests[key] = mapLayerGeoJsonRequest.create({ url });
+        this.mapLayerGeoJsonRequests[key].start();
     }
 
     setGeoJsons = (url: string, geoJsons: GeoJSON) => {
@@ -358,14 +374,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (oldValues.provinceId !== provinceId) {
             this.handleProvinceChange(provinceId);
         }
-        if (programmeId && oldValues.programmeId !== values.programmeId) {
-            window.location.hash = '#/programme';
-        }
-        if (sectorId && oldValues.sectorId !== values.sectorId) {
+        if (sectorId && oldValues.sectorId !== sectorId) {
             window.location.hash = '#/sector';
         }
-        if (oldValues.mapLayerId !== values.mapLayerId) {
+        if (oldValues.mapLayerId !== mapLayerId) {
             this.handleMapLayerChange(mapLayerId);
+        }
+        if (oldValues.programmeId !== programmeId) {
+            this.handleProgramChange(programmeId);
         }
     }
 
@@ -373,16 +389,21 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (key) {
             window.location.hash = '#/province';
         }
-        this.setState(
-            {
-                loadingGeoJson: true,
-            },
-            this.reloadGeoJson,
-        );
+        this.setState({ loadingGeoJson: true }, () => {
+            this.reloadGeoJson();
+            this.reloadMunicipalities();
+        });
     }
 
     handleMapLayerChange = (layerId?: number) => {
         this.reloadMapLayer();
+    }
+
+    handleProgramChange = (programmeId?: number) => {
+        if (programmeId) {
+            window.location.hash = '#/programme';
+        }
+        this.reloadProgramLayer();
     }
 
     reloadGeoJson = () => {
@@ -415,28 +436,97 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.startRequestForCountryGeoJson(url, idKey, labelKey);
     }
 
-    reloadMapLayer = () => {
-        const { selectedMapLayer } = this.props;
-        if (!selectedMapLayer.id || !selectedMapLayer.file) {
-            this.setState({
-                mapLayerGeoJson: undefined,
-            });
+    reloadMunicipalities = () => {
+        const key = 'municipalities';
+        const { selectedProvince } = this.props;
+        if (selectedProvince.id) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
             return;
         }
 
-        console.log('Selecting layer: ', selectedMapLayer);
-        const url = selectedMapLayer.file;
+        const url = 'http://139.59.67.104:4000/core/geojson/municipalities/';
+        const type = 'Line';
+        const color = '#ffffff';
 
         if (this.geoJsons[url]) {
-            this.setState({
-                mapLayerGeoJson: this.geoJsons[url],
-                mapLayerType: selectedMapLayer.type,
-            });
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                color,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
             return;
         }
 
-        this.startRequestForMapLayerGeoJson(url, selectedMapLayer.type);
+        this.startRequestForMapLayerGeoJson(key, url, type, color);
     }
+
+    reloadMapLayer = () => {
+        const key = 'map-layer';
+        const { selectedMapLayer } = this.props;
+        if (!selectedMapLayer.id || !selectedMapLayer.file) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
+            return;
+        }
+
+        const url = selectedMapLayer.file;
+        let type = selectedMapLayer.type;
+        if (type === 'Polygon') {
+            type = 'Fill';
+        }
+        const color = '#ffa80d';
+
+        if (this.geoJsons[url]) {
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                color,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
+            return;
+        }
+
+        this.startRequestForMapLayerGeoJson(key, url, type, color);
+    }
+
+    reloadProgramLayer = () => {
+        const key = 'program-layer';
+        const { selectedProgramme } = this.props;
+
+        if (selectedProgramme.id !== 6) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
+            return;
+        }
+
+        const url = 'http://139.59.67.104:4000/core/geojson/ipssj/';
+        const highlightKey = 'ActLevel';
+        const type = 'Fill';
+
+        if (this.geoJsons[url]) {
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                highlightKey,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
+            return;
+        }
+
+        this.startRequestForMapLayerGeoJson(key, url, type, undefined, highlightKey);
+    }
+
 
     handleMapClick = (key: string) => {
         const { selectedProvince, setDashboardProvince } = this.props;
@@ -488,8 +578,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson,
             geoJsonLabelKey,
             geoJsonIdKey,
-            mapLayerGeoJson,
-            mapLayerType,
+            mapLayers,
             loadingProvinceData,
             loadingProgrammeData,
             // loadingSectorData,
@@ -506,15 +595,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingIndicators // || loadingSectorData
         );
 
-        const mapLayers: Layer[] = [];
-        if (mapLayerGeoJson) {
-            mapLayers.push({
-                geoJson: mapLayerGeoJson,
-                key: 'layerKey',
-                type: mapLayerType,
-            });
-        }
-
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
@@ -529,7 +609,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         idKey={geoJsonIdKey}
                         labelKey={geoJsonLabelKey}
                         onClick={this.handleMapClick}
-                        layers={mapLayers}
+                        layers={Object.values(mapLayers)}
                     />
                 </div>
                 <Information />

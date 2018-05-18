@@ -4,7 +4,6 @@ import {
     FgRestBuilder,
 } from '../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
 import { GeoJSON } from '../../../components/Map';
 import {
     createParamsForProvinces,
@@ -13,13 +12,12 @@ import { Request } from '../../../rest/interface';
 // import schema from '../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setMapLayerGeoJson(geoJson: GeoJSON): void;
     setGeoJsons(url: string, geoJsons: GeoJSON): void;
 }
 
 interface MapLayerGeoJsonParams {
     url: string;
-    type: string;
 }
 
 export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJsonParams> {
@@ -29,7 +27,7 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
         this.props = props;
     }
 
-    create = ({ url, type }: MapLayerGeoJsonParams): RestRequest => {
+    create = ({ url }: MapLayerGeoJsonParams): RestRequest => {
         const request = new FgRestBuilder()
             .url(url)
             .params(createParamsForProvinces)
@@ -37,19 +35,22 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
             .postLoad()
             .success((response: GeoJSON) => {
                 // schema.validate(response, 'countryGeoJson');
-                const geoJson = topojson.feature(
-                    response,
-                    Object.values(response.objects)[0] as any,
-                ) as GeoJSON;
+                let geoJson;
+                if (response.type && response.type === 'FeatureCollection') {
+                    geoJson = response;
+                } else {
+                    geoJson = topojson.feature(
+                        response,
+                        Object.values(response.objects)[0] as any,
+                    ) as GeoJSON;
+                }
                 this.props.setGeoJsons(url, geoJson);
                 // Convert ids to strings to make things simpler later
                 // geoJson.features.forEach((acc: any) => {
                 //     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
                 // });
-                this.props.setState({
-                    mapLayerGeoJson: geoJson,
-                    mapLayerType: type,
-                });
+
+                this.props.setMapLayerGeoJson(geoJson);
             })
             .build();
         return request;
