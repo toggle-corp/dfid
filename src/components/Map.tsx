@@ -9,6 +9,14 @@ interface MapMouseEvent extends mapboxgl.MapMouseEvent {
     features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
 }
 
+export interface Layer {
+    key: string;
+    geoJson: GeoJSON;
+    type: string;
+    color?: string;
+    highlightKey?: string;
+}
+
 interface OwnProps {
     className: string;
     geojson: GeoJSON;
@@ -23,6 +31,8 @@ interface OwnProps {
 
     selections?: Selections;
     onClick?(key: string): void;
+
+    layers?: Layer[];
 }
 
 type Props = OwnProps;
@@ -43,6 +53,7 @@ const defaultProps = {
 
     selections: [],
     onClick: undefined,
+    layers: [],
 };
 
 const getInFilter = (key: string, values?: Selections) => {
@@ -56,6 +67,27 @@ const getInFilter = (key: string, values?: Selections) => {
     return ['in', key, ...values];
 };
 
+const sameArrays = (a1?: any[], a2?: any[]) => {
+    if (a1 === a2) {
+        return false;
+    }
+
+    if (!a1 || !a2) {
+        return false;
+    }
+
+    if (a1.length !== a2.length) {
+        return false;
+    }
+
+    for (let i = 0; i < a1.length; i += 1) {
+        if (a1[i] !== a2[i]) {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 export default class Map extends React.PureComponent<Props, States> {
     mounted: boolean;
@@ -104,7 +136,8 @@ export default class Map extends React.PureComponent<Props, States> {
     }
 
     componentWillReceiveProps(nextProps: Props) {
-        if (this.props.geojson !== nextProps.geojson) {
+        if (this.props.geojson !== nextProps.geojson ||
+            !sameArrays(this.props.layers, nextProps.layers)) {
             this.loadMapLayers(nextProps);
             return;
         }
@@ -236,6 +269,7 @@ export default class Map extends React.PureComponent<Props, States> {
             colorMapping,
             geojson, idKey, selections,
             strokeColor,
+            layers,
         } = props;
 
         if (!map || !geojson) {
@@ -264,12 +298,23 @@ export default class Map extends React.PureComponent<Props, States> {
         });
         this.sources.push('geojson');
 
+        if (layers) {
+            layers.forEach((layer) => {
+                map.addSource(layer.key, {
+                    type: 'geojson',
+                    data: layer.geoJson,
+                });
+                this.sources.push(layer.key);
+            });
+        }
+
         map.addLayer({
             id: 'geojson-fill',
             type: 'fill',
             source: 'geojson',
             paint: basePaint,
         });
+
         map.addLayer({
             id: 'geojson-hover',
             type: 'fill',
@@ -293,6 +338,53 @@ export default class Map extends React.PureComponent<Props, States> {
             filter: getInFilter(idKey, selections),
         });
 
+        this.layers = [
+            'geojson-stroke',
+            'geojson-fill',
+            'geojson-hover',
+            'geojson-selected',
+        ];
+
+        if (layers) {
+            layers.forEach((layer) => {
+                if (layer.type === 'Fill') {
+                    map.addLayer({
+                        id: layer.key,
+                        type: 'fill',
+                        source: layer.key,
+                        paint: {
+                            'fill-color': layer.color || '#77bcb1',
+                            'fill-opacity': 0.7,
+                        },
+                    });
+                } else if (layer.type === 'Line') {
+                    map.addLayer({
+                        id: layer.key,
+                        type: 'line',
+                        source: layer.key,
+                        paint: {
+                            'line-color': layer.color || '#77bcb1',
+                            'line-opacity': 0.3,
+                        },
+                    });
+                } else {
+                    map.addLayer({
+                        id: layer.key,
+                        type: 'circle',
+                        source: layer.key,
+                        paint: {
+                            'circle-color': layer.color || '#77bcb1',
+                        },
+                    });
+                }
+
+                if (layer.highlightKey) {
+                    map.setFilter(layer.key, ['!=', layer.highlightKey, '']);
+                }
+                this.layers.push(layer.key);
+            });
+        }
+
         map.addLayer({
             id: 'geojson-stroke',
             type: 'line',
@@ -302,14 +394,6 @@ export default class Map extends React.PureComponent<Props, States> {
                 'line-width': 1,
             },
         });
-
-        this.layers = [
-            ...this.layers,
-            'geojson-stroke',
-            'geojson-fill',
-            'geojson-hover',
-            'geojson-selected',
-        ];
     }
 
     flyToBounds = (geoJson: GeoJSON) => {

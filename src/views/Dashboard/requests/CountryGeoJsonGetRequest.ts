@@ -1,3 +1,4 @@
+import * as topojson  from 'topojson-client';
 import {
     RestRequest,
     FgRestBuilder,
@@ -9,7 +10,7 @@ import {
     createParamsForProvinces,
 } from '../../../rest';
 import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+// import schema from '../../../schema';
 
 interface Props {
     setState: Dashboard['setState'];
@@ -36,16 +37,20 @@ export default class CountryGeoJsonGetRequest implements Request<CountryGeoParam
             .preLoad(() => this.props.setState({ loadingGeoJson: true }))
             .postLoad(() => this.props.setState({ loadingGeoJson: false }))
             .success((response: GeoJSON) => {
-                schema.validate(response, 'countryGeoJson');
-                this.props.setGeoJsons(url, response);
+                // schema.validate(response, 'countryGeoJson');
+                const geoJson = topojson.feature(
+                    response,
+                    Object.values(response.objects)[0] as any,
+                ) as GeoJSON;
+                this.props.setGeoJsons(url, geoJson);
                 // Convert ids to strings to make things simpler later
-                response.features.forEach((acc: any) => {
+                geoJson.features.forEach((acc: any) => {
                     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
                 });
                 this.props.setState({
                     geoJsonIdKey,
                     geoJsonLabelKey,
-                    geoJson: response,
+                    geoJson,
                 });
             })
             .build();

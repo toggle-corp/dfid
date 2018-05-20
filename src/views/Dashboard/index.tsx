@@ -13,6 +13,7 @@ import {
     urlForCountryGeoJson,
 } from '../../rest';
 import {
+    setDashboardProvinceAction,
     setProvincesAction,
     setProvincesDataAction,
     setProgrammesAction,
@@ -23,6 +24,7 @@ import {
     dashboardProvinceSelector,
     dashboardProgrammeSelector,
     dashboardSectorSelector,
+    dashboardMapLayerSelector,
     dashboardProgrammeDataSelector,
 } from '../../redux';
 
@@ -40,9 +42,10 @@ import {
     SetIndicatorsAction,
     SetMapLayersAction,
     DashboardFilterParams,
+    MapLayer,
 } from '../../redux/interface';
 
-import Map, { GeoJSON } from '../../components/Map';
+import Map, { Layer, GeoJSON } from '../../components/Map';
 
 import CountryDetails from '../Dashboard/CountryDetails';
 import Filter from './Filter';
@@ -56,6 +59,7 @@ import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
+import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
 import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
 import MapLayersGetRequest from './requests/MapLayersGetRequest';
 
@@ -67,6 +71,7 @@ interface PropsFromState {
     selectedProgramme: Programme;
     selectedProgrammeData: ProgrammeData;
     selectedSector: Sector;
+    selectedMapLayer: MapLayer;
 }
 interface PropsFromDispatch {
     setProvinces(params: SetProvincesAction): void;
@@ -76,6 +81,7 @@ interface PropsFromDispatch {
     setSectors(params: SetSectorsAction): void;
     setIndicators(params: SetIndicatorsAction): void;
     setMapLayers(params: SetMapLayersAction): void;
+    setDashboardProvince(provinceId: number): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
@@ -92,6 +98,10 @@ interface State {
     geoJson?: GeoJSON;
     geoJsonIdKey: string;
     geoJsonLabelKey: string;
+
+    mapLayers: {
+        [key: string]: Layer;
+    };
 }
 
 interface Routes {
@@ -115,6 +125,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
     mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
+    mapLayerGeoJsonRequests: {
+        [key: string]: RestRequest;
+    };
 
     geoJsons: {
         [key: string]: GeoJSON,
@@ -139,6 +152,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson: undefined,
             geoJsonIdKey: 'id',
             geoJsonLabelKey: 'label',
+            mapLayers: {},
         };
 
         this.defaultHash = 'province';
@@ -152,36 +166,34 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.views = {
             province: {
                 component: () => (
-                    <ProvinceDetailInfo
-                        loading={this.state.loadingProvinceData}
-                    />
+                    <ProvinceDetailInfo loading={this.state.loadingProvinceData} />
                 ),
             },
 
             programme: {
                 component: () => (
-                    <ProgrammeDetails
-                        loading={this.state.loadingProgrammeData}
-                    />
+                    <ProgrammeDetails loading={this.state.loadingProgrammeData} />
                 ),
             },
 
             sector: {
                 component: () => (
-                    <SectorDetailInfo
-                        loading={this.state.loadingSectorData}
-                    />
+                    <SectorDetailInfo loading={this.state.loadingSectorData} />
                 ),
             },
         };
 
         this.geoJsons = {};
+        this.mapLayerGeoJsonRequests = {};
     }
 
     componentDidMount() {
         this.startRequestForProvinceData();
         this.startRequestForProvinces();
         this.reloadGeoJson();
+        this.reloadMunicipalities();
+        this.reloadMapLayer();
+        this.reloadProgramLayer();
         this.startRequestForProgrammes();
         this.startRequestForProgrammesData();
         this.startRequestForSectors();
@@ -205,6 +217,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (this.geoJsonRequest) {
             this.geoJsonRequest.stop();
         }
+        Object.values(this.mapLayerGeoJsonRequests).forEach(
+            r => r.stop(),
+        );
         if (this.sectorRequest) {
             this.sectorRequest.stop();
         }
@@ -320,39 +335,79 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.geoJsonRequest.start();
     }
 
+    startRequestForMapLayerGeoJson = (
+        key: string,
+        url: string,
+        type: string,
+        color?: string,
+        highlightKey?: string,
+    ) => {
+        if (this.mapLayerGeoJsonRequests[key]) {
+            this.mapLayerGeoJsonRequests[key].stop();
+        }
+
+        const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
+            setMapLayerGeoJson: (geoJson: GeoJSON) => {
+                const mapLayers = { ...this.state.mapLayers };
+                mapLayers[key] = {
+                    key,
+                    geoJson,
+                    type,
+                    color,
+                    highlightKey,
+                };
+                this.setState({ mapLayers });
+            },
+            setGeoJsons: this.setGeoJsons,
+        });
+
+        this.mapLayerGeoJsonRequests[key] = mapLayerGeoJsonRequest.create({ url });
+        this.mapLayerGeoJsonRequests[key].start();
+    }
+
     setGeoJsons = (url: string, geoJsons: GeoJSON) => {
         this.geoJsons[url] = geoJsons;
     }
 
     handleFilterChange = (oldValues: DashboardFilterParams, values: DashboardFilterParams) => {
-        const { provinceId, programmeId, sectorId } = values;
-        if (provinceId && oldValues.provinceId !== provinceId) {
+        const { provinceId, programmeId, sectorId, mapLayerId } = values;
+        if (oldValues.provinceId !== provinceId) {
             this.handleProvinceChange(provinceId);
         }
-        if (programmeId && oldValues.programmeId !== values.programmeId) {
-            window.location.hash = '#/programme';
-        }
-        if (sectorId && oldValues.sectorId !== values.sectorId) {
+        if (sectorId && oldValues.sectorId !== sectorId) {
             window.location.hash = '#/sector';
+        }
+        if (oldValues.mapLayerId !== mapLayerId) {
+            this.handleMapLayerChange(mapLayerId);
+        }
+        if (oldValues.programmeId !== programmeId) {
+            this.handleProgramChange(programmeId);
         }
     }
 
-    handleProvinceChange = (key: number) => {
-        window.location.hash = '#/province';
-        this.setState(
-            {
-                loadingGeoJson: true,
-            },
-            this.reloadGeoJson,
-        );
+    handleProvinceChange = (key?: number) => {
+        if (key) {
+            window.location.hash = '#/province';
+        }
+        this.setState({ loadingGeoJson: true }, () => {
+            this.reloadGeoJson();
+            this.reloadMunicipalities();
+        });
+    }
+
+    handleMapLayerChange = (layerId?: number) => {
+        this.reloadMapLayer();
+    }
+
+    handleProgramChange = (programmeId?: number) => {
+        if (programmeId) {
+            window.location.hash = '#/programme';
+        }
+        this.reloadProgramLayer();
     }
 
     reloadGeoJson = () => {
         const { selectedProvince } = this.props;
-
-        if (this.geoJsonRequest) {
-            this.geoJsonRequest.stop();
-        }
 
         let url: string;
         let idKey: string;
@@ -381,10 +436,102 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.startRequestForCountryGeoJson(url, idKey, labelKey);
     }
 
-    handleMapClick = (key: string) => {
+    reloadMunicipalities = () => {
+        const key = 'municipalities';
         const { selectedProvince } = this.props;
+        if (selectedProvince.id) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
+            return;
+        }
+
+        const url = 'http://139.59.67.104:4000/core/geojson/municipalities/';
+        const type = 'Line';
+        const color = '#ffffff';
+
+        if (this.geoJsons[url]) {
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                color,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
+            return;
+        }
+
+        this.startRequestForMapLayerGeoJson(key, url, type, color);
+    }
+
+    reloadMapLayer = () => {
+        const key = 'map-layer';
+        const { selectedMapLayer } = this.props;
+        if (!selectedMapLayer.id || !selectedMapLayer.file) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
+            return;
+        }
+
+        const url = selectedMapLayer.file;
+        let type = selectedMapLayer.type;
+        if (type === 'Polygon') {
+            type = 'Fill';
+        }
+        const color = '#ffa80d';
+
+        if (this.geoJsons[url]) {
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                color,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
+            return;
+        }
+
+        this.startRequestForMapLayerGeoJson(key, url, type, color);
+    }
+
+    reloadProgramLayer = () => {
+        const key = 'program-layer';
+        const { selectedProgramme } = this.props;
+
+        if (selectedProgramme.id !== 6) {
+            const mapLayers = { ...this.state.mapLayers };
+            delete mapLayers[key];
+            this.setState({ mapLayers });
+            return;
+        }
+
+        const url = 'http://139.59.67.104:4000/core/geojson/ipssj/';
+        const highlightKey = 'ActLevel';
+        const type = 'Fill';
+
+        if (this.geoJsons[url]) {
+            const mapLayers = { ...this.state.mapLayers };
+            mapLayers[key] = {
+                key,
+                type,
+                highlightKey,
+                geoJson: this.geoJsons[url],
+            };
+            this.setState({ mapLayers });
+            return;
+        }
+
+        this.startRequestForMapLayerGeoJson(key, url, type, undefined, highlightKey);
+    }
+
+
+    handleMapClick = (key: string) => {
+        const { selectedProvince, setDashboardProvince } = this.props;
         if (!selectedProvince.id) {
-            this.handleProvinceChange(parseInt(key, 10));
+            setDashboardProvince(parseInt(key, 10));
         }
     }
 
@@ -431,6 +578,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             geoJson,
             geoJsonLabelKey,
             geoJsonIdKey,
+            mapLayers,
             loadingProvinceData,
             loadingProgrammeData,
             // loadingSectorData,
@@ -461,6 +609,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         idKey={geoJsonIdKey}
                         labelKey={geoJsonLabelKey}
                         onClick={this.handleMapClick}
+                        layers={Object.values(mapLayers)}
                     />
                 </div>
                 <Information />
@@ -474,10 +623,12 @@ const mapStateToProps = (state: RootState) => ({
     selectedProgramme: dashboardProgrammeSelector(state),
     selectedProgrammeData: dashboardProgrammeDataSelector(state),
     selectedSector: dashboardSectorSelector(state),
+    selectedMapLayer: dashboardMapLayerSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setProvinces: (params: SetProvincesAction) => dispatch(setProvincesAction(params)),
+    setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
     setProvincesData: (params: SetProvincesDataAction) => dispatch(setProvincesDataAction(params)),
     setProgrammes: (params: SetProgrammesAction) => dispatch(setProgrammesAction(params)),
     setProgrammesData: (params: SetProgrammesDataAction) =>

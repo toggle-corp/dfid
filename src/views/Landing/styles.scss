@@ -3,8 +3,8 @@
 .landing {
     display: flex;
     flex-wrap: wrap;
-    width: 100%;
     background-image: url('../../resources/img/background.png');
+    width: 100%;
 
     .left {
         display: flex;
@@ -35,22 +35,19 @@
                     flex-basis: calc(calc(100% / 3) - #{2 * $spacing-extra-large} - 40px); 
                     margin: $spacing-extra-large;
                     border: $width-separator-thin solid $color-accent;
+                    background-color: rgba(255, 255, 255, 0.8);
                     padding: $spacing-extra-large;
-                    background-color: rgba(0, 0, 0, 0.77);
-                    color: $color-text-on-dark;
 
                     .label {
                         color: $color-text-label;
                         font-size: $font-size-large;
                         font-weight: $font-weight-bold;
-                        color: $color-text-on-dark;
                     }
 
                     .value {
                         color: $color-accent;
                         font-size: $font-size-ultra-large-alt;
                         font-weight: $font-weight-light;
-                        color: $color-text-on-dark;
                     }
 
                     &:hover {
@@ -64,15 +61,14 @@
 
         .bottom-content {
             display: flex;
-            border-top: $width-separator-thin solid $color-separator;
-            background-color: rgba(0, 0, 0, 0.77);
-            color: $color-text-on-dark;
             flex-shrink: 0;
+            border-top: $width-separator-thin solid $color-separator;
+            background-color: rgba(255, 255, 255, 0.8);
 
             .about {
-                padding: $spacing-medium 0;
                 flex-basis: 50%;
                 border-right: $width-separator-thin solid $color-accent;
+                padding: $spacing-medium 0;
 
                 .title {
                     padding: $spacing-medium;
@@ -176,16 +172,16 @@
     .footer {
         display: flex;
         align-items: center;
-        flex-shrink: 0;
         flex-basis: 100%;
+        flex-shrink: 0;
         background-color: $color-foreground-dark;
         padding: 0 $spacing-medium;
         height: 100px;
         color: $color-text-on-dark;
 
         .title {
-            font-size: $font-size-super-large;
             padding: $spacing-large;
+            font-size: $font-size-super-large;
         }
 
         .link {

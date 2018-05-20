@@ -106,3 +106,12 @@ export const dashboardSectorSelector = createSelector(
             sector.id === filter.faramValues.sectorId),
         ) || emptyObject as Sector,
 );
+
+export const dashboardMapLayerSelector = createSelector(
+    mapLayersSelector,
+    dashboardFilterSelector,
+    (layers, filter) =>
+        layers.find(layers => (
+            layers.id === filter.faramValues.mapLayerId),
+        ) || emptyObject as MapLayer,
+);
