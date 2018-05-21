@@ -6,6 +6,8 @@
 }
 
 .province-details {
+    padding: 5px;
+
     .programme {
         .programme-name {
             display: flex;
@@ -14,6 +16,7 @@
                 flex-shrink: 0;
                 padding-right: $spacing-small;
             }
+
             .title {
                 flex-grow: 1;
             }

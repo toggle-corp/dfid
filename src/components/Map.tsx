@@ -67,7 +67,7 @@ const getInFilter = (key: string, values?: Selections) => {
     return ['in', key, ...values];
 };
 
-const sameArrays = (a1?: any[], a2?: any[]) => {
+export const sameArrays = (a1?: any[], a2?: any[]) => {
     if (a1 === a2) {
         return false;
     }

@@ -7,6 +7,8 @@ const iconNames: Readonly<{
     logout: 'ion-log-out',
     close: 'ion-android-close',
     filter: 'fa fa-filter',
+    refresh: 'ion-refresh',
+    check: 'ion-checkmark',
 };
 
 export default iconNames;

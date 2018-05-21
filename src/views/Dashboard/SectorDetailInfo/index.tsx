@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import Message from '../../../vendor/react-store/components/View/Message';
 
-import { dashboardSectorSelector } from '../../../redux';
+import { sectorDataSelector } from '../../../redux';
 import {
     RootState,
     Sector,
@@ -12,53 +12,41 @@ import {
 import styles from './styles.scss';
 
 interface OwnProps {
-    loading?: boolean;
+    sectorId: number;
 }
 interface PropsFromState {
-    selectedSector: Sector;
+    selectedSectorData: Sector;
 }
 
 type Props = OwnProps & PropsFromState;
 
-interface State {
-    provinceData: object;
-}
+interface State {}
 
 export class SectorDetailInfo extends React.PureComponent<Props, State>{
     render() {
         const {
-            // loading,
-            selectedSector,
+            selectedSectorData,
         } = this.props;
 
-        if (!selectedSector.id) {
+        if (!selectedSectorData.id) {
             return (
                 <Message className={styles.message}>
-                    Select a sector
+                    Data not available
                 </Message>
             );
         }
 
-        /*
-        if (loading) {
-            return (
-                <Message className={styles.message}>
-                    Loading...
-                </Message>
-            );
-        }
-        */
-
+        // FIXME: complete this
         return (
-            <Message className={styles.message}>
-                Data not available
-            </Message>
+            <div className={styles.sectorDetails}>
+                {selectedSectorData.name}
+            </div>
         );
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    selectedSector: dashboardSectorSelector(state),
+const mapStateToProps = (state: RootState, props: Props) => ({
+    selectedSectorData: sectorDataSelector(state, props),
 });
 
 export default connect<PropsFromState, OwnProps>(

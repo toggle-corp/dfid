@@ -17,10 +17,12 @@ export const enum DASHBOARD_ACTION {
 // ACTION-CREATOR
 
 export const setDashboardFiltersAction = (
-    { faramValues, faramErrors, isHidden }: SetDashboardFilterAction,
+    { filters, faramValues, faramErrors, pristine, isHidden }: SetDashboardFilterAction,
 ) => ({
+    filters,
     faramValues,
     faramErrors,
+    pristine,
     isHidden,
     type: DASHBOARD_ACTION.setFilters,
 });
@@ -36,15 +38,19 @@ export const setDashboardProvinceAction = (
 
 const setFilters = (state: DomainData, action: SetDashboardFilterAction) => {
     const {
+        filters,
         faramValues,
         faramErrors,
+        pristine,
         isHidden,
     } = action;
     const settings = {
         dashboardFilter: {
+            filters: { $if: [filters, { $set: filters }] },
             faramValues: { $if: [faramValues, { $set: faramValues }] },
             faramErrors: { $if: [faramErrors, { $set: faramErrors }] },
             isHidden: { $if: [isHidden !== undefined, { $set: isHidden }] },
+            pristine: { $if: [pristine !== undefined, { $set: pristine }] },
         },
     };
     return update(state, settings);
@@ -54,7 +60,10 @@ const setProvince = (state: DomainData, { provinceId }: { provinceId: number }) 
     const settings = {
         dashboardFilter: {
             faramValues: { $auto: {
-                provinceId: { $set: provinceId },
+                provincesId: { $set: [provinceId] },
+            } },
+            filters: { $auto: {
+                provincesId: { $set: [provinceId] },
             } },
         },
     };

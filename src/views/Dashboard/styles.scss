@@ -22,5 +22,9 @@ $width-right-panel: 460px;
         flex-grow: 0;
         flex-shrink: 0;
         background-color: $color-foreground;
+
+        .fixed-tabs {
+            flex-shrink: 0;
+        }
     }
 }
