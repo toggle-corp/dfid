@@ -20,8 +20,14 @@ before_script:
     - echo 'before_script'
 
 script:
-    - echo 'script'
+    - ./scripts/travis_deploy.sh
 
 after_success:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push devtc/dfid:latest
+
+deploy:
+  provider: surge
+  project: ./build/
+  domain: dfid.surge.sh
+  on: feature-deploy
