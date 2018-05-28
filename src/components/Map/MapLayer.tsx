@@ -29,8 +29,6 @@ interface Props {
     showPopUp?: boolean;
 
     onClick?(key: String): void;
-    // TODO: handleClick and selections
-
     zoomOnLoad?: boolean;
 }
 
@@ -249,6 +247,14 @@ class MapLayer extends React.PureComponent<Props, States> {
             map.getCanvas().style.cursor = '';
 
             popup.remove();
+        });
+
+        map.on('click', layerId, (e: MapMouseEvent) => {
+            const { idKey, onClick } = this.props;
+            if (onClick && idKey) {
+                const feature = e.features[0];
+                onClick(feature.properties[idKey]);
+            }
         });
     }
 

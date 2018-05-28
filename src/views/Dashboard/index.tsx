@@ -91,7 +91,7 @@ type Dictionary<T> = {
 };
 
 interface LayerInfo {
-    key: string;
+    layerKey: string;
     order: number;
     geoJson: GeoJSON;
     type: string;
@@ -103,6 +103,7 @@ interface LayerInfo {
     zoomOnLoad?: boolean;
     handleHover?: boolean;
     showPopUp?: boolean;
+    onClick?(key: String): void;
 }
 
 interface State {
@@ -444,11 +445,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
             const layerInfo = {
                 ...selectedMapLayer,
-                key,
                 type,
                 color,
                 visibilityKey,
                 order,
+                layerKey: key,
             };
 
             if (this.geoJsons[url]) {
@@ -485,6 +486,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 showPopUp: true,
                 idKey: 'Province',
                 labelKey: 'Province',
+                onClick: this.handleMapClick,
             });
 
             selections.push({
@@ -500,6 +502,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     file: createUrlForProvinceGeoJson(selectedProvince.id),
                     type: 'Fill',
                     order: 1,
+                    zoomOnLoad: true,
                     handleHover: true,
                     showPopUp: true,
                     idKey: 'FIRST_DCOD',
@@ -541,12 +544,20 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     reloadProgramLayer = () => {
+        const { selectedProgrammes } = this.props;
+        const ipss = selectedProgrammes.find(p => (
+            p.name === 'Integrated Programme for Strengthening Security and Justice'
+        ));
+        if (!ipss) {
+            return;
+        }
+
         this.reloadSelectionToLayers({
             keyPrefix: 'programmeLayer',
-            selectedList: this.props.selectedProgrammes,
+            selectedList: [ipss],
             visibilityKey: 'ActLevel',
             typeOverride: 'Fill',
-            color: '#ffa80d',
+            color: '#2ecc71',
             urlOverride: urlForIpssjGeoJson,
             orderOverride: 3,
         });
@@ -556,7 +567,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.reloadSelectionToLayers({
             keyPrefix: 'mapLayer',
             selectedList: this.props.selectedMapLayers,
-            color: '#ffa80d',
+            color: '#e74c3c',
             orderOverride: 4,
         });
     }
@@ -643,36 +654,13 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         onChange={this.handleFilterChange}
                     />
                     <Map className={styles.map}>
-                        {/*
-                        <GeoJsonLayer
-                            key={`${this.reloadKey}-fill`}
-                            geoJson={geoJson}
-                            idKey={geoJsonIdKey}
-                            layerKey="fill"
-                            labelKey={geoJsonLabelKey}
-                            onClick={this.handleMapClick}
-                            zoomOnLoad
-                            handleHover
-                            showPopUp
-                            fill
-                        />
-                        */}
                         {layers.map((l: LayerInfo, index: number) => (
                             <GeoJsonLayer
-                                key={`${l.key}-layer-${this.reloadKey}`}
-                                geoJson={l.geoJson}
-                                layerKey={l.key}
-                                color={l.color}
-                                opacity={l.opacity}
+                                key={`${l.layerKey}-layer-${this.reloadKey}`}
                                 fill={l.type === 'Fill'}
                                 stroke={l.type === 'Line'}
                                 point={l.type === 'Point'}
-                                visibilityKey={l.visibilityKey}
-                                idKey={l.idKey}
-                                labelKey={l.labelKey}
-                                zoomOnLoad={l.zoomOnLoad}
-                                handleHover={l.handleHover}
-                                showPopUp={l.showPopUp}
+                                {...l}
                             />
                         ))}
                     </Map>
