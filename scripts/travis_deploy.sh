@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Ignore pull request
 if ! [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
     echo '[Travis Build] Pull request found ... exiting...'
@@ -14,14 +16,14 @@ fi
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # /code/scripts/
 ROOT_DIR=$(dirname "$BASE_DIR") # /code/
 
-set -e;
+set -xe;
 echo "::::::  >> Generating Reacts Builds"
-python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
-docker run -t -v ${ROOT_DIR}/build:/code/build \
-    # --env-file=${CLIENT_DIR}/.env \
-    devtc/dfid:latest bash -c 'yarn install && CI=false yarn build'
-set +e;
+    python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+    docker run -t -v ${ROOT_DIR}/build:/code/build \
+        devtc/dfid:latest bash -c 'yarn install && CI=false yarn build && mv build/index.html build/200.html'
+        # --env-file=${CLIENT_DIR}/.env
+set +xe;
 
-cd ${ROOT_DIR}/build
-mv index.html 200.html
-surge -d dfid.surge.sh
+#cd ${ROOT_DIR}/build
+#python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+#surge -d dfid.surge.sh
