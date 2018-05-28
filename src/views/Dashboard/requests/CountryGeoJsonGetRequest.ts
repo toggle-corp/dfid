@@ -5,7 +5,7 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { GeoJSON } from '../../../components/Map';
+import { GeoJSON } from '../../../components/Map/MapLayer';
 import {
     createParamsForProvinces,
 } from '../../../rest';
@@ -34,8 +34,8 @@ export default class CountryGeoJsonGetRequest implements Request<CountryGeoParam
         const request = new FgRestBuilder()
             .url(url)
             .params(createParamsForProvinces)
-            .preLoad(() => this.props.setState({ loadingGeoJson: true }))
-            .postLoad(() => this.props.setState({ loadingGeoJson: false }))
+        // .preLoad(() => this.props.setState({ loadingGeoJson: true }))
+        // .postLoad(() => this.props.setState({ loadingGeoJson: false }))
             .success((response: GeoJSON) => {
                 // schema.validate(response, 'countryGeoJson');
                 const geoJson = topojson.feature(
@@ -48,9 +48,9 @@ export default class CountryGeoJsonGetRequest implements Request<CountryGeoParam
                     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
                 });
                 this.props.setState({
-                    geoJsonIdKey,
-                    geoJsonLabelKey,
-                    geoJson,
+                    // geoJsonIdKey,
+                    // geoJsonLabelKey,
+                    // geoJson,
                 });
             })
             .build();

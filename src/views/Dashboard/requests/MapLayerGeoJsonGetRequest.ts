@@ -4,7 +4,7 @@ import {
     FgRestBuilder,
 } from '../../../vendor/react-store/utils/rest';
 
-import { GeoJSON } from '../../../components/Map';
+import { GeoJSON } from '../../../components/Map/MapLayer';
 import {
     createParamsForProvinces,
 } from '../../../rest';

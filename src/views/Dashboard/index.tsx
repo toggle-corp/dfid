@@ -3,7 +3,7 @@ import Redux from 'redux';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
-import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+// import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
@@ -45,11 +45,9 @@ import {
     MapLayer,
 } from '../../redux/interface';
 
-import Map, {
-    Layer,
-    GeoJSON,
-    sameArrays,
-} from '../../components/Map';
+import Map from '../../components/Map';
+
+import GeoJsonLayer, { GeoJSON } from '../../components/Map/MapLayer';
 
 import CountryDetails from '../Dashboard/CountryDetails';
 import Filter from './Filter';
@@ -62,7 +60,6 @@ import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
-import CountryGeoJsonGetRequest from './requests/CountryGeoJsonGetRequest';
 import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
 import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
 import MapLayersGetRequest from './requests/MapLayersGetRequest';
@@ -89,6 +86,25 @@ interface PropsFromDispatch {
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
+type Dictionary<T> = {
+    [key: string]: T;
+};
+
+interface LayerInfo {
+    key: string;
+    order: number;
+    geoJson: GeoJSON;
+    type: string;
+    color?: string;
+    opacity?: number;
+    visibilityKey?: string;
+    idKey?: string;
+    labelKey?: string;
+    zoomOnLoad?: boolean;
+    handleHover?: boolean;
+    showPopUp?: boolean;
+}
+
 interface State {
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
@@ -96,15 +112,8 @@ interface State {
     loadingProvinces: boolean;
     loadingProgrammes: boolean;
     loadingSectors: boolean;
-    loadingGeoJson: boolean;
     loadingIndicators: boolean;
-    geoJson?: GeoJSON;
-    geoJsonIdKey: string;
-    geoJsonLabelKey: string;
-
-    mapLayers: {
-        [key: string]: Layer;
-    };
+    layersInfo: Dictionary<LayerInfo>;
 }
 
 interface Routes {
@@ -119,9 +128,20 @@ interface Views {
     sector: object;
 }
 
-const sameArraysIgnoreOrder = (a: any[], b: any[]) => (
-    sameArrays(a.sort(), b.sort())
-);
+const sameArraysIgnoreOrder = (a: any[], b: any[]) => {
+    if (a.length !== b.length) {
+        return;
+    }
+
+    for (let i = 0; i < a.length; i += 1) {
+        const e1 = a[i];
+        if (b.find((e2: any) => e1 !== e2)) {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 export class Dashboard extends React.PureComponent<Props, State>{
     provinceDataRequest: RestRequest;
@@ -132,17 +152,13 @@ export class Dashboard extends React.PureComponent<Props, State>{
     mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     geoJsonRequest: RestRequest;
-    mapLayerGeoJsonRequests: {
-        [key: string]: RestRequest;
-    };
-
-    geoJsons: {
-        [key: string]: GeoJSON,
-    };
-
+    mapLayerGeoJsonRequests: Dictionary<RestRequest>;
+    geoJsons: Dictionary<GeoJSON>;
+    layersInfo: Dictionary<LayerInfo>;
     routes: Routes;
     defaultHash: string;
     views: Views;
+    reloadKey: number;
 
     constructor(props: Props) {
         super(props);
@@ -156,11 +172,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes: true,
             loadingSectors: true,
             loadingIndicators: true,
-            loadingGeoJson: false,
-            geoJson: undefined,
-            geoJsonIdKey: 'id',
-            geoJsonLabelKey: 'label',
-            mapLayers: {},
+            layersInfo: {},
         };
 
         this.defaultHash = 'province';
@@ -192,13 +204,16 @@ export class Dashboard extends React.PureComponent<Props, State>{
         };
 
         this.geoJsons = {};
+        this.layersInfo = {};
         this.mapLayerGeoJsonRequests = {};
+
+        this.reloadKey = 0;
     }
 
     componentDidMount() {
         this.startRequestForProvinceData();
         this.startRequestForProvinces();
-        this.reloadGeoJson();
+        this.reloadProvince();
         this.reloadMunicipalities();
         this.reloadMapLayer();
         this.reloadProgramLayer();
@@ -323,49 +338,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.mapLayersRequest.start();
     }
 
-    startRequestForCountryGeoJson = (
-        url: string,
-        geoJsonIdKey: string,
-        geoJsonLabelKey: string,
-    ) => {
-        if (this.geoJsonRequest) {
-            this.geoJsonRequest.stop();
-        }
-        const geoJsonRequest = new CountryGeoJsonGetRequest({
-            setState: params => this.setState(params),
-            setGeoJsons: this.setGeoJsons,
-        });
-        this.geoJsonRequest = geoJsonRequest.create({
-            url,
-            geoJsonIdKey,
-            geoJsonLabelKey,
-        });
-        this.geoJsonRequest.start();
-    }
-
     startRequestForMapLayerGeoJson = (
         key: string,
         url: string,
-        type: string,
-        color?: string,
-        highlightKey?: string,
+        responseHandler: (geoJson: GeoJSON) => void,
     ) => {
         if (this.mapLayerGeoJsonRequests[key]) {
             this.mapLayerGeoJsonRequests[key].stop();
         }
 
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
-            setMapLayerGeoJson: (geoJson: GeoJSON) => {
-                const mapLayers = { ...this.state.mapLayers };
-                mapLayers[key] = {
-                    key,
-                    geoJson,
-                    type,
-                    color,
-                    highlightKey,
-                };
-                this.setState({ mapLayers });
-            },
+            setMapLayerGeoJson: responseHandler,
             setGeoJsons: this.setGeoJsons,
         });
 
@@ -375,6 +358,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     setGeoJsons = (url: string, geoJsons: GeoJSON) => {
         this.geoJsons[url] = geoJsons;
+    }
+
+    setLayersInfo = (layersInfo: Dictionary<LayerInfo>) => {
+        this.reloadKey += 1;
+        this.layersInfo = layersInfo;
+        this.setState({ layersInfo });
     }
 
     handleFilterChange = (oldValues: DashboardFilterParams, values: DashboardFilterParams) => {
@@ -409,10 +398,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (keys && keys.length) {
             // window.location.hash = '#/province';
         }
-        this.setState({ loadingGeoJson: true }, () => {
-            this.reloadGeoJson();
-            this.reloadMunicipalities();
-        });
+        this.reloadProvince();
+        this.reloadMunicipalities();
     }
 
     handleMapLayerChange = (layerId?: number[]) => {
@@ -426,134 +413,152 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.reloadProgramLayer();
     }
 
-    reloadGeoJson = () => {
-        const { selectedProvinces } = this.props;
+    reloadSelectionToLayers = ({
+        keyPrefix, selectedList, visibilityKey,
+        color, typeOverride, urlOverride, orderOverride,
+    } : {
+        keyPrefix: string,
+        selectedList: any[],
+        visibilityKey?: string,
+        color?: string,
+        typeOverride?: string,
+        urlOverride?: string,
+        orderOverride?: number,
+    }) => {
+        const layersInfo = { ...this.layersInfo };
 
-        const geosJson: {url: string, idKey: string, labelKey: string }[] = [];
+        Object.keys(layersInfo).filter((key: string) => key.startsWith(`${keyPrefix}-`))
+            .forEach((key: string) => {
+                delete layersInfo[key];
+            });
+
+        selectedList.forEach((selectedMapLayer) => {
+            const key = `${keyPrefix}-${selectedMapLayer.id}`;
+            const url = urlOverride || selectedMapLayer.file;
+            const order = orderOverride || selectedMapLayer.order;
+            let type = typeOverride || selectedMapLayer.type;
+
+            if (type === 'Polygon') {
+                type = 'Fill';
+            }
+
+            const layerInfo = {
+                ...selectedMapLayer,
+                key,
+                type,
+                color,
+                visibilityKey,
+                order,
+            };
+
+            if (this.geoJsons[url]) {
+                layersInfo[key] = {
+                    ...layerInfo,
+                    geoJson: this.geoJsons[url],
+                };
+            } else {
+                this.startRequestForMapLayerGeoJson(key, url,  (geoJson: GeoJSON) => {
+                    const layersInfo = { ...this.layersInfo };
+                    layersInfo[key] = {
+                        ...layerInfo,
+                        geoJson,
+                    };
+                    this.setLayersInfo(layersInfo);
+                });
+            }
+        });
+        this.setLayersInfo(layersInfo);
+    }
+
+    reloadProvince = () => {
+        const { selectedProvinces } = this.props;
+        let selections: any[] = [];
 
         if (!selectedProvinces.length) {
-            geosJson.push({
-                url: urlForCountryGeoJson,
+            selections.push({
+                id: 'country',
+                file: urlForCountryGeoJson,
+                type: 'Fill',
+                order: 1,
+                zoomOnLoad: true,
+                handleHover: true,
+                showPopUp: true,
                 idKey: 'Province',
                 labelKey: 'Province',
             });
+
+            selections.push({
+                id: 'country-line',
+                file: urlForCountryGeoJson,
+                type: 'Line',
+                order: -1,
+            });
         } else {
-            selectedProvinces.forEach((selectedProvince) => {
-                geosJson.push({
-                    url: createUrlForProvinceGeoJson(selectedProvince.id),
+            selections = [
+                ...selectedProvinces.map(selectedProvince => ({
+                    id: selectedProvince.id,
+                    file: createUrlForProvinceGeoJson(selectedProvince.id),
+                    type: 'Fill',
+                    order: 1,
+                    handleHover: true,
+                    showPopUp: true,
                     idKey: 'FIRST_DCOD',
                     labelKey: 'FIRST_DIST',
-                });
-            });
+                })),
+                ...selectedProvinces.map(selectedProvince => ({
+                    id: `${selectedProvince.id}-line`,
+                    file: createUrlForProvinceGeoJson(selectedProvince.id),
+                    type: 'Line',
+                    order: -1,
+                })),
+            ];
         }
 
-        geosJson.forEach((geoJson) => {
-            // TODO: Show all selected provinces in map
-            const { url, idKey, labelKey } = geoJson;
-            if (this.geoJsons[url]) {
-                this.setState({
-                    geoJsonIdKey: idKey,
-                    geoJsonLabelKey: labelKey,
-                    geoJson: this.geoJsons[url],
-                    loadingGeoJson: false,
-                });
-                return;
-            }
-            this.startRequestForCountryGeoJson(url, idKey, labelKey);
+        this.reloadSelectionToLayers({
+            keyPrefix: 'province',
+            selectedList: selections,
         });
     }
 
     reloadMunicipalities = () => {
-        const key = 'municipalities';
         const { selectedProvinces } = this.props;
-        if (selectedProvinces.length) {
-            const mapLayers = { ...this.state.mapLayers };
-            delete mapLayers[key];
-            this.setState({ mapLayers });
-            return;
+        const selections: any[] = [];
+
+        if (!selectedProvinces.length) {
+            selections.push({
+                id: 'municipalities',
+                file: urlForMunicipalitiesGeoJson,
+                type: 'Line',
+                order: 2,
+                opacity: 0.2,
+            });
         }
 
-        const url = urlForMunicipalitiesGeoJson;
-        const type = 'Line';
-        const color = '#ffffff';
-
-        if (this.geoJsons[url]) {
-            const mapLayers = { ...this.state.mapLayers };
-            mapLayers[key] = {
-                key,
-                type,
-                color,
-                geoJson: this.geoJsons[url],
-            };
-            this.setState({ mapLayers });
-            return;
-        }
-
-        this.startRequestForMapLayerGeoJson(key, url, type, color);
-    }
-
-    reloadMapLayer = () => {
-        const key = 'map-layer';
-        const { selectedMapLayers } = this.props;
-        if (!selectedMapLayers.filter(selectedMapLayer => selectedMapLayer.file).length) {
-            const mapLayers = { ...this.state.mapLayers };
-            delete mapLayers[key];
-            this.setState({ mapLayers });
-            return;
-        }
-
-        selectedMapLayers.forEach((selectedMapLayer) => {
-            const url = selectedMapLayer.file;
-            let type = selectedMapLayer.type;
-            if (type === 'Polygon') {
-                type = 'Fill';
-            }
-            const color = '#ffa80d';
-
-            if (this.geoJsons[url]) {
-                const mapLayers = { ...this.state.mapLayers };
-                mapLayers[key] = {
-                    key,
-                    type,
-                    color,
-                    geoJson: this.geoJsons[url],
-                };
-                this.setState({ mapLayers });
-                return;
-            }
-
-            this.startRequestForMapLayerGeoJson(key, url, type, color);
+        this.reloadSelectionToLayers({
+            keyPrefix: 'municipality',
+            selectedList: selections,
         });
     }
 
     reloadProgramLayer = () => {
-        const key = 'program-layer';
-        const { selectedProgrammes } = this.props;
+        this.reloadSelectionToLayers({
+            keyPrefix: 'programmeLayer',
+            selectedList: this.props.selectedProgrammes,
+            visibilityKey: 'ActLevel',
+            typeOverride: 'Fill',
+            color: '#ffa80d',
+            urlOverride: urlForIpssjGeoJson,
+            orderOverride: 3,
+        });
+    }
 
-        if (!selectedProgrammes.find(programme => programme.id === 6)) {
-            const mapLayers = { ...this.state.mapLayers };
-            delete mapLayers[key];
-            this.setState({ mapLayers });
-            return;
-        }
-
-        const url = urlForIpssjGeoJson;
-        const highlightKey = 'ActLevel';
-        const type = 'Fill';
-
-        if (this.geoJsons[url]) {
-            const mapLayers = { ...this.state.mapLayers };
-            mapLayers[key] = {
-                key,
-                type,
-                highlightKey,
-                geoJson: this.geoJsons[url],
-            };
-            this.setState({ mapLayers });
-            return;
-        }
-
-        this.startRequestForMapLayerGeoJson(key, url, type, undefined, highlightKey);
+    reloadMapLayer = () => {
+        this.reloadSelectionToLayers({
+            keyPrefix: 'mapLayer',
+            selectedList: this.props.selectedMapLayers,
+            color: '#ffa80d',
+            orderOverride: 4,
+        });
     }
 
     handleMapClick = (key: string) => {
@@ -604,10 +609,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         const Information = this.renderInformation;
 
         const {
-            geoJson,
-            geoJsonLabelKey,
-            geoJsonIdKey,
-            mapLayers,
+            layersInfo,
             loadingProvinceData,
             loadingProgrammeData,
             loadingSectorData,
@@ -615,31 +617,65 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes,
             loadingSectors,
             loadingIndicators,
-            loadingGeoJson,
         } = this.state;
 
         const loading = (
-            loadingProvinceData || loadingProgrammeData ||  loadingGeoJson ||
+            loadingProvinceData || loadingProgrammeData ||
             loadingProvinces || loadingProgrammes || loadingSectors ||
             loadingIndicators || loadingSectorData
         );
 
+        const layers = [
+            ...Object.values(layersInfo).filter(
+                l => l.order >= 0,
+            ).sort((l1, l2) => l1.order - l2.order),
+            ...Object.values(layersInfo).filter(
+                l => l.order < 0,
+            ).sort((l1, l2) => l1.order - l2.order),
+        ];
+
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
-                    {loadingGeoJson && <LoadingAnimation />}
+                    {/* loadingGeoJson && <LoadingAnimation /> */}
                     <Filter
                         disabled={loading}
                         onChange={this.handleFilterChange}
                     />
-                    <Map
-                        className={styles.map}
-                        geojson={geoJson}
-                        idKey={geoJsonIdKey}
-                        labelKey={geoJsonLabelKey}
-                        onClick={this.handleMapClick}
-                        layers={Object.values(mapLayers)}
-                    />
+                    <Map className={styles.map}>
+                        {/*
+                        <GeoJsonLayer
+                            key={`${this.reloadKey}-fill`}
+                            geoJson={geoJson}
+                            idKey={geoJsonIdKey}
+                            layerKey="fill"
+                            labelKey={geoJsonLabelKey}
+                            onClick={this.handleMapClick}
+                            zoomOnLoad
+                            handleHover
+                            showPopUp
+                            fill
+                        />
+                        */}
+                        {layers.map((l: LayerInfo, index: number) => (
+                            <GeoJsonLayer
+                                key={`${l.key}-layer-${this.reloadKey}`}
+                                geoJson={l.geoJson}
+                                layerKey={l.key}
+                                color={l.color}
+                                opacity={l.opacity}
+                                fill={l.type === 'Fill'}
+                                stroke={l.type === 'Line'}
+                                point={l.type === 'Point'}
+                                visibilityKey={l.visibilityKey}
+                                idKey={l.idKey}
+                                labelKey={l.labelKey}
+                                zoomOnLoad={l.zoomOnLoad}
+                                handleHover={l.handleHover}
+                                showPopUp={l.showPopUp}
+                            />
+                        ))}
+                    </Map>
                 </div>
                 <Information />
             </div>
