@@ -1,169 +1,108 @@
 @import '../../stylesheets/base';
 
+$width-left: 720px;
+$width-right: 320px;
+
 .landing {
-    display: flex;
-    flex-wrap: wrap;
-    background-image: url('../../resources/img/background.png');
-    width: 100%;
-
-    .left {
+    .body {
         display: flex;
-        flex-basis: 70%;
-        flex-direction: column;
+        justify-content: center;
 
-        .overview {
-            flex-grow: 1;
+        .left {
+            background-color: $color-foreground-alt;
+            width: $width-left;
 
             .logo {
                 display: block;
-                align-self: flex-start;
                 padding: $spacing-large;
                 height: 144px;
             }
 
-            .content {
-                @include transition-medium;
-                @include shadow-small;
-                display: flex;
-                align-content: center;
-                align-items: center;
-                flex-grow: 1;
-                flex-wrap: wrap;
-                justify-content: center;
-
-                .item {
-                    flex-basis: calc(calc(100% / 3) - #{2 * $spacing-extra-large} - 40px); 
-                    margin: $spacing-extra-large;
-                    border: $width-separator-thin solid $color-accent;
-                    background-color: rgba(255, 255, 255, 0.8);
-                    padding: $spacing-extra-large;
-
-                    .label {
-                        color: $color-text-label;
-                        font-size: $font-size-large;
-                        font-weight: $font-weight-bold;
-                    }
-
-                    .value {
-                        color: $color-accent;
-                        font-size: $font-size-ultra-large-alt;
-                        font-weight: $font-weight-light;
-                    }
-
-                    &:hover {
-                        @include transition-medium;
-                        @include shadow-medium;
-                        opacity: 1;
-                    }
-                }
-            }
-        }
-
-        .bottom-content {
-            display: flex;
-            flex-shrink: 0;
-            border-top: $width-separator-thin solid $color-separator;
-            background-color: rgba(255, 255, 255, 0.8);
-
-            .about {
-                flex-basis: 50%;
-                border-right: $width-separator-thin solid $color-accent;
+            %section {
                 padding: $spacing-medium 0;
 
-                .title {
-                    padding: $spacing-medium;
+                .heading {
+                    padding: $spacing-small $spacing-large;
                 }
 
                 .content {
-                    padding: $spacing-medium;
-                    line-height: 1.6;
+                    padding: $spacing-small $spacing-large;
                 }
             }
 
-            .explore {
-                flex-basis: 50%;
-
-                .title {
-                    padding: $spacing-medium;
-                }
+            .overview {
+                @extend %section;
 
                 .content {
-                    padding: 0 $spacing-medium;
-                }
-            }
-        }
-    }
-
-    .right {
-        flex-basis: 30%;
-        background-color: $color-background;
-
-        >.title {
-            border-bottom: $width-separator-thin solid $color-accent;
-            background-color: $color-foreground;
-            padding: $spacing-medium;
-        }
-
-        >.content {
-            .province {
-                @extend %background-alternating-row;
-                @include transition-medium;
-                display: flex;
-                align-items: center;
-                border-bottom: $width-separator-thin solid $color-separator;
-                border-left: $width-separator-thick solid $color-separator;
-                text-transform: none;
-
-                &:hover {
-                    border-left-color: $color-accent;
-                    background-color: darken($color-background-hover, 20%);
-                }
-
-                .image {
-                    flex-shrink: 0;
-                    width: 144px;
-                }
-
-                >.content {
+                    @include transition-medium;
+                    display: flex;
+                    align-content: center;
+                    align-items: center;
                     flex-grow: 1;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    padding: 0 $spacing-large - $spacing-medium;
 
-                    > .title {
+                    .item {
+                        flex-basis: calc(calc(100% / 3) - #{2 * $spacing-medium}); 
+                        margin: $spacing-medium;
+                        border: $width-separator-thin solid $color-accent;
+                        background-color: rgba(255, 255, 255, 0.8);
                         padding: $spacing-small $spacing-medium;
-                        color: $color-accent;
-                        font-size: $font-size-large-alt;
-                    }
 
-                    > .content {
-                        display: table;
-                        padding: $spacing-small 0;
+                        .label {
+                            color: $color-text-label;
+                            font-size: $font-size-large;
+                            font-weight: $font-weight-bold;
+                        }
 
-                        .item {
-                            display: table-row;
-
-                            .icon {
-                                padding-left: $spacing-medium;
-                                height: $font-size-large;
-                            }
-
-                            .label {
-                                display: table-cell;
-                                padding: $spacing-extra-small $spacing-medium;
-                            }
-
-                            .value {
-                                display: table-cell;
-                                padding: $spacing-extra-small $spacing-medium;
-                                font-size: $font-size-large;
-
-                                :global {
-                                    .normalized-suffix {
-                                        margin-left: $spacing-small;
-                                        font-family: $font-family-sans-serif;
-                                    }
-                                }
-                            }
+                        .value {
+                            color: $color-accent;
+                            font-size: $font-size-ultra-large;
+                            font-weight: $font-weight-light;
                         }
                     }
+                }
+            }
+
+            .about {
+                @extend %section;
+
+                .content {
+                    line-height: 1.6;
+
+                    p {
+                        margin: 0 0 $spacing-medium 0;
+                    }
+                }
+            }
+        }
+
+        .right {
+            width: $width-right;
+
+            %section {
+                background-color: $color-background-alt;
+                margin: $spacing-small;
+
+                .heading {
+                    padding: $spacing-small $spacing-medium;
+                }
+
+                .content {
+                    padding: $spacing-small $spacing-medium;
+                }
+            }
+
+            .links {
+                @extend %section;
+            }
+
+            .province-list {
+                @extend %section;
+
+                .content {
+                    padding: 0;
                 }
             }
         }

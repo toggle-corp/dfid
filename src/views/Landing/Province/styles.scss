@@ -1,0 +1,21 @@
+@import '../../../stylesheets/base';
+
+.province {
+    display: block;
+    padding: $spacing-small 0;
+    text-transform: none;
+
+    .title {
+        padding: $spacing-extra-small $spacing-medium;
+        font-size: $font-size-large;
+    }
+
+    .content {
+        display: table;
+        padding: 0;
+    }
+
+    &:hover {
+        background-color: $color-background-hover;
+    }
+}

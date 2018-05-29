@@ -3,9 +3,21 @@ import Numeral from '../../../vendor/react-store/components/View/Numeral';
 
 import styles from './styles.scss';
 
-export default class ProvinceDetailItem extends React.PureComponent {
+interface Data {
+    label: string;
+    icon: string;
+    isCurrency: boolean;
+    value: string;
+}
+
+interface Props {
+    className: string;
+    datum: Data;
+}
+
+export default class ProvinceDetailItem extends React.PureComponent <Props>{
     getClassName = () => {
-        cosnt { className } = this.props;
+        const { className } = this.props;
         const classNames = [
             className,
             styles.provinceDetailItem,
@@ -18,10 +30,7 @@ export default class ProvinceDetailItem extends React.PureComponent {
         const className = this.getClassName();
 
         return (
-            <div
-                key={datum.label}
-                className={className}
-            >
+            <div className={className}>
                 <img
                     className={styles.icon}
                     src={datum.icon}
@@ -38,6 +47,6 @@ export default class ProvinceDetailItem extends React.PureComponent {
                     />
                 </div>
             </div>
-        )
+        );
     }
 }

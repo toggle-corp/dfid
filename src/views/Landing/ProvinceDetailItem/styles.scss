@@ -1,0 +1,30 @@
+@import '../../../stylesheets/base';
+
+.province-detail-item {
+    display: table-row;
+
+    .icon {
+        padding-left: $spacing-medium;
+        height: $font-size-medium;
+    }
+
+    .label {
+        display: table-cell;
+        padding: 0 $spacing-medium;
+        color: $color-text-label;
+    }
+
+    .value {
+        display: table-cell;
+        padding: 0 $spacing-medium;
+        font-size: $font-size-large;
+
+        :global {
+            .normalized-suffix {
+                margin-left: $spacing-small;
+                font-family: $font-family-sans-serif;
+            }
+        }
+    }
+}
+
