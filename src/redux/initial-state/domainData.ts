@@ -6,13 +6,17 @@ const initialDomainDataState: DomainData = {
 
     programmes: [],
     programmesData: [],
+
     sectors: [],
+    sectorsData: [],
 
     countriesData: [],
 
     dashboardFilter: {
+        filters: {},
         faramValues: {},
         faramErrors: {},
+        pristine: true,
         isHidden: false,
     },
 

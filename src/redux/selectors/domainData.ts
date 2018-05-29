@@ -6,6 +6,7 @@ import {
     Programme,
     ProgrammeData,
     Sector,
+    SectorData,
     CountryData,
     DashboardFilter,
     Indicator,
@@ -13,12 +14,25 @@ import {
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
-const emptyArray: object[] = [];
+const emptyArray: any[] = [];
 const emptyObject: object = {};
 const emptyFaram: object = {
     faramValues: {},
     faramErrors: {},
 };
+
+
+const provinceIdFromPropsSelector = (
+    state: RootState, props: { provinceId: number },
+) => (props.provinceId);
+
+const programmeIdFromPropsSelector = (
+    state: RootState, props: { programmeId: number },
+) => (props.programmeId);
+
+const sectorIdFromPropsSelector = (
+    state: RootState, props: { sectorId: number },
+) => (props.sectorId);
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
     domainData.provinces || emptyArray
@@ -38,6 +52,10 @@ export const programmesDataSelector = ({ domainData }: RootState): ProgrammeData
 
 export const sectorsSelector = ({ domainData }: RootState): Sector[] => (
     domainData.sectors || emptyArray
+);
+
+export const sectorsDataSelector = ({ domainData }: RootState): SectorData[] => (
+    domainData.sectorsData || emptyArray
 );
 
 export const countriesDataSelector = ({ domainData }: RootState): CountryData[] => (
@@ -62,56 +80,86 @@ export const countryDataSelector = createSelector(
     countriesData =>  countriesData[0] || emptyObject,
 );
 
-export const dashboardProvinceSelector = createSelector(
-    provincesSelector,
+// Dashboard
+export const dashboardProvincesIdSelector = createSelector(
     dashboardFilterSelector,
-    (provinces, filter) =>
-        provinces.find(province => (
-            province.id === filter.faramValues.provinceId),
-        ) || emptyObject as Province,
+    filter => filter.filters.provincesId || emptyArray as number[],
 );
 
-export const dashboardProvinceDataSelector = createSelector(
-    provincesDataSelector,
+export const dashboardProgrammesIdSelector = createSelector(
     dashboardFilterSelector,
-    (provincesData, filter) =>
+    filter => filter.filters.programmesId || emptyArray as number[],
+);
+
+export const dashboardSectorsIdSelector = createSelector(
+    dashboardFilterSelector,
+    filter => filter.filters.sectorsId || emptyArray as number[],
+);
+
+export const dashboardMapLayersIdSelector = createSelector(
+    dashboardFilterSelector,
+    filter => filter.filters.mapLayersId || emptyArray as number[],
+);
+
+export const dashboardProvincesSelector = createSelector(
+    provincesSelector,
+    dashboardProvincesIdSelector,
+    (provinces, provincesId) =>
+        provinces.filter(province => (
+            provincesId.findIndex(id => id === province.id)) !== -1,
+        ) || emptyArray as Province[],
+);
+
+export const dashboardProgrammesSelector = createSelector(
+    programmesSelector,
+    dashboardProgrammesIdSelector,
+    (programmes, programmesId) =>
+        programmes.filter(programme => (
+            programmesId.findIndex(id => id === programme.id)) !== -1,
+        ) || emptyArray as Programme[],
+);
+
+export const dashboardSectorsSelector = createSelector(
+    sectorsSelector,
+    dashboardSectorsIdSelector,
+    (sectors, sectorsId) =>
+        sectors.filter(sector => (
+            sectorsId.findIndex(id => id === sector.id)) !== -1,
+        ) || emptyArray as Sector[],
+);
+
+export const dashboardMapLayersSelector = createSelector(
+    mapLayersSelector,
+    dashboardMapLayersIdSelector,
+    (mapLayers, mapLayersId) =>
+        mapLayers.filter(mapLayer => (
+            mapLayersId.findIndex(id => id === mapLayer.id)) !== -1,
+        ) || emptyArray as MapLayer[],
+);
+
+export const provinceDataSelector = createSelector(
+    provincesDataSelector,
+    provinceIdFromPropsSelector,
+    (provincesData, provinceId) =>
         provincesData.find(provinceData => (
-            provinceData.id === filter.faramValues.provinceId),
+            provinceData.id === provinceId),
         ) || emptyObject as ProvinceData,
 );
 
-export const dashboardProgrammeSelector = createSelector(
-    programmesSelector,
-    dashboardFilterSelector,
-    (programmes, filter) =>
-        programmes.find(programme => (
-            programme.id === filter.faramValues.programmeId),
-        ) || emptyObject as Programme,
-);
-
-export const dashboardProgrammeDataSelector = createSelector(
+export const programmeDataSelector = createSelector(
     programmesDataSelector,
-    dashboardFilterSelector,
-    (programmesData, filter) =>
+    programmeIdFromPropsSelector,
+    (programmesData, programmeId) =>
         programmesData.find(programmeData => (
-            programmeData.programId === filter.faramValues.programmeId),
+            programmeData.id === programmeId),
         ) || emptyObject as ProgrammeData,
 );
 
-export const dashboardSectorSelector = createSelector(
-    sectorsSelector,
-    dashboardFilterSelector,
-    (sectors, filter) =>
-        sectors.find(sector => (
-            sector.id === filter.faramValues.sectorId),
-        ) || emptyObject as Sector,
-);
-
-export const dashboardMapLayerSelector = createSelector(
-    mapLayersSelector,
-    dashboardFilterSelector,
-    (layers, filter) =>
-        layers.find(layers => (
-            layers.id === filter.faramValues.mapLayerId),
-        ) || emptyObject as MapLayer,
+export const sectorDataSelector = createSelector(
+    sectorsDataSelector,
+    sectorIdFromPropsSelector,
+    (sectorsData, sectorId) =>
+        sectorsData.find(sectorData => (
+            sectorData.id === sectorId),
+        ) || emptyObject as SectorData,
 );

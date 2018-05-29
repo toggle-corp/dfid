@@ -1,5 +1,7 @@
 @import '../../../stylesheets/base';
 
+$height-header: 8px;
+
 %float-position {
     top: $spacing-medium;
     left: $spacing-medium;
@@ -19,16 +21,20 @@
 
 .filters-container {
     @extend %float-position;
+    display: flex;
+    flex-direction: column;
     position: absolute;
     opacity: .9;
     z-index: 1;
     background-color: $color-foreground-alt;
     width: 292px;
+    max-height: calc(100vh - #{$height-navbar + 2 * $spacing-medium});
 
     .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-shrink: 0;
 
         .close {
             padding: $spacing-small $spacing-medium;
@@ -37,6 +43,10 @@
             &:hover {
                 background-color: $color-background-hover;
             }
+        }
+
+        .right-container {
+            display: flex;
         }
     }
 
@@ -58,12 +68,18 @@
         }
     }
 
-    .layers {
-        @extend %content;
-    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 0;
+        overflow-y: auto;
 
-    .filters {
-        @extend %content;
-    }
+        .layers {
+            @extend %content;
+        }
 
+        .filters {
+            @extend %content;
+        }
+    }
 }

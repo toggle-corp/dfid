@@ -6,15 +6,11 @@ import Message from '../../../vendor/react-store/components/View/Message';
 import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import { RestRequest } from '../../../vendor/react-store/utils/rest';
 
+import { programmeDataSelector } from '../../../redux';
 
-import {
-    dashboardProgrammeSelector,
-    dashboardProgrammeDataSelector,
-} from '../../../redux';
 import {
     RootState,
     ProgrammeData,
-    Programme,
     ProgrammeSectorName,
 } from '../../../redux/interface';
 
@@ -23,10 +19,9 @@ import Item from '../Item';
 import styles from './styles.scss';
 
 interface OwnProps {
-    loading?: boolean;
+    programmeId: number;
 }
 interface PropsFromState {
-    selectedProgramme: Programme;
     selectedProgrammeData: ProgrammeData;
 }
 type Props = OwnProps & PropsFromState ;
@@ -64,24 +59,13 @@ export class ProgrammeDetails extends React.PureComponent<Props, State>{
 
     render() {
         const {
-            loading,
-            selectedProgramme,
             selectedProgrammeData,
         } = this.props;
 
-
-        if (!selectedProgramme.id) {
+        if (!selectedProgrammeData.id) {
             return (
                 <Message className={styles.message}>
-                    Select a programme
-                </Message>
-            );
-        }
-
-        if (loading) {
-            return (
-                <Message className={styles.message}>
-                    Loading programme information...
+                    Data not available
                 </Message>
             );
         }
@@ -118,9 +102,8 @@ export class ProgrammeDetails extends React.PureComponent<Props, State>{
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    selectedProgramme: dashboardProgrammeSelector(state),
-    selectedProgrammeData: dashboardProgrammeDataSelector(state),
+const mapStateToProps = (state: RootState, props: Props) => ({
+    selectedProgrammeData: programmeDataSelector(state, props),
 });
 
 export default connect<PropsFromState, OwnProps>(

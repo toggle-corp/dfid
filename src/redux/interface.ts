@@ -35,6 +35,7 @@ export interface DomainData {
     programmes: Programme[];
     programmesData: ProgrammeData[];
     sectors: Sector[];
+    sectorsData: SectorData[];
     countriesData: CountryData[];
     dashboardFilter: DashboardFilter;
     indicators: Indicator[];
@@ -131,6 +132,9 @@ export interface Sector {
     code: string;
 }
 
+// FIXME: complete this
+export type SectorData = Sector;
+
 export interface SetSectorsAction {
     sectors: Sector[];
 }
@@ -160,16 +164,18 @@ export interface SetCountriesDataAction {
 // Dashboard
 
 export interface DashboardFilterParams {
-    provinceId?: number;
-    programmeId?: number;
-    sectorId?: number;
-    indicatorId?: number;
-    mapLayerId?: number;
+    provincesId?: number[];
+    programmesId?: number[];
+    sectorsId?: number[];
+    indicatorsId?: number[];
+    mapLayersId?: number[];
 }
 
 export interface DashboardFilter {
+    filters: DashboardFilterParams;
     faramValues: DashboardFilterParams;
     faramErrors: FaramErrors;
+    pristine: boolean;
     isHidden: boolean;
 }
 

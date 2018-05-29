@@ -1,30 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import ListView from '../../../vendor/react-store/components/View/List/ListView';
 import Message from '../../../vendor/react-store/components/View/Message';
-import {
-    dashboardProvinceDataSelector,
-    dashboardProvinceSelector,
-} from '../../../redux';
+import Numeral from '../../../vendor/react-store/components/View/Numeral';
+import { provinceDataSelector } from '../../../redux';
 
 import {
     RootState,
     ProvinceData,
-    Province,
     ProgrammeName,
 } from '../../../redux/interface';
 
-import Item from '../Item'; 
+import Item from '../Item';
 
 import styles from './styles.scss';
 
 interface OwnProps {
-    loading?: boolean;
+    provinceId: number;
 }
 interface PropsFromState {
-    selectedProvince: Province;
     selectedProvinceData: ProvinceData;
 }
 
@@ -80,23 +75,13 @@ const renderNumeral = (data: number) => (
 export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
     render() {
         const {
-            loading,
-            selectedProvince,
             selectedProvinceData,
         } = this.props;
 
-        if (!selectedProvince.id) {
+        if (!selectedProvinceData.id) {
             return (
-                <Message>
-                    Select a province
-                </Message>
-            );
-        }
-
-        if (loading) {
-            return (
-                <Message>
-                    Loading province information...
+                <Message className={styles.message}>
+                    Data not available
                 </Message>
             );
         }
@@ -194,9 +179,8 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    selectedProvince: dashboardProvinceSelector(state),
-    selectedProvinceData: dashboardProvinceDataSelector(state),
+const mapStateToProps = (state: RootState, props: Props) => ({
+    selectedProvinceData: provinceDataSelector(state, props),
 });
 
 export default connect<PropsFromState, OwnProps>(

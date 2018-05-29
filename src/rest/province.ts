@@ -17,3 +17,5 @@ export const createUrlForProvinceGeoJson = (provinceId: number) => (
     `${wsEndpoint}/geojson/province/${provinceId}/`
 );
 export const urlForCountryGeoJson = `${wsEndpoint}/geojson/country/`;
+export const urlForMunicipalitiesGeoJson = `${wsEndpoint}/geojson/municipalities/`;
+export const urlForIpssjGeoJson = `${wsEndpoint}/geojson/ipssj/`;
