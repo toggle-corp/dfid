@@ -49,7 +49,6 @@ export const alterAndCombineResponseError = (errors: ServerError) => (
     Object.values(alterResponseErrorToFaramError(errors))
 );
 
-export * from './token';
 export * from './user';
 export * from './province';
 export * from './programmes';

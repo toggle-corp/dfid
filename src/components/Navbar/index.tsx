@@ -16,7 +16,7 @@ import {
 import { CloakSettings } from '../../constants/routes/interface';
 
 import NavMenu from './NavMenu';
-import NavDrop from './NavDrop';
+// import NavDrop from './NavDrop';
 import * as styles from './styles.scss';
 
 const defaultProps = {
@@ -42,7 +42,7 @@ class Navbar extends React.PureComponent<Props, State> {
     currentMatch?: Props['match'];
     currentPath: string;
     validNavLinks: CloakSettingsWithKey[];
-    validDropLinks: CloakSettingsWithKey[];
+    // validDropLinks: CloakSettingsWithKey[];
 
     static getCurrentMatch = (location: Props['location']): Props['match'] | undefined => {
         const links = Object.keys(pathNames);
@@ -95,13 +95,15 @@ class Navbar extends React.PureComponent<Props, State> {
             'explore',
         ];
 
+        /*
         const dropLinks: string[] = [
             'dashboard',
             'explore',
         ];
+        */
 
         this.validNavLinks = Navbar.getValidLinks(navLinks, this.currentPath);
-        this.validDropLinks = Navbar.getValidLinks(dropLinks, this.currentPath);
+        // this.validDropLinks = Navbar.getValidLinks(dropLinks, this.currentPath);
     }
 
     render() {
@@ -128,10 +130,12 @@ class Navbar extends React.PureComponent<Props, State> {
                     links={this.validNavLinks}
                     className={styles.mainMenu}
                 />
+                {/*
                 <NavDrop
                     links={this.validDropLinks}
                     className={styles.userMenu}
                 />
+                */}
             </nav>
         );
     }
