@@ -30,4 +30,4 @@ deploy:
   provider: surge
   project: ./build/
   domain: dfid.surge.sh
-  on: feature-deploy
+  on: release
