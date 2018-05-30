@@ -7,16 +7,23 @@ interface Props {
     label: string;
     values: object[];
     valueModifier(value?: object | string | number): string;
+    keySelector(value?: object | string | number, index?: number): string | number;
 }
 
 const marker = '•';
 class ListItem extends React.PureComponent<Props> {
-    renderItem = ({ datum }: { datum: object }) => {
-        const { valueModifier } = this.props;
+
+    renderItem = (_: undefined, datum: object, index: number) => {
+        const { keySelector, valueModifier } = this.props;
         const title = valueModifier(datum);
 
+        const key = keySelector(datum, index);
+
         return (
-            <div className={styles.item}>
+            <div
+                key={key}
+                className={styles.item}
+            >
                 <span className={styles.marker}>
                     {marker}
                 </span>
@@ -41,7 +48,7 @@ class ListItem extends React.PureComponent<Props> {
                 <ListView
                     className={styles.list}
                     data={values}
-                    renderer={this.renderItem}
+                    modifier={this.renderItem}
                 />
             </div>
         );

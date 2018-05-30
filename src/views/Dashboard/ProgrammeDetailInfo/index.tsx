@@ -43,6 +43,8 @@ const renderSectorName = (data: ProgrammeSectorName) => data.sectorName;
 export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
     programmeDataRequest: RestRequest;
 
+    keySelector = (data: ProgrammeSectorName) => data.sectorId;
+
     render() {
         const {
             selectedProgrammeData,
@@ -81,6 +83,7 @@ export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
                     label="Sector"
                     values={sectors}
                     valueModifier={renderSectorName}
+                    keySelector={this.keySelector}
                 />
             </div>
         );

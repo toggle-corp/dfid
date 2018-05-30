@@ -29,7 +29,7 @@ type Props = OwnProps & PropsFromState;
 interface State {
 }
 
-const renderProgrammeName = (datum: ProgrammeName) => (datum.programName);
+const renderProgrammeName = (datum: ProgrammeName) => datum.programName;
 
 const renderPound = (data: number) => (
     <Numeral
@@ -53,6 +53,9 @@ const renderNumeral = (data: number) => (
 );
 
 export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
+
+    keySelector = (data: ProgrammeName) => data.programID;
+
     render() {
         const {
             selectedProvinceData,
@@ -151,6 +154,7 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
                     label="Active programmes"
                     values={activeProgrammes}
                     valueModifier={renderProgrammeName}
+                    keySelector={this.keySelector}
                 />
             </div>
         );
