@@ -33,7 +33,7 @@ export default class Root extends React.Component<object, State> {
             // NOTE: showing empty div, this lasts for a fraction of a second
             return (
                 <div>
-                    Initializing App
+                    Initializing App...
                 </div>
             );
         }

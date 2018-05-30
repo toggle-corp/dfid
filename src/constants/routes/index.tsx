@@ -1,34 +1,14 @@
 import React from 'react';
 import ViewManager from '../../components/ViewManager';
 import { mapObjectToArray, mapObjectToObject, Map } from '../../utils/map';
-import { allLinks, noLinks } from './links';
+import { allLinks } from './links';
 import { RouteSetting, ROUTE, CloakSettings } from './interface';
 
 // NOTE: only change values in routes
 export const routes: Map<RouteSetting> = {
-    login: {
-        order: 1,
-        type: ROUTE.exclusivelyPublic,
-        redirectTo: '/',
-        path: '/login',
-        loader: () => import('../../views/Login'),
-        links: noLinks,
-        hideNavbar: true,
-    },
-
-    register: {
-        order: 2,
-        type: ROUTE.exclusivelyPublic,
-        redirectTo: '/',
-        path: '/register',
-        loader: () => import('../../views/Register'),
-        links: noLinks,
-        hideNavbar: true,
-    },
-
     landing: {
         order: 3,
-        type: ROUTE.private,
+        type: ROUTE.public,
         path: '/',
         loader: () => import('../../views/Landing'),
         links: allLinks,
@@ -36,7 +16,7 @@ export const routes: Map<RouteSetting> = {
 
     dashboard: {
         order: 4,
-        type: ROUTE.private,
+        type: ROUTE.public,
         path: '/dashboard',
         loader: () => import('../../views/Dashboard'),
         links: allLinks,
@@ -44,7 +24,7 @@ export const routes: Map<RouteSetting> = {
 
     explore: {
         order: 5,
-        type: ROUTE.private,
+        type: ROUTE.public,
         path: '/explore',
         loader: () => import('../../views/Explore'),
         links: allLinks,

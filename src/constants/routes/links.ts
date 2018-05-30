@@ -28,7 +28,6 @@ const prepareSettings = (semantics: string): CloakSettings => {
 export const noLinks = {};
 export const allLinks = mapObjectToObject<string, CloakSettings>(
     {
-        // FIXME: add login later
         dashboard: '',
         explore: '',
     },
