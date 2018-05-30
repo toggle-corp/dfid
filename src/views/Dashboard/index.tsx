@@ -553,13 +553,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
         const ipss = selectedProgrammes.find(p => (
             p.name === 'Integrated Programme for Strengthening Security and Justice'
         ));
-        if (!ipss) {
-            return;
+        const selectedList = [];
+        if (ipss) {
+            selectedList.push(ipss);
         }
 
         this.reloadSelectionToLayers({
+            selectedList,
             keyPrefix: 'programmeLayer',
-            selectedList: [ipss],
             visibilityKey: 'ActLevel',
             typeOverride: 'Fill',
             color: '#2ecc71',
@@ -647,9 +648,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
             ...Object.values(layersInfo).filter(
                 l => l.separateStroke,
             ).sort((l1, l2) => l1.order - l2.order).map(l => ({
-                ...l,
                 layerKey: `${l.layerKey}-stroke`,
                 type: 'Line',
+                geoJson: l.geoJson,
+                color: l.color,
+                opacity: l.opacity,
             })),
         ];
 
