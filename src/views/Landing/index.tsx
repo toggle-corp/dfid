@@ -1,18 +1,16 @@
 import React from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
+import { reverseRoute } from '../../vendor/react-store/utils/common';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
 
+import { pathNames } from '../../constants';
 import logo from '../../resources/img/logo.png';
-// import province1Image from '../../resources/img/province1.png';
-// import province2Image from '../../resources/img/province2.png';
-// import province3Image from '../../resources/img/province3.png';
-// import province4Image from '../../resources/img/province4.png';
-// import province5Image from '../../resources/img/province5.png';
-// import province6Image from '../../resources/img/province6.png';
-// import province7Image from '../../resources/img/province7.png';
+import backgroundImage from '../../resources/img/background2.png';
+
 import { RootState } from '../../redux/interface';
 import { setDashboardProvinceAction } from '../../redux';
 
@@ -41,6 +39,14 @@ interface Item {
     icon?: string;
     isCurrency?: boolean;
 }
+
+const routeToDashboard = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
+const routeToExplore = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
 
 export class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
@@ -198,15 +204,27 @@ export class Landing extends React.PureComponent<Props, State> {
                     for UK business, and trade with India and China.
                 </p>
                 <p>
-                    This potential is hampered by complex investment
-                    rules and processes, costly and unreliable energy supply,
-                    poor transport infrastructure, political instability,
-                    weak institutions and poor governance.
+                    This potential is hampered by complex investment rules and processes,
+                    costly and unreliable energy supply, poor transport infrastructure,
+                    political instability, weak institutions and poor governance.
+                    Nepal is highly vulnerable to natural disasters and climate
+                    change which can push populations back into poverty,
+                    destroy infrastructure and undermine growth.
+                    The 2015 earthquakes caused extensive damage and Nepal
+                    remains at high risk of a catastrophic earthquake.
                 </p>
                 <p>
-                    Nepal is highly vulnerable to natural disasters
-                    and climate change which can push populations
-                    back into poverty, destroy infrastructure and undermine growth.
+                    Nepal is the 16 poorest country in the world and the second poorest
+                    in Asia (after Afghanistan) in terms of per capita income.
+                    23% of the population of 28 million people live on less than $1.25 a day.
+                    The poorest people live in the inaccessible west
+                    of the country or are from the dalit (untouchable) caste.
+                    High unemployment means that about 1,500 Nepalis migrate for work every day.
+                    Nepal’s poverty and inequality is reflected
+                    in its ranking for human development; it is ranked
+                    145 in the world in the Human Development Index,
+                    a situation which has not improved significantly
+                    since emerging from conflict in 2006.
                 </p>
             </div>
         </div>
@@ -223,24 +241,37 @@ export class Landing extends React.PureComponent<Props, State> {
 
         return (
             <div className={styles.landing}>
+                <div className={styles.header}>
+                    <img
+                        className={styles.logo}
+                        src={logo}
+                    />
+                    <div className={styles.backdrop} />
+                    <img
+                        src={backgroundImage}
+                        className={styles.background}
+                    />
+                    <div className={styles.menu}>
+                        <Link
+                            className={styles.link}
+                            to={routeToDashboard}
+                        >
+                            Dashboard
+                        </Link>
+                        <Link
+                            className={styles.link}
+                            to={routeToExplore}
+                        >
+                            Explore
+                        </Link>
+                    </div>
+                </div>
                 <div className={styles.body}>
                     <div className={styles.left}>
-                        <img
-                            className={styles.logo}
-                            src={logo}
-                        />
                         <Overview />
                         <About />
                     </div>
                     <div className={styles.right}>
-                        <div className={styles.links}>
-                            <h4 className={styles.heading}>
-                                Links
-                            </h4>
-                            <div className={styles.content}>
-                                Links maybe
-                            </div>
-                        </div>
                         <div className={styles.provinceList}>
                             <h4 className={styles.heading}>
                                 Provinces
@@ -255,14 +286,71 @@ export class Landing extends React.PureComponent<Props, State> {
                 </div>
 
                 <footer className={styles.footer}>
-                    <div className={styles.title}>
-                        DFID Nepal
+                    <div className={styles.address}>
+                        <div className={styles.title}>
+                            DFID Nepal
+                        </div>
+                        <div className={styles.info}>
+                            British Embassy 
+                        </div>
+                        <div className={styles.info}>
+                            PO Box 106
+                        </div>
+                        <div className={styles.info}>
+                            Kathmandu, Nepal
+                        </div>
                     </div>
-                    <div className={styles.link}>
-                        Dashboard
+                    <div className={styles.contact}>
+                        <div
+                            className={styles.info}
+                            title="Email"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-envelope" />
+                            </div>
+                            <a
+                                className={styles.value}
+                                href="mailto:nepal-enquiries@dfid.gov.uk"
+                            >
+                                nepal-enquiries@dfid.gov.uk
+                            </a>
+                        </div>
+                        <div
+                            className={styles.info}
+                            title="Telephone"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-phone" />
+                            </div>
+                            <div className={styles.value}>
+                                +977 1 5542980
+                            </div>
+                        </div>
+                        <div
+                            className={styles.info}
+                            title="Fax"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-fax" />
+                            </div>
+                            <div className={styles.value}>
+                                +977 1 5000179
+                            </div>
+                        </div>
                     </div>
-                    <div className={styles.link}>
-                        Explore
+                    <div className={styles.links}>
+                        <Link
+                            className={styles.link}
+                            to={routeToDashboard}
+                        >
+                            Dashboard
+                        </Link>
+                        <Link
+                            className={styles.link}
+                            to={routeToExplore}
+                        >
+                            Explore
+                        </Link>
                     </div>
                 </footer>
             </div>

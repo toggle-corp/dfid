@@ -12,6 +12,7 @@ export const routes: Map<RouteSetting> = {
         path: '/',
         loader: () => import('../../views/Landing'),
         links: allLinks,
+        hideNavbar: true,
     },
 
     dashboard: {
