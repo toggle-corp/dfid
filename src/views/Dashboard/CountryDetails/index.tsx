@@ -142,9 +142,6 @@ export class CountryDetails extends React.PureComponent<Props, State>{
 
         return (
             <div className={classNames.join(' ')}>
-                <h3 className={styles.title}>
-                    Country details
-                </h3>
                 <Details />
             </div>
         );

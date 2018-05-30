@@ -12,6 +12,7 @@ import {
     RootState,
     ProgrammeData,
     ProgrammeSectorName,
+    ProgrammeDatum,
 } from '../../../redux/interface';
 
 import Item from '../Item';
@@ -19,7 +20,7 @@ import Item from '../Item';
 import styles from './styles.scss';
 
 interface OwnProps {
-    programmeId: number;
+    datum: ProgrammeDatum;
 }
 interface PropsFromState {
     selectedProgrammeData: ProgrammeData;
@@ -54,7 +55,7 @@ const renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
     </div>
 );
 
-export class ProgrammeDetails extends React.PureComponent<Props, State>{
+export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
     programmeDataRequest: RestRequest;
 
     render() {
@@ -108,4 +109,4 @@ const mapStateToProps = (state: RootState, props: Props) => ({
 
 export default connect<PropsFromState, OwnProps>(
     mapStateToProps,
-)(ProgrammeDetails);
+)(ProgrammeDetailInfo);

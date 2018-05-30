@@ -11,6 +11,9 @@ import {
     DashboardFilter,
     Indicator,
     MapLayer,
+    ProvinceDatum,
+    ProgrammeDatum,
+    SectorDatum,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -21,18 +24,17 @@ const emptyFaram: object = {
     faramErrors: {},
 };
 
-
 const provinceIdFromPropsSelector = (
-    state: RootState, props: { provinceId: number },
-) => (props.provinceId);
+    state: RootState, props: { datum: ProvinceDatum },
+) => (props.datum.id);
 
 const programmeIdFromPropsSelector = (
-    state: RootState, props: { programmeId: number },
-) => (props.programmeId);
+    state: RootState, props: { datum: ProgrammeDatum },
+) => (props.datum.id);
 
 const sectorIdFromPropsSelector = (
-    state: RootState, props: { sectorId: number },
-) => (props.sectorId);
+    state: RootState, props: { datum: SectorDatum },
+) => (props.datum.id);
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
     domainData.provinces || emptyArray

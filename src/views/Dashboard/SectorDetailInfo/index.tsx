@@ -7,12 +7,13 @@ import { sectorDataSelector } from '../../../redux';
 import {
     RootState,
     Sector,
+    SectorDatum,
 } from '../../../redux/interface';
 
 import styles from './styles.scss';
 
 interface OwnProps {
-    sectorId: number;
+    datum: SectorDatum;
 }
 interface PropsFromState {
     selectedSectorData: Sector;

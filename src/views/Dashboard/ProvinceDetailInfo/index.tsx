@@ -10,6 +10,7 @@ import {
     RootState,
     ProvinceData,
     ProgrammeName,
+    ProvinceDatum,
 } from '../../../redux/interface';
 
 import Item from '../Item';
@@ -17,7 +18,7 @@ import Item from '../Item';
 import styles from './styles.scss';
 
 interface OwnProps {
-    provinceId: number;
+    datum: ProvinceDatum;
 }
 interface PropsFromState {
     selectedProvinceData: ProvinceData;

@@ -120,12 +120,14 @@ interface State {
 }
 
 interface Routes {
+    country: string;
     province: string;
     programme: string;
     sector: string;
 }
 
 interface Views {
+    country: object;
     province: object;
     programme: object;
     sector: object;
@@ -181,15 +183,22 @@ export class Dashboard extends React.PureComponent<Props, State>{
         };
         this.pendingGeoJsonRequests = 0;
 
-        this.defaultHash = 'province';
+        this.defaultHash = 'country';
 
         this.routes = {
+            country: 'Country',
             province: 'Province',
             programme: 'Programme',
             sector: 'Sector',
         };
 
         this.views = {
+            country: {
+                component: () => (
+                    <CountryDetails className={styles.right} />
+                ),
+            },
+
             province: {
                 component: () => (
                     <MultiProvinceDetailInfo loading={this.state.loadingProvinceData} />
@@ -585,41 +594,21 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
-    renderInformation = () => {
-        const {
-            selectedProvinces,
-            selectedProgrammes,
-            selectedSectors,
-        } = this.props;
-
-        const showCountryDetails = !(
-            selectedProgrammes.length
-            || selectedProvinces.length
-            || selectedSectors.length
-        );
-
-        if (showCountryDetails) {
-            return (
-                <CountryDetails className={styles.right} />
-            );
-        }
-
-        return (
-            <div className={styles.right} >
-                <FixedTabs
-                    className={styles.fixedTabs}
-                    useHash
-                    replaceHistory
-                    tabs={this.routes}
-                    defaultHash={this.defaultHash}
-                />
-                <MultiViewContainer
-                    useHash
-                    views={this.views}
-                />
-            </div>
-        );
-    }
+    renderInformation = () => (
+        <div className={styles.right} >
+            <FixedTabs
+                className={styles.fixedTabs}
+                useHash
+                replaceHistory
+                tabs={this.routes}
+                defaultHash={this.defaultHash}
+            />
+            <MultiViewContainer
+                useHash
+                views={this.views}
+            />
+        </div>
+    )
 
     render() {
         // tslint:disable-next-line variable-name

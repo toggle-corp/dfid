@@ -28,13 +28,6 @@ interface State {}
 export class MultiProgrammeDetailInfo extends React.PureComponent<Props, State>{
     keyExtractor = (item: Programme) => item.id;
 
-    renderItem = (key: string, item: Programme) => (
-        <ProgrammeDetailInfo
-            key={key}
-            programmeId={item.id}
-        />
-    )
-
     render() {
         const {
             loading,
@@ -61,8 +54,8 @@ export class MultiProgrammeDetailInfo extends React.PureComponent<Props, State>{
             <ListView
                 className={styles.programmeList}
                 data={selectedProgrammes}
-                modifier={this.renderItem}
                 keyExtractor={this.keyExtractor}
+                renderer={ProgrammeDetailInfo}
             />
         );
     }
