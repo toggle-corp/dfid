@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import ListView from '../../../vendor/react-store/components/View/List/ListView';
 import Message from '../../../vendor/react-store/components/View/Message';
 import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import { RestRequest } from '../../../vendor/react-store/utils/rest';
@@ -12,14 +11,16 @@ import {
     RootState,
     ProgrammeData,
     ProgrammeSectorName,
+    ProgrammeDatum,
 } from '../../../redux/interface';
 
 import Item from '../Item';
+import ListItem from '../ListItem';
 
 import styles from './styles.scss';
 
 interface OwnProps {
-    programmeId: number;
+    datum: ProgrammeDatum;
 }
 interface PropsFromState {
     selectedProgrammeData: ProgrammeData;
@@ -37,25 +38,12 @@ const renderBudget = (data: number) => (
     />
 );
 
-const renderSector = (data: ProgrammeSectorName[]) => (
-    <ListView
-        className={styles.sectorList}
-        data={data}
-        modifier={renderProgrammeSectorName}
-    />
-);
+const renderSectorName = (data: ProgrammeSectorName) => data.sectorName;
 
-const renderProgrammeSectorName = (k: undefined, data: ProgrammeSectorName) => (
-    <div
-        key={data.sectorId}
-        className={styles.sectorName}
-    >
-        {data.sectorName}
-    </div>
-);
-
-export class ProgrammeDetails extends React.PureComponent<Props, State>{
+export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
     programmeDataRequest: RestRequest;
+
+    keySelector = (data: ProgrammeSectorName) => data.sectorId;
 
     render() {
         const {
@@ -79,23 +67,23 @@ export class ProgrammeDetails extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.programmeDetails}>
-                <Item
-                    label="Programme"
-                    value={program}
-                />
+                <h4 className={styles.heading}>
+                    {program}
+                </h4>
                 <Item
                     label="Budget"
                     value={programBudget}
                     valueModifier={renderBudget}
                 />
                 <Item
-                    label="Sector"
-                    value={sectors}
-                    valueModifier={renderSector}
-                />
-                <Item
                     label="Description"
                     value={description}
+                />
+                <ListItem
+                    label="Sector"
+                    values={sectors}
+                    valueModifier={renderSectorName}
+                    keySelector={this.keySelector}
                 />
             </div>
         );
@@ -108,4 +96,4 @@ const mapStateToProps = (state: RootState, props: Props) => ({
 
 export default connect<PropsFromState, OwnProps>(
     mapStateToProps,
-)(ProgrammeDetails);
+)(ProgrammeDetailInfo);

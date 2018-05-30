@@ -5,24 +5,17 @@ import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../vendor/react-store/utils/common';
 import ListView from '../../vendor/react-store/components/View/List/ListView';
-import Numeral from '../../vendor/react-store/components/View/Numeral';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import { pathNames } from '../../constants';
 import logo from '../../resources/img/logo.png';
-import budgetIcon from '../../resources/img/budget.png';
-import projectIcon from '../../resources/img/project.png';
-import province1Image from '../../resources/img/province1.png';
-import province2Image from '../../resources/img/province2.png';
-import province3Image from '../../resources/img/province3.png';
-import province4Image from '../../resources/img/province4.png';
-import province5Image from '../../resources/img/province5.png';
-import province6Image from '../../resources/img/province6.png';
-import province7Image from '../../resources/img/province7.png';
+import backgroundImage from '../../resources/img/background2.png';
+
 import { RootState } from '../../redux/interface';
 import { setDashboardProvinceAction } from '../../redux';
 
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
+import Province from './Province';
 
 import styles from './styles.scss';
 
@@ -47,6 +40,14 @@ interface Item {
     isCurrency?: boolean;
 }
 
+const routeToDashboard = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
+const routeToExplore = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
 export class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
     provincesData: object;
@@ -63,49 +64,42 @@ export class Landing extends React.PureComponent<Props, State> {
             1:  {
                 id: 1,
                 name: 'Province 1',
-                image: province1Image,
                 noOfActiveProjects: 5,
                 totalBudget: undefined,
             },
             2: {
                 id: 2,
                 name: 'Province 2',
-                image: province2Image,
                 noOfActiveProjects: 3,
                 totalBudget: undefined,
             },
             3: {
                 id: 3,
                 name: 'Province 3',
-                image: province3Image,
                 noOfActiveProjects: 3,
                 totalBudget: undefined,
             },
             4: {
                 id: 4,
                 name: 'Province 4',
-                image: province4Image,
                 noOfActiveProjects: 2,
                 totalBudget: undefined,
             },
             5: {
                 id: 5,
                 name: 'Province 5',
-                image: province5Image,
                 noOfActiveProjects: 3,
                 totalBudget: undefined,
             },
             6: {
                 id: 6,
                 name: 'Province 6',
-                image: province6Image,
                 noOfActiveProjects: 2,
                 totalBudget: undefined,
             },
             7: {
                 id: 7,
                 name: 'Province 7',
-                image: province7Image,
                 noOfActiveProjects: 1,
                 totalBudget: undefined,
             },
@@ -146,76 +140,6 @@ export class Landing extends React.PureComponent<Props, State> {
         this.props.setDashboardProvince(id);
     }
 
-    renderProvinceDetailItem = (k: undefined, data: Item) => (
-        <div
-            key={data.label}
-            className={styles.item}
-        >
-            <img
-                className={styles.icon}
-                src={data.icon}
-            />
-            <div className={styles.label}>
-                {data.label || '-'}
-            </div>
-            <div className={styles.value}>
-                <Numeral
-                    precision={data.isCurrency ? 2 : 0}
-                    prefix={data.isCurrency ? '£' : undefined}
-                    normal={data.isCurrency}
-                    value={data.value}
-                />
-            </div>
-        </div>
-    )
-
-    renderProvince = (k: undefined, id: number) => {
-        const {
-            name,
-            noOfActiveProjects,
-            totalBudget,
-            image,
-        } = this.provincesData[id] || this.defaultData;
-
-        const provinceDetailItemList = [
-            { label: 'Active DFID projects', value: noOfActiveProjects, icon: projectIcon },
-            {
-                label: 'Total budget (FY 2017/18)',
-                value: totalBudget,
-                icon: budgetIcon,
-                isCurrency: true,
-            },
-        ];
-
-        const route = {
-            pathname: reverseRoute(pathNames.dashboard),
-        };
-
-        return (
-            <Link
-                key={id}
-                to={route}
-                onClick={this.setDashboardProvince(id)}
-                className={styles.province}
-            >
-                <img
-                    className={styles.image}
-                    src={image}
-                />
-                <div className={styles.content}>
-                    <div className={styles.title}>
-                        {name || '-'}
-                    </div>
-                    <ListView
-                        className={styles.content}
-                        data={provinceDetailItemList}
-                        modifier={this.renderProvinceDetailItem}
-                    />
-                </div>
-            </Link>
-        );
-    }
-
     renderOverviewItem = (k: undefined, data: Item) => (
         <div
             key={data.label}
@@ -254,10 +178,9 @@ export class Landing extends React.PureComponent<Props, State> {
 
         return (
             <div className={styles.overview}>
-                <img
-                    className={styles.logo}
-                    src={logo}
-                />
+                <h2 className={styles.heading}>
+                    Overview
+                </h2>
                 <ListView
                     className={styles.content}
                     data={items}
@@ -269,7 +192,7 @@ export class Landing extends React.PureComponent<Props, State> {
 
     renderAbout = () => (
         <div className={styles.about}>
-            <h2 className={styles.title}>
+            <h2 className={styles.heading}>
                 About
             </h2>
             <div className={styles.content}>
@@ -281,27 +204,28 @@ export class Landing extends React.PureComponent<Props, State> {
                     for UK business, and trade with India and China.
                 </p>
                 <p>
-                    This potential is hampered by complex investment
-                    rules and processes, costly and unreliable energy supply,
-                    poor transport infrastructure, political instability,
-                    weak institutions and poor governance.
+                    This potential is hampered by complex investment rules and processes,
+                    costly and unreliable energy supply, poor transport infrastructure,
+                    political instability, weak institutions and poor governance.
+                    Nepal is highly vulnerable to natural disasters and climate
+                    change which can push populations back into poverty,
+                    destroy infrastructure and undermine growth.
+                    The 2015 earthquakes caused extensive damage and Nepal
+                    remains at high risk of a catastrophic earthquake.
                 </p>
                 <p>
-                    Nepal is highly vulnerable to natural disasters
-                    and climate change which can push populations
-                    back into poverty, destroy infrastructure and undermine growth.
+                    Nepal is the 16 poorest country in the world and the second poorest
+                    in Asia (after Afghanistan) in terms of per capita income.
+                    23% of the population of 28 million people live on less than $1.25 a day.
+                    The poorest people live in the inaccessible west
+                    of the country or are from the dalit (untouchable) caste.
+                    High unemployment means that about 1,500 Nepalis migrate for work every day.
+                    Nepal’s poverty and inequality is reflected
+                    in its ranking for human development; it is ranked
+                    145 in the world in the Human Development Index,
+                    a situation which has not improved significantly
+                    since emerging from conflict in 2006.
                 </p>
-            </div>
-        </div>
-    )
-
-    renderExplore = () => (
-        <div className={styles.explore}>
-            <h2 className={styles.title}>
-                Explore
-            </h2>
-            <div className={styles.content}>
-                -
             </div>
         </div>
     )
@@ -313,38 +237,120 @@ export class Landing extends React.PureComponent<Props, State> {
         // tslint:disable-next-line variable-name
         const About = this.renderAbout;
 
-        // tslint:disable-next-line variable-name
-        const Explore = this.renderExplore;
+        const provincesDataList = Object.values(this.provincesData);
 
         return (
             <div className={styles.landing}>
-                <div className={styles.left}>
-                    <Overview />
-                    <div className={styles.bottomContent}>
-                        <About />
-                        <Explore />
+                <div className={styles.header}>
+                    <img
+                        className={styles.logo}
+                        src={logo}
+                    />
+                    <div className={styles.backdrop} />
+                    <img
+                        src={backgroundImage}
+                        className={styles.background}
+                    />
+                    <div className={styles.menu}>
+                        <Link
+                            className={styles.link}
+                            to={routeToDashboard}
+                        >
+                            Dashboard
+                        </Link>
+                        <Link
+                            className={styles.link}
+                            to={routeToExplore}
+                        >
+                            Explore
+                        </Link>
                     </div>
                 </div>
-             <div className={styles.right}>
-                    <h2 className={styles.title}>
-                        Provinces
-                    </h2>
-                    <ListView
-                        className={styles.content}
-                        data={this.provinces}
-                        modifier={this.renderProvince}
-                    />
+                <div className={styles.body}>
+                    <div className={styles.left}>
+                        <Overview />
+                        <About />
+                    </div>
+                    <div className={styles.right}>
+                        <div className={styles.provinceList}>
+                            <h4 className={styles.heading}>
+                                Provinces
+                            </h4>
+                            <ListView
+                                className={styles.content}
+                                data={provincesDataList}
+                                renderer={Province}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-            <footer className={styles.footer}>
-                    <div className={styles.title}>
-                        DFID Nepal
+                <footer className={styles.footer}>
+                    <div className={styles.address}>
+                        <div className={styles.title}>
+                            DFID Nepal
+                        </div>
+                        <div className={styles.info}>
+                            British Embassy 
+                        </div>
+                        <div className={styles.info}>
+                            PO Box 106
+                        </div>
+                        <div className={styles.info}>
+                            Kathmandu, Nepal
+                        </div>
                     </div>
-                    <div className={styles.link}>
-                        Dashboard
+                    <div className={styles.contact}>
+                        <div
+                            className={styles.info}
+                            title="Email"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-envelope" />
+                            </div>
+                            <a
+                                className={styles.value}
+                                href="mailto:nepal-enquiries@dfid.gov.uk"
+                            >
+                                nepal-enquiries@dfid.gov.uk
+                            </a>
+                        </div>
+                        <div
+                            className={styles.info}
+                            title="Telephone"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-phone" />
+                            </div>
+                            <div className={styles.value}>
+                                +977 1 5542980
+                            </div>
+                        </div>
+                        <div
+                            className={styles.info}
+                            title="Fax"
+                        >
+                            <div className={styles.label}>
+                                <span className="fa fa-fax" />
+                            </div>
+                            <div className={styles.value}>
+                                +977 1 5000179
+                            </div>
+                        </div>
                     </div>
-                    <div className={styles.link}>
-                        Explore
+                    <div className={styles.links}>
+                        <Link
+                            className={styles.link}
+                            to={routeToDashboard}
+                        >
+                            Dashboard
+                        </Link>
+                        <Link
+                            className={styles.link}
+                            to={routeToExplore}
+                        >
+                            Explore
+                        </Link>
                     </div>
                 </footer>
             </div>

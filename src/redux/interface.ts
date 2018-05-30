@@ -205,3 +205,17 @@ export interface MapLayer {
 export interface SetMapLayersAction {
     mapLayers: MapLayer[];
 }
+
+export interface ProvinceDatum {
+    id: number;
+}
+
+export interface ProgrammeDatum {
+    id: number;
+}
+
+export interface SectorDatum {
+    id: number;
+}
+
+

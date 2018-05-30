@@ -25,16 +25,8 @@ type Props = OwnProps & PropsFromState;
 
 interface State {}
 
-
 export class MultiProvinceDetailInfo extends React.PureComponent<Props, State>{
     keyExtractor = (item: Province) => item.id;
-
-    renderItem = (key: string, item: Province) => (
-        <ProvinceDetailInfo
-            key={key}
-            provinceId={item.id}
-        />
-    )
 
     render() {
         const {
@@ -62,8 +54,8 @@ export class MultiProvinceDetailInfo extends React.PureComponent<Props, State>{
             <ListView
                 className={styles.provinceList}
                 data={selectedProvinces}
-                modifier={this.renderItem}
                 keyExtractor={this.keyExtractor}
+                renderer={ProvinceDetailInfo}
             />
         );
     }

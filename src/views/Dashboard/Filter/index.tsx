@@ -177,7 +177,7 @@ export class Filter extends React.PureComponent<Props, State>{
             isHidden,
         } = faramState;
 
-        if (isHidden) {
+        if (isHidden || disabled) {
             return this.renderPopup();
         }
 

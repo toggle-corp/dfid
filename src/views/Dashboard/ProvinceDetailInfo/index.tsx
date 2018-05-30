@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import ListView from '../../../vendor/react-store/components/View/List/ListView';
 import Message from '../../../vendor/react-store/components/View/Message';
 import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import { provinceDataSelector } from '../../../redux';
@@ -10,14 +9,16 @@ import {
     RootState,
     ProvinceData,
     ProgrammeName,
+    ProvinceDatum,
 } from '../../../redux/interface';
 
 import Item from '../Item';
+import ListItem from '../ListItem';
 
 import styles from './styles.scss';
 
 interface OwnProps {
-    provinceId: number;
+    datum: ProvinceDatum;
 }
 interface PropsFromState {
     selectedProvinceData: ProvinceData;
@@ -28,28 +29,7 @@ type Props = OwnProps & PropsFromState;
 interface State {
 }
 
-const marker = '•';
-
-const renderProgrammeName = (k: undefined, data: ProgrammeName) => (
-    <div
-        key={data.programID}
-        className={styles.programmeName}
-    >
-        <span className={styles.marker}>
-            {marker}
-        </span>
-        <span className={styles.title}>
-            {data.programName}
-        </span>
-    </div>
-);
-const renderActiveProgrammes = (data = []) => (
-    <ListView
-        className={styles.programme}
-        data={data}
-        modifier={renderProgrammeName}
-    />
-);
+const renderProgrammeName = (datum: ProgrammeName) => datum.programName;
 
 const renderPound = (data: number) => (
     <Numeral
@@ -73,6 +53,9 @@ const renderNumeral = (data: number) => (
 );
 
 export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
+
+    keySelector = (data: ProgrammeName) => data.programID;
+
     render() {
         const {
             selectedProvinceData,
@@ -92,7 +75,6 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
             district,
             area,
             populationDensity,
-            // programmeName,
             povertyRate,
             populationUnderPovertyLine,
             perCapitaIncome,
@@ -107,10 +89,9 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.provinceDetails}>
-                <Item
-                    label="Province"
-                    value={province}
-                />
+                <h4 className={styles.heading}>
+                    {province}
+                </h4>
                 <Item
                     label="Total population"
                     value={totalPopulation}
@@ -165,14 +146,15 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
                     valueModifier={renderDollar}
                 />
                 <Item
-                    label="Active programmes"
-                    value={activeProgrammes}
-                    valueModifier={renderActiveProgrammes}
-                />
-                <Item
                     label="Total budget"
                     value={totalBudget}
                     valueModifier={renderPound}
+                />
+                <ListItem
+                    label="Active programmes"
+                    values={activeProgrammes}
+                    valueModifier={renderProgrammeName}
+                    keySelector={this.keySelector}
                 />
             </div>
         );
