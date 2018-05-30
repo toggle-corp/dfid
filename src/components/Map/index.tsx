@@ -1,10 +1,28 @@
 import React from 'react';
 import mapboxgl from 'mapbox-gl';
-import { MapContext } from './MapLayer';
+import MapLayer, { MapContext, GeoJSON } from './MapLayer';
+
+export interface LayerInfo {
+    layerKey: string;
+    order: number;
+    geoJson: GeoJSON;
+    type: string;
+    separateStroke?: boolean;
+    color?: string;
+    opacity?: number;
+    visibilityKey?: string;
+    idKey?: string;
+    labelKey?: string;
+    zoomOnLoad?: boolean;
+    handleHover?: boolean;
+    showPopUp?: boolean;
+    onClick?(key: String): void;
+}
 
 interface OwnProps {
     className: string;
-    children?: React.ReactNode;
+    layers: { [key: string]: LayerInfo };
+    hideLayers?: boolean;
 }
 
 type Props = OwnProps;
@@ -24,7 +42,26 @@ export default class Map extends React.PureComponent<Props, States> {
     sources: string[];
     mapElement: HTMLDivElement;
 
+    sortedLayers: LayerInfo[];
+    reloadKey: number;
+
     static defaultProps = defaultProps;
+
+    static generateSortedLayers = (layers: Props['layers']) => ([
+        ...Object.values(layers)
+            .sort((l1, l2) => l1.order - l2.order),
+        ...Object.values(layers)
+            .filter(l => l.separateStroke)
+            .sort((l1, l2) => l1.order - l2.order)
+            .map(l => ({
+                order: 0,
+                layerKey: `${l.layerKey}-stroke`,
+                type: 'Line',
+                geoJson: l.geoJson,
+                color: l.color,
+                opacity: l.opacity,
+            })),
+    ])
 
     constructor(props: Props) {
         super(props);
@@ -34,10 +71,18 @@ export default class Map extends React.PureComponent<Props, States> {
         this.state = {
             map: undefined,
         };
+        this.sortedLayers = [];
+
+        this.reloadKey = 0;
     }
 
     componentDidMount() {
         this.mounted = true;
+
+        if (!this.props.hideLayers) {
+            this.sortedLayers = Map.generateSortedLayers(this.props.layers);
+            this.reloadKey += 1;
+        }
 
         const { REACT_APP_MAPBOX_ACCESS_TOKEN: token } = process.env;
         // Add the mapbox map
@@ -60,6 +105,25 @@ export default class Map extends React.PureComponent<Props, States> {
         });
 
         setTimeout(() => { map.resize(); }, 200);
+    }
+
+    componentWillReceiveProps(nextProps: Props) {
+        const {
+            hideLayers: oldHideLayers,
+            layers: oldLayers,
+        } = this.props;
+        const {
+            hideLayers: newHideLayers,
+            layers: newLayers,
+        } = nextProps;
+
+        if (
+            (!newHideLayers && oldHideLayers !== newHideLayers) ||
+            (!newHideLayers && oldLayers !== newLayers)
+        ) {
+            this.sortedLayers = Map.generateSortedLayers(newLayers);
+            this.reloadKey += 1;
+        }
     }
 
     componentWillUnmount() {
@@ -85,12 +149,14 @@ export default class Map extends React.PureComponent<Props, States> {
 
     render() {
         const className = this.getClassName();
-        const { children } = this.props;
+        const { hideLayers } = this.props;
+
         const { map } = this.state;
 
         const mapContextData = {
             map,
         };
+
 
         return (
             <div
@@ -98,7 +164,17 @@ export default class Map extends React.PureComponent<Props, States> {
                 ref={(el: HTMLDivElement) => { this.mapElement = el; }}
             >
                 <MapContext.Provider value={mapContextData}>
-                    {children}
+                    {
+                        !hideLayers && this.sortedLayers.map((l: LayerInfo, index: number) => (
+                            <MapLayer
+                                key={`${l.layerKey}-layer-${this.reloadKey}`}
+                                fill={l.type === 'Fill'}
+                                stroke={l.type === 'Line'}
+                                point={l.type === 'Point'}
+                                {...l}
+                            />
+                        ))
+                    }
                 </MapContext.Provider>
             </div>
         );

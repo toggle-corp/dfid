@@ -1,16 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../vendor/react-store/components/View/Message';
-import ListView from '../../../vendor/react-store/components/View/List/ListView';
-import { dashboardProgrammesSelector } from '../../../redux';
+import Message from '../../../../vendor/react-store/components/View/Message';
+import ListView from '../../../../vendor/react-store/components/View/List/ListView';
+import { dashboardProgrammesSelector } from '../../../../redux';
 
 import {
     RootState,
     Programme,
-} from '../../../redux/interface';
+} from '../../../../redux/interface';
 
-import ProgrammeDetailInfo from '../ProgrammeDetailInfo';
+import ProgrammeDetailInfo from './ProgrammeDetailInfo';
 
 import styles from './styles.scss';
 

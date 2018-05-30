@@ -1,11 +1,11 @@
-@import '../../../stylesheets/base';
+@import '../../../../../stylesheets/base';
 
 .message {
     flex-grow: 1;
     height: auto;
 }
 
-.province-details {
+.programme-details {
     padding-bottom: $spacing-large;
 
     .heading {
@@ -17,5 +17,11 @@
         width: 100%;
         color: $color-accent;
         font-weight: $font-weight-bold;
+    }
+
+    .sector-list {
+        .sector-name {
+            padding: 0;
+        }
     }
 }

@@ -1,21 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../vendor/react-store/components/View/Numeral';
-import { RestRequest } from '../../../vendor/react-store/utils/rest';
+import Message from '../../../../../vendor/react-store/components/View/Message';
+import Numeral from '../../../../../vendor/react-store/components/View/Numeral';
 
-import { programmeDataSelector } from '../../../redux';
+import { programmeDataSelector } from '../../../../../redux';
 
 import {
     RootState,
     ProgrammeData,
     ProgrammeSectorName,
     ProgrammeDatum,
-} from '../../../redux/interface';
+} from '../../../../../redux/interface';
 
-import Item from '../Item';
-import ListItem from '../ListItem';
+import ListItem from '../../../ListItem';
+import Item from '../../../../../components/Item';
 
 import styles from './styles.scss';
 
@@ -41,8 +40,6 @@ const renderBudget = (data: number) => (
 const renderSectorName = (data: ProgrammeSectorName) => data.sectorName;
 
 export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
-    programmeDataRequest: RestRequest;
-
     keySelector = (data: ProgrammeSectorName) => data.sectorId;
 
     render() {
