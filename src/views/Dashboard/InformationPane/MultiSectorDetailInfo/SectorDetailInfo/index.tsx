@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../vendor/react-store/components/View/Message';
+import Message from '../../../../../vendor/react-store/components/View/Message';
 
-import { sectorDataSelector } from '../../../redux';
+import { sectorDataSelector } from '../../../../../redux';
 import {
     RootState,
     Sector,
     SectorDatum,
-} from '../../../redux/interface';
+} from '../../../../../redux/interface';
 
 import styles from './styles.scss';
 

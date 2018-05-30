@@ -3,7 +3,7 @@ import {
     FgRestBuilder,
 } from '../../../vendor/react-store/utils/rest';
 
-import { CountryDetails } from '../CountryDetails';
+import { Dashboard } from '../index';
 import {
     CountryData,
     SetCountriesDataAction,
@@ -16,7 +16,7 @@ import { Request } from '../../../rest/interface';
 import schema from '../../../schema';
 
 interface Props {
-    setState: CountryDetails['setState'];
+    setState: Dashboard['setState'];
     setCountriesData(params: SetCountriesDataAction): void;
 }
 

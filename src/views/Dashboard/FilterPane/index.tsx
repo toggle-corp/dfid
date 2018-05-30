@@ -2,7 +2,6 @@ import React from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
-import { iconNames } from '../../../constants';
 import SelectInputWithList from '../../../vendor/react-store/components/Input/SelectInputWithList';
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
@@ -36,6 +35,7 @@ import {
     FaramErrors,
     Schema,
 } from '../../../rest/interface';
+import { iconNames } from '../../../constants';
 
 import styles from './styles.scss';
 
@@ -61,7 +61,7 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State { }
 
-export class Filter extends React.PureComponent<Props, State>{
+export class FilterPane extends React.PureComponent<Props, State>{
     schema: Schema;
 
     static provinceKeyExtractor = (p: Province) => p.id;
@@ -236,8 +236,8 @@ export class Filter extends React.PureComponent<Props, State>{
                                 className={styles.input}
                                 faramElementName="provincesId"
                                 options={provinces}
-                                keySelector={Filter.provinceKeyExtractor}
-                                labelSelector={Filter.provinceLabelExtractor}
+                                keySelector={FilterPane.provinceKeyExtractor}
+                                labelSelector={FilterPane.provinceLabelExtractor}
                                 showHintAndError={false}
                             />
                             <SelectInputWithList
@@ -245,8 +245,8 @@ export class Filter extends React.PureComponent<Props, State>{
                                 className={styles.input}
                                 options={programmes}
                                 faramElementName="programmesId"
-                                keySelector={Filter.programmeKeyExtractor}
-                                labelSelector={Filter.programmeLabelExtractor}
+                                keySelector={FilterPane.programmeKeyExtractor}
+                                labelSelector={FilterPane.programmeLabelExtractor}
                                 showHintAndError={false}
                             />
                             <SelectInputWithList
@@ -254,8 +254,8 @@ export class Filter extends React.PureComponent<Props, State>{
                                 className={styles.input}
                                 options={sectors}
                                 faramElementName="sectorsId"
-                                keySelector={Filter.sectorKeyExtractor}
-                                labelSelector={Filter.sectorLabelExtractor}
+                                keySelector={FilterPane.sectorKeyExtractor}
+                                labelSelector={FilterPane.sectorLabelExtractor}
                                 showHintAndError={false}
                             />
                         </div>
@@ -270,8 +270,8 @@ export class Filter extends React.PureComponent<Props, State>{
                                 className={styles.input}
                                 options={indicators}
                                 faramElementName="indicatorsId"
-                                keySelector={Filter.indicatorKeyExtractor}
-                                labelSelector={Filter.indicatorLabelExtractor}
+                                keySelector={FilterPane.indicatorKeyExtractor}
+                                labelSelector={FilterPane.indicatorLabelExtractor}
                                 showHintAndError={false}
                             />
                             <SelectInputWithList
@@ -279,8 +279,8 @@ export class Filter extends React.PureComponent<Props, State>{
                                 className={styles.input}
                                 options={mapLayers}
                                 faramElementName="mapLayersId"
-                                keySelector={Filter.mapLayerKeyExtractor}
-                                labelSelector={Filter.mapLayerLabelExtractor}
+                                keySelector={FilterPane.mapLayerKeyExtractor}
+                                labelSelector={FilterPane.mapLayerLabelExtractor}
                                 showHintAndError={false}
                             />
                         </div>
@@ -307,4 +307,4 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
     mapStateToProps, mapDispatchToProps,
-)(Filter);
+)(FilterPane);

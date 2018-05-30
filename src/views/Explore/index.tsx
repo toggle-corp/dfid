@@ -6,7 +6,9 @@ export default class Explore extends React.PureComponent {
     render() {
         return (
             <div className={styles.explore}>
-               <div className={styles.map} />
+               <div className={styles.map}>
+                    Map
+                </div>
                <div className={styles.stats}>
                     Stats
               </div>

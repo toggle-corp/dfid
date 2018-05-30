@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
-import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
-import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import {
@@ -15,6 +13,7 @@ import {
     urlForIpssjGeoJson,
 } from '../../rest';
 import {
+    setCountriesDataAction,
     setDashboardProvinceAction,
     setProvincesAction,
     setProvincesDataAction,
@@ -36,6 +35,7 @@ import {
     Sector,
     SetProvincesAction,
     SetProvincesDataAction,
+    SetCountriesDataAction,
     SetProgrammesAction,
     SetProgrammesDataAction,
     SetSectorsAction,
@@ -45,24 +45,21 @@ import {
     MapLayer,
 } from '../../redux/interface';
 
-import Map from '../../components/Map';
+import Map, { LayerInfo } from '../../components/Map';
+import { GeoJSON } from '../../components/Map/MapLayer';
 
-import GeoJsonLayer, { GeoJSON } from '../../components/Map/MapLayer';
+import FilterPane from './FilterPane';
+import InformationPane from './InformationPane';
 
-import CountryDetails from '../Dashboard/CountryDetails';
-import Filter from './Filter';
-import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
-import MultiProgrammeDetailInfo from '../Dashboard/MultiProgrammeDetailInfo';
-import MultiSectorDetailInfo from '../Dashboard/MultiSectorDetailInfo';
-
+import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
+import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
+import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
+import MapLayersGetRequest from './requests/MapLayersGetRequest';
+import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
+import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
-import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
-import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
-import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
-import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
-import MapLayersGetRequest from './requests/MapLayersGetRequest';
 
 import styles from './styles.scss';
 
@@ -74,6 +71,7 @@ interface PropsFromState {
     selectedMapLayers: MapLayer[];
 }
 interface PropsFromDispatch {
+    setCountriesData(params: SetCountriesDataAction): void;
     setProvinces(params: SetProvincesAction): void;
     setProvincesData(params: SetProvincesDataAction): void;
     setProgrammes(params: SetProgrammesAction): void;
@@ -90,47 +88,18 @@ type Dictionary<T> = {
     [key: string]: T;
 };
 
-interface LayerInfo {
-    layerKey: string;
-    order: number;
-    geoJson: GeoJSON;
-    type: string;
-    separateStroke?: boolean;
-    color?: string;
-    opacity?: number;
-    visibilityKey?: string;
-    idKey?: string;
-    labelKey?: string;
-    zoomOnLoad?: boolean;
-    handleHover?: boolean;
-    showPopUp?: boolean;
-    onClick?(key: String): void;
-}
-
 interface State {
+    loadingCountryData: boolean;
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
+
     loadingProvinces: boolean;
     loadingProgrammes: boolean;
     loadingSectors: boolean;
     loadingIndicators: boolean;
     layersInfo: Dictionary<LayerInfo>;
     loadingGeoJson: boolean;
-}
-
-interface Routes {
-    country: string;
-    province: string;
-    programme: string;
-    sector: string;
-}
-
-interface Views {
-    country: object;
-    province: object;
-    programme: object;
-    sector: object;
 }
 
 const sameArraysIgnoreOrder = (a: any[], b: any[]) => {
@@ -149,6 +118,7 @@ const sameArraysIgnoreOrder = (a: any[], b: any[]) => {
 };
 
 export class Dashboard extends React.PureComponent<Props, State>{
+    countryDataRequest: RestRequest;
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     programmeRequest: RestRequest;
@@ -160,72 +130,36 @@ export class Dashboard extends React.PureComponent<Props, State>{
     mapLayerGeoJsonRequests: Dictionary<RestRequest>;
     geoJsons: Dictionary<GeoJSON>;
     layersInfo: Dictionary<LayerInfo>;
-    routes: Routes;
-    defaultHash: string;
-    views: Views;
-    reloadKey: number;
     pendingGeoJsonRequests: number;
 
     constructor(props: Props) {
         super(props);
 
         this.state = {
+            loadingCountryData: false,
+
             loadingProvinceData: true,
             loadingProgrammeData: true,
             loadingProvinces: true,
+
             // FIXME: change to false
             loadingSectorData: false,
             loadingProgrammes: true,
             loadingSectors: true,
             loadingIndicators: true,
             loadingGeoJson: false,
+
             layersInfo: {},
         };
         this.pendingGeoJsonRequests = 0;
 
-        this.defaultHash = 'country';
-
-        this.routes = {
-            country: 'Country',
-            province: 'Province',
-            programme: 'Programme',
-            sector: 'Sector',
-        };
-
-        this.views = {
-            country: {
-                component: () => (
-                    <CountryDetails className={styles.right} />
-                ),
-            },
-
-            province: {
-                component: () => (
-                    <MultiProvinceDetailInfo loading={this.state.loadingProvinceData} />
-                ),
-            },
-
-            programme: {
-                component: () => (
-                    <MultiProgrammeDetailInfo loading={this.state.loadingProgrammeData} />
-                ),
-            },
-
-            sector: {
-                component: () => (
-                    <MultiSectorDetailInfo loading={this.state.loadingSectorData} />
-                ),
-            },
-        };
-
         this.geoJsons = {};
         this.layersInfo = {};
         this.mapLayerGeoJsonRequests = {};
-
-        this.reloadKey = 0;
     }
 
     componentDidMount() {
+        this.startRequestForCountriesData();
         this.startRequestForProvinceData();
         this.startRequestForProvinces();
         this.reloadProvince();
@@ -240,6 +174,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     componentWillUnmount() {
+        if (this.countryDataRequest) {
+            this.countryDataRequest.stop();
+        }
         if (this.provinceDataRequest) {
             this.provinceDataRequest.stop();
         }
@@ -267,6 +204,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (this.mapLayersRequest) {
             this.mapLayersRequest.stop();
         }
+    }
+
+    startRequestForCountriesData = () => {
+        if (this.countryDataRequest) {
+            this.countryDataRequest.stop();
+        }
+        const countryDataRequest = new CountriesDataGetRequest({
+            setState: params => this.setState(params),
+            setCountriesData: this.props.setCountriesData,
+        });
+        this.countryDataRequest = countryDataRequest.create();
+        this.countryDataRequest.start();
     }
 
     startRequestForProvinceData = () => {
@@ -388,7 +337,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     setLayersInfo = (layersInfo: Dictionary<LayerInfo>) => {
-        this.reloadKey += 1;
         this.layersInfo = layersInfo;
         this.setState({ layersInfo });
     }
@@ -594,28 +542,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
-    renderInformation = () => (
-        <div className={styles.right} >
-            <FixedTabs
-                className={styles.fixedTabs}
-                useHash
-                replaceHistory
-                tabs={this.routes}
-                defaultHash={this.defaultHash}
-            />
-            <MultiViewContainer
-                useHash
-                views={this.views}
-            />
-        </div>
-    )
-
     render() {
-        // tslint:disable-next-line variable-name
-        const Information = this.renderInformation;
-
         const {
             layersInfo,
+            loadingCountryData,
             loadingProvinceData,
             loadingProgrammeData,
             loadingSectorData,
@@ -625,47 +555,45 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingIndicators,
             loadingGeoJson,
         } = this.state;
+        const {
+            selectedProvinces,
+            selectedProgrammes,
+            selectedSectors,
+        } = this.props;
 
         const loading = (
             loadingProvinceData || loadingProgrammeData || loadingGeoJson ||
             loadingProvinces || loadingProgrammes || loadingSectors ||
-            loadingIndicators || loadingSectorData
+            loadingIndicators || loadingSectorData || loadingCountryData
         );
 
-        const layers = loadingGeoJson ? [] : [
-            ...Object.values(layersInfo).sort((l1, l2) => l1.order - l2.order),
-            ...Object.values(layersInfo).filter(
-                l => l.separateStroke,
-            ).sort((l1, l2) => l1.order - l2.order).map(l => ({
-                layerKey: `${l.layerKey}-stroke`,
-                type: 'Line',
-                geoJson: l.geoJson,
-                color: l.color,
-                opacity: l.opacity,
-            })),
-        ];
 
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
                     {loadingGeoJson && <LoadingAnimation />}
-                    <Filter
+                    <FilterPane
                         disabled={loading}
                         onChange={this.handleFilterChange}
                     />
-                    <Map className={styles.map}>
-                        {layers.map((l: LayerInfo, index: number) => (
-                            <GeoJsonLayer
-                                key={`${l.layerKey}-layer-${this.reloadKey}`}
-                                fill={l.type === 'Fill'}
-                                stroke={l.type === 'Line'}
-                                point={l.type === 'Point'}
-                                {...l}
-                            />
-                        ))}
-                    </Map>
+                    <Map
+                        className={styles.map}
+                        layers={layersInfo}
+                        hideLayers={loadingGeoJson}
+                    />
                 </div>
-                <Information />
+                <div className={styles.right} >
+                    <InformationPane
+                        selectedProvinces={selectedProvinces}
+                        selectedProgrammes={selectedProgrammes}
+                        selectedSectors={selectedSectors}
+
+                        loadingProvinceData={loadingProvinceData}
+                        loadingProgrammeData={loadingProgrammeData}
+                        loadingSectorData={loadingSectorData}
+                        loadingCountryData={loadingCountryData}
+                    />
+                </div>
             </div>
         );
     }
@@ -679,6 +607,7 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setCountriesData: (params: SetCountriesDataAction) => dispatch(setCountriesDataAction(params)),
     setProvinces: (params: SetProvincesAction) => dispatch(setProvincesAction(params)),
     setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
     setProvincesData: (params: SetProvincesDataAction) => dispatch(setProvincesDataAction(params)),

@@ -1,16 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../vendor/react-store/components/View/Message';
-import ListView from '../../../vendor/react-store/components/View/List/ListView';
-import { dashboardProvincesSelector } from '../../../redux';
+import Message from '../../../../vendor/react-store/components/View/Message';
+import ListView from '../../../../vendor/react-store/components/View/List/ListView';
+import { dashboardProvincesSelector } from '../../../../redux';
 
 import {
     RootState,
     Province,
-} from '../../../redux/interface';
+} from '../../../../redux/interface';
 
-import ProvinceDetailInfo from '../ProvinceDetailInfo';
+import ProvinceDetailInfo from './ProvinceDetailInfo';
 
 import styles from './styles.scss';
 

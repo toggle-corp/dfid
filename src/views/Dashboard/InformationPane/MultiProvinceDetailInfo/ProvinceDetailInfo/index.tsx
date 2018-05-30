@@ -1,19 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../vendor/react-store/components/View/Numeral';
-import { provinceDataSelector } from '../../../redux';
+import Message from '../../../../../vendor/react-store/components/View/Message';
+import Numeral from '../../../../../vendor/react-store/components/View/Numeral';
+import { provinceDataSelector } from '../../../../../redux';
 
 import {
     RootState,
     ProvinceData,
     ProgrammeName,
     ProvinceDatum,
-} from '../../../redux/interface';
+} from '../../../../../redux/interface';
 
-import Item from '../Item';
-import ListItem from '../ListItem';
+import ListItem from '../../../ListItem';
+
+import Item from '../../../../../components/Item';
 
 import styles from './styles.scss';
 
