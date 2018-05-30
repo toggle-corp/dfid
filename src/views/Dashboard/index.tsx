@@ -555,11 +555,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingIndicators,
             loadingGeoJson,
         } = this.state;
-        const {
-            selectedProvinces,
-            selectedProgrammes,
-            selectedSectors,
-        } = this.props;
 
         const loading = (
             loadingProvinceData || loadingProgrammeData || loadingGeoJson ||
@@ -584,10 +579,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 </div>
                 <div className={styles.right} >
                     <InformationPane
-                        selectedProvinces={selectedProvinces}
-                        selectedProgrammes={selectedProgrammes}
-                        selectedSectors={selectedSectors}
-
                         loadingProvinceData={loadingProvinceData}
                         loadingProgrammeData={loadingProgrammeData}
                         loadingSectorData={loadingSectorData}
