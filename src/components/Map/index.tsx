@@ -68,7 +68,9 @@ export default class Map extends React.PureComponent<Props, States> {
         // Remove the mapbox map
         const { map } = this.state;
         if (map) {
-            map.remove();
+            this.setState({ map: undefined }, () => {
+                map.remove();
+            });
         }
     }
 
