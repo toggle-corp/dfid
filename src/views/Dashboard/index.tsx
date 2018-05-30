@@ -3,7 +3,7 @@ import Redux from 'redux';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
-// import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import FixedTabs from '../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../vendor/react-store/components/View/MultiViewContainer';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
@@ -95,6 +95,7 @@ interface LayerInfo {
     order: number;
     geoJson: GeoJSON;
     type: string;
+    separateStroke?: boolean;
     color?: string;
     opacity?: number;
     visibilityKey?: string;
@@ -115,6 +116,7 @@ interface State {
     loadingSectors: boolean;
     loadingIndicators: boolean;
     layersInfo: Dictionary<LayerInfo>;
+    loadingGeoJson: boolean;
 }
 
 interface Routes {
@@ -160,6 +162,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     defaultHash: string;
     views: Views;
     reloadKey: number;
+    pendingGeoJsonRequests: number;
 
     constructor(props: Props) {
         super(props);
@@ -173,8 +176,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes: true,
             loadingSectors: true,
             loadingIndicators: true,
+            loadingGeoJson: false,
             layersInfo: {},
         };
+        this.pendingGeoJsonRequests = 0;
 
         this.defaultHash = 'province';
 
@@ -351,6 +356,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
             setMapLayerGeoJson: responseHandler,
             setGeoJsons: this.setGeoJsons,
+            preLoad: () => {
+                this.pendingGeoJsonRequests += 1;
+                this.setState({
+                    loadingGeoJson: this.pendingGeoJsonRequests > 0,
+                });
+            },
+            postLoad: () => {
+                this.pendingGeoJsonRequests -= 1;
+                this.setState({
+                    loadingGeoJson: this.pendingGeoJsonRequests > 0,
+                });
+            },
         });
 
         this.mapLayerGeoJsonRequests[key] = mapLayerGeoJsonRequest.create({ url });
@@ -487,13 +504,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 idKey: 'Province',
                 labelKey: 'Province',
                 onClick: this.handleMapClick,
-            });
-
-            selections.push({
-                id: 'country-line',
-                file: urlForCountryGeoJson,
-                type: 'Line',
-                order: -1,
+                separateStroke: true,
             });
         } else {
             selections = [
@@ -502,17 +513,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     file: createUrlForProvinceGeoJson(selectedProvince.id),
                     type: 'Fill',
                     order: 1,
-                    zoomOnLoad: true,
                     handleHover: true,
                     showPopUp: true,
                     idKey: 'FIRST_DCOD',
                     labelKey: 'FIRST_DIST',
-                })),
-                ...selectedProvinces.map(selectedProvince => ({
-                    id: `${selectedProvince.id}-line`,
-                    file: createUrlForProvinceGeoJson(selectedProvince.id),
-                    type: 'Line',
-                    order: -1,
+                    separateStroke: true,
                 })),
             ];
         }
@@ -548,13 +553,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
         const ipss = selectedProgrammes.find(p => (
             p.name === 'Integrated Programme for Strengthening Security and Justice'
         ));
-        if (!ipss) {
-            return;
+        const selectedList = [];
+        if (ipss) {
+            selectedList.push(ipss);
         }
 
         this.reloadSelectionToLayers({
+            selectedList,
             keyPrefix: 'programmeLayer',
-            selectedList: [ipss],
             visibilityKey: 'ActLevel',
             typeOverride: 'Fill',
             color: '#2ecc71',
@@ -628,27 +634,32 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes,
             loadingSectors,
             loadingIndicators,
+            loadingGeoJson,
         } = this.state;
 
         const loading = (
-            loadingProvinceData || loadingProgrammeData ||
+            loadingProvinceData || loadingProgrammeData || loadingGeoJson ||
             loadingProvinces || loadingProgrammes || loadingSectors ||
             loadingIndicators || loadingSectorData
         );
 
-        const layers = [
+        const layers = loadingGeoJson ? [] : [
+            ...Object.values(layersInfo).sort((l1, l2) => l1.order - l2.order),
             ...Object.values(layersInfo).filter(
-                l => l.order >= 0,
-            ).sort((l1, l2) => l1.order - l2.order),
-            ...Object.values(layersInfo).filter(
-                l => l.order < 0,
-            ).sort((l1, l2) => l1.order - l2.order),
+                l => l.separateStroke,
+            ).sort((l1, l2) => l1.order - l2.order).map(l => ({
+                layerKey: `${l.layerKey}-stroke`,
+                type: 'Line',
+                geoJson: l.geoJson,
+                color: l.color,
+                opacity: l.opacity,
+            })),
         ];
 
         return (
             <div className={styles.dashboard}>
                 <div className={styles.left}>
-                    {/* loadingGeoJson && <LoadingAnimation /> */}
+                    {loadingGeoJson && <LoadingAnimation />}
                     <Filter
                         disabled={loading}
                         onChange={this.handleFilterChange}
