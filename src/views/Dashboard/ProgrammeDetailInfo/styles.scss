@@ -6,7 +6,18 @@
 }
 
 .programme-details {
-    padding: 5px;
+    padding-bottom: $spacing-large;
+
+    .heading {
+        position: sticky;
+        top: 0;
+        border-bottom: $width-separator-thin solid $color-accent;
+        background-color: $color-foreground;
+        padding: $spacing-small $spacing-medium;
+        width: 100%;
+        color: $color-accent;
+        font-weight: $font-weight-bold;
+    }
 
     .sector-list {
         .sector-name {

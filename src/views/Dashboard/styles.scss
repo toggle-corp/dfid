@@ -1,12 +1,13 @@
 @import '../../stylesheets/base';
 
-$width-right-panel: 460px;
+$width-right-panel: 340px;
 
 .dashboard {
     @extend %main-content;
     display: flex;
 
     >.left {
+        position: relative;
         flex-grow: 1;
 
         .map {
@@ -21,7 +22,8 @@ $width-right-panel: 460px;
         flex-direction: column;
         flex-grow: 0;
         flex-shrink: 0;
-        background-color: $color-foreground;
+        z-index: 1;
+        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
 
         .fixed-tabs {
             flex-shrink: 0;

@@ -22,8 +22,8 @@ $height-header: 8px;
 .filters-container {
     @extend %float-position;
     display: flex;
-    flex-direction: column;
     position: absolute;
+    flex-direction: column;
     opacity: .9;
     z-index: 1;
     background-color: $color-foreground-alt;
@@ -33,8 +33,8 @@ $height-header: 8px;
     .header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         flex-shrink: 0;
+        justify-content: space-between;
 
         .close {
             padding: $spacing-small $spacing-medium;

@@ -1,0 +1,29 @@
+@import '../../../stylesheets/base';
+
+.list-item {
+    @extend %background-alternating-row;
+
+    .label {
+        padding: $spacing-extra-small $spacing-medium;
+        color: $color-text-label;
+    }
+
+    .list {
+        padding: $spacing-extra-small 0;
+
+        .item {
+            display: flex;
+            padding: $spacing-extra-small $spacing-medium;
+
+            .marker {
+                flex-shrink: 0;
+                padding-right: $spacing-small;
+            }
+
+            .title {
+                flex-grow: 1;
+                padding: 0;
+            }
+        }
+    }
+}
