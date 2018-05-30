@@ -14,6 +14,8 @@ import { Request } from '../../../rest/interface';
 interface Props {
     setMapLayerGeoJson(geoJson: GeoJSON): void;
     setGeoJsons(url: string, geoJsons: GeoJSON): void;
+    preLoad(): void;
+    postLoad(): void;
 }
 
 interface MapLayerGeoJsonParams {
@@ -31,8 +33,8 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
         const request = new FgRestBuilder()
             .url(url)
             .params(createParamsForProvinces)
-            .preLoad()
-            .postLoad()
+            .preLoad(this.props.preLoad)
+            .postLoad(this.props.postLoad)
             .success((response: GeoJSON) => {
                 // schema.validate(response, 'countryGeoJson');
                 let geoJson;
