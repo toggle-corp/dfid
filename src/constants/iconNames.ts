@@ -9,6 +9,9 @@ const iconNames: Readonly<{
     filter: 'fa fa-filter',
     refresh: 'ion-refresh',
     check: 'ion-checkmark',
+    chevronUp: 'ion-chevron-up',
+    information: 'ion-information',
+    informationCircle: 'ion-information-circled',
 };
 
 export default iconNames;

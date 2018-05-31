@@ -1,4 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
+
+import Button from '../../../vendor/react-store/components/Action/Button';
+import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
 import FixedTabs from '../../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../../vendor/react-store/components/View/MultiViewContainer';
 
@@ -7,6 +10,8 @@ import MultiProgrammeDetailInfo from './MultiProgrammeDetailInfo';
 import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
 import MultiSectorDetailInfo from './MultiSectorDetailInfo';
 
+import { iconNames } from '../../../constants';
+
 import styles from './styles.scss';
 
 interface Props {
@@ -14,9 +19,13 @@ interface Props {
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
     loadingCountryData: boolean;
+    className?: string;
 }
 
-interface State {}
+interface State {
+    isCollapsed: boolean;
+    activeTab: string;
+}
 
 interface Routes {
     province: string;
@@ -38,6 +47,11 @@ export default class InformationPane extends React.PureComponent<Props, State>{
 
     constructor(props: Props) {
         super(props);
+
+        this.state = {
+            isCollapsed: true,
+            activeTab: 'country',
+        };
 
         this.routes = {
             country: 'Country',
@@ -73,20 +87,61 @@ export default class InformationPane extends React.PureComponent<Props, State>{
         };
     }
 
+    handleCollapseButtonClick = () => {
+        this.setState({ isCollapsed: true });
+    }
+
+    handleShowInformationButtonClick = () => {
+        this.setState({ isCollapsed: false });
+    }
+
+    handleTabChange = (tab: string) => {
+        this.setState({ activeTab: tab });
+    }
+
     render() {
+        const { className } = this.props;
+        const {
+            isCollapsed,
+            activeTab,
+        } = this.state;
+
+        const classNames = [
+            className,
+            styles.informationPane,
+        ];
+
+        if (isCollapsed) {
+            return (
+                <PrimaryButton
+                    className={styles.showInformationButton}
+                    onClick={this.handleShowInformationButtonClick}
+                    title="Show information pane"
+                    iconName={iconNames.informationCircle}
+                />
+            );
+        }
+
         return (
-            <Fragment>
+            <div className={classNames.join(' ')}>
                 <FixedTabs
                     className={styles.fixedTabs}
-                    useHash
-                    replaceHistory
                     tabs={this.routes}
-                />
+                    active={activeTab}
+                    onClick={this.handleTabChange}
+                >
+                    <Button
+                        title="Collapse information pane"
+                        onClick={this.handleCollapseButtonClick}
+                        iconName={iconNames.chevronUp}
+                        transparent
+                    />
+                </FixedTabs>
                 <MultiViewContainer
-                    useHash
+                    active={activeTab}
                     views={this.views}
                 />
-            </Fragment>
+            </div>
         );
     }
 }

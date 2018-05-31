@@ -475,6 +475,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     idKey: 'FIRST_DCOD',
                     labelKey: 'FIRST_DIST',
                     separateStroke: true,
+                    zoomOnLoad: selectedProvinces.length === 1,
                 })),
             ];
         }
@@ -565,19 +566,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.dashboard}>
-                <div className={styles.left}>
+                <FilterPane
+                    className={styles.left}
+                    disabled={loading}
+                    onChange={this.handleFilterChange}
+                />
+                <div className={styles.right}>
                     {loadingGeoJson && <LoadingAnimation />}
-                    <FilterPane
-                        disabled={loading}
-                        onChange={this.handleFilterChange}
-                    />
                     <Map
                         className={styles.map}
                         layers={layersInfo}
                         hideLayers={loadingGeoJson}
                     />
-                </div>
-                <div className={styles.right} >
                     <InformationPane
                         loadingProvinceData={loadingProvinceData}
                         loadingProgrammeData={loadingProgrammeData}

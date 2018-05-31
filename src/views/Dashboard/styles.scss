@@ -1,12 +1,23 @@
 @import '../../stylesheets/base';
 
-$width-right-panel: 340px;
+$width-left-pane: 240px;
 
 .dashboard {
     @extend %main-content;
     display: flex;
 
     >.left {
+        display: flex;
+        position: relative;
+        flex-basis: $width-left-pane;
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 0;
+        z-index: 1;
+        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+    }
+
+    >.right {
         position: relative;
         flex-grow: 1;
 
@@ -14,15 +25,5 @@ $width-right-panel: 340px;
             width: 100%;
             height: 100%;
         }
-    }
-
-    >.right {
-        display: flex;
-        flex-basis: $width-right-panel;
-        flex-direction: column;
-        flex-grow: 0;
-        flex-shrink: 0;
-        z-index: 1;
-        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
     }
 }

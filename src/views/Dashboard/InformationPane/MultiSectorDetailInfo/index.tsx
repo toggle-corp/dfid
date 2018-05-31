@@ -37,15 +37,15 @@ export class MultiSectorDetailInfo extends React.PureComponent<Props, State>{
 
         if (!selectedSectors.length) {
             return (
-                <Message>
-                    Select a sector
+                <Message className={styles.message}>
+                    No sector selected
                 </Message>
             );
         }
 
         if (loading) {
             return (
-                <Message>
+                <Message className={styles.message}>
                     Loading sector information...
                 </Message>
             );
