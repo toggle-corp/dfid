@@ -36,8 +36,8 @@ export class MultiProgrammeDetailInfo extends React.PureComponent<Props, State>{
 
         if (!selectedProgrammes.length) {
             return (
-                <Message>
-                    Select a programme
+                <Message className={styles.message}>
+                    No program selected
                 </Message>
             );
         }

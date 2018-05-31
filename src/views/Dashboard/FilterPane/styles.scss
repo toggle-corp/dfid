@@ -1,69 +1,70 @@
 @import '../../../stylesheets/base';
 
-$height-header: 8px;
-
-%float-position {
-    top: $spacing-medium;
-    left: $spacing-medium;
-    box-shadow: 0 $spacing-extra-small $radius-blur-large $radius-spread-medium $color-shadow-medium;
-}
-
-.popup {
-    @extend %float-position;
-    display: flex;
-    position: absolute;
-    z-index: 1;
-
-    button {
-        padding: $spacing-medium;
-    }
-}
-
 .filters-container {
-    @extend %float-position;
     display: flex;
-    position: absolute;
     flex-direction: column;
-    opacity: .9;
     z-index: 1;
     background-color: $color-foreground-alt;
-    width: 292px;
-    max-height: calc(100vh - #{$height-navbar + 2 * $spacing-medium});
 
     .header {
         display: flex;
         align-items: center;
         flex-shrink: 0;
         justify-content: space-between;
+        border-bottom: $width-separator-thin solid $color-separator;
+        background-color: $color-foreground;
+        padding: $spacing-small 0;
 
-        .close {
-            padding: $spacing-small $spacing-medium;
-            font-size: $font-size-large;
-
-            &:hover {
-                background-color: $color-background-hover;
-            }
+        .left {
+            flex-shrink: 0;
         }
 
-        .right-container {
-            display: flex;
+        .right {
+            flex-shrink: 0;
         }
     }
 
     %content {
-        border-top: $width-separator-thin solid $color-separator;
+        .input {
+            margin: $spacing-medium-alt 0;
 
-        .heading {
-            background-color: $color-background-header;
-            padding: $spacing-small $spacing-medium;
-        }
+            :global {
+                .multi-select-input {
+                    .label {
+                        font-size: $font-size-medium;
+                    }
+                }
 
-        .content {
-            padding: $spacing-medium;
-            padding-top: 0;
+                .list {
+                    .selected-item {
+                        padding: $spacing-extra-small 0;
 
-            .input {
-                margin: $spacing-small 0;
+                        .label {
+                            color: $color-text-label;
+                            font-size: $font-size-small;
+                        }
+
+                        .remove-button {
+                            @include transition-medium;
+                            align-self: flex-start;
+                            order: 1;
+                            opacity: 0;
+                            padding-left: $spacing-small;
+                            font-size: $font-size-medium-alt;
+                        }
+
+                        &:hover {
+                            .remove-button {
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .empty {
+                padding: $spacing-small 0;
+                color: $color-text-disabled;
             }
         }
     }
@@ -72,6 +73,7 @@ $height-header: 8px;
         display: flex;
         flex-direction: column;
         flex-grow: 0;
+        padding: 0 $spacing-medium;
         overflow-y: auto;
 
         .layers {

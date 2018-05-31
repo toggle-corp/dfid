@@ -36,15 +36,15 @@ export class MultiProvinceDetailInfo extends React.PureComponent<Props, State>{
 
         if (!selectedProvinces.length) {
             return (
-                <Message>
-                    Select a province
+                <Message className={styles.message}>
+                    No province selected
                 </Message>
             );
         }
 
         if (loading) {
             return (
-                <Message>
+                <Message className={styles.message}>
                     Loading province information...
                 </Message>
             );

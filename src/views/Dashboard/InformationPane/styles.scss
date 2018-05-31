@@ -1,5 +1,31 @@
 @import '../../../stylesheets/base';
 
-.fixed-tabs {
-    flex-shrink: 0;
+$width-information-pane: 380px;
+
+%float {
+    position: absolute;
+    top: $spacing-medium;
+    right: $spacing-medium;
+    z-index: 1;
+    box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+}
+
+.information-pane {
+    @extend %float;
+    display: flex;
+    flex-direction: column;
+    opacity: .9;
+    background-color: $color-background-row;
+    width: $width-information-pane;
+    height: calc(100% - #{$spacing-medium * 2});
+
+    .fixed-tabs {
+        flex-shrink: 0;
+    }
+}
+
+.show-information-button {
+    @extend %float;
+    padding: $spacing-small $spacing-medium;
+    font-size: $font-size-extra-large;
 }
