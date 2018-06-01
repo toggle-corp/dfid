@@ -1,6 +1,11 @@
-import {
-    FaramErrors,
-} from '../rest/interface';
+import { FaramErrors } from '../rest/interface';
+import { GeoJSON } from '../components/Map/MapLayer';
+
+// FIXME: Move to common interfaces
+export type Dictionary<T> = {
+    [key: string]: T;
+};
+
 export interface Notification {
     type: string;
     title: string;
@@ -37,9 +42,13 @@ export interface DomainData {
     sectors: Sector[];
     sectorsData: SectorData[];
     countriesData: CountryData[];
-    dashboardFilter: DashboardFilter;
     indicators: Indicator[];
     mapLayers: MapLayer[];
+}
+
+export interface SiloDomainData {
+    dashboard: Dashboard;
+    geoJsons: GeoJSONS;
 }
 
 export interface Notify {
@@ -48,6 +57,7 @@ export interface Notify {
 
 export interface RootState {
     domainData: DomainData;
+    siloDomainData: SiloDomainData;
     auth: Auth;
     notify: Notify;
 }
@@ -57,6 +67,11 @@ export interface ReducerGroup<T> {
 }
 
 // Dashboard
+export interface Dashboard {
+    filterPane: DashboardFilter;
+    loadings: DashboardRequestManagerLoadings;
+}
+
 export interface ProgrammeName {
     programID: number;
     programName: string;
@@ -218,4 +233,27 @@ export interface SectorDatum {
     id: number;
 }
 
+// Request Manager
 
+export interface DashboardRequestManagerLoadings {
+    loadingCountryData: boolean;
+    loadingProvinceData: boolean;
+    loadingProgrammeData: boolean;
+    loadingSectorData: boolean;
+
+    loadingProvinces: boolean;
+    loadingProgrammes: boolean;
+    loadingSectors: boolean;
+    loadingIndicators: boolean;
+    loadingGeoJson: boolean;
+}
+
+export type SetRequestManagerLoadingAction = Partial<DashboardRequestManagerLoadings>;
+
+// GeoJSON
+
+export interface GeoJSONS {
+    [url: string]: GeoJSON;
+}
+
+export type SetGeoJsonsAction = GeoJSONS;

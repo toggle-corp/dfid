@@ -9,11 +9,12 @@ import {
     createParamsForProvinces,
 } from '../../../rest';
 import { Request } from '../../../rest/interface';
+import { SetGeoJsonsAction } from '../../../redux/interface';
 // import schema from '../../../schema';
 
 interface Props {
     setMapLayerGeoJson(geoJson: GeoJSON): void;
-    setGeoJsons(url: string, geoJsons: GeoJSON): void;
+    setGeoJsons: (params: SetGeoJsonsAction) => void;
     preLoad(): void;
     postLoad(): void;
 }
@@ -46,7 +47,7 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
                         Object.values(response.objects)[0] as any,
                     ) as GeoJSON;
                 }
-                this.props.setGeoJsons(url, geoJson);
+                this.props.setGeoJsons({ [url]: geoJson });
                 // Convert ids to strings to make things simpler later
                 // geoJson.features.forEach((acc: any) => {
                 //     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;

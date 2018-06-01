@@ -8,7 +8,6 @@ import {
     Sector,
     SectorData,
     CountryData,
-    DashboardFilter,
     Indicator,
     MapLayer,
     ProvinceDatum,
@@ -19,10 +18,6 @@ import {
 // NOTE: Use these to make sure reference don't change
 const emptyArray: any[] = [];
 const emptyObject: object = {};
-const emptyFaram: object = {
-    faramValues: {},
-    faramErrors: {},
-};
 
 const provinceIdFromPropsSelector = (
     state: RootState, props: { datum: ProvinceDatum },
@@ -64,10 +59,6 @@ export const countriesDataSelector = ({ domainData }: RootState): CountryData[] 
     domainData.countriesData || emptyArray
 );
 
-export const dashboardFilterSelector = ({ domainData }: RootState): DashboardFilter => (
-    domainData.dashboardFilter || emptyFaram
-);
-
 export const indicatorsSelector = ({ domainData }: RootState): Indicator[] => (
     domainData.indicators || emptyArray
 );
@@ -83,62 +74,6 @@ export const countryDataSelector = createSelector(
 );
 
 // Dashboard
-export const dashboardProvincesIdSelector = createSelector(
-    dashboardFilterSelector,
-    filter => filter.filters.provincesId || emptyArray as number[],
-);
-
-export const dashboardProgrammesIdSelector = createSelector(
-    dashboardFilterSelector,
-    filter => filter.filters.programmesId || emptyArray as number[],
-);
-
-export const dashboardSectorsIdSelector = createSelector(
-    dashboardFilterSelector,
-    filter => filter.filters.sectorsId || emptyArray as number[],
-);
-
-export const dashboardMapLayersIdSelector = createSelector(
-    dashboardFilterSelector,
-    filter => filter.filters.mapLayersId || emptyArray as number[],
-);
-
-export const dashboardProvincesSelector = createSelector(
-    provincesSelector,
-    dashboardProvincesIdSelector,
-    (provinces, provincesId) =>
-        provinces.filter(province => (
-            provincesId.findIndex(id => id === province.id)) !== -1,
-        ) || emptyArray as Province[],
-);
-
-export const dashboardProgrammesSelector = createSelector(
-    programmesSelector,
-    dashboardProgrammesIdSelector,
-    (programmes, programmesId) =>
-        programmes.filter(programme => (
-            programmesId.findIndex(id => id === programme.id)) !== -1,
-        ) || emptyArray as Programme[],
-);
-
-export const dashboardSectorsSelector = createSelector(
-    sectorsSelector,
-    dashboardSectorsIdSelector,
-    (sectors, sectorsId) =>
-        sectors.filter(sector => (
-            sectorsId.findIndex(id => id === sector.id)) !== -1,
-        ) || emptyArray as Sector[],
-);
-
-export const dashboardMapLayersSelector = createSelector(
-    mapLayersSelector,
-    dashboardMapLayersIdSelector,
-    (mapLayers, mapLayersId) =>
-        mapLayers.filter(mapLayer => (
-            mapLayersId.findIndex(id => id === mapLayer.id)) !== -1,
-        ) || emptyArray as MapLayer[],
-);
-
 export const provinceDataSelector = createSelector(
     provincesDataSelector,
     provinceIdFromPropsSelector,

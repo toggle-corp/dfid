@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     Sector,
     SetSectorsAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForSectors,
     createParamsForSectors,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setSectors(params: SetSectorsAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class SectorsGetRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class SectorsGetRequest implements Request<{}> {
         const sectorsRequest = new FgRestBuilder()
             .url(urlForSectors)
             .params(createParamsForSectors)
-            .preLoad(() => this.props.setState({ loadingSectors: true }))
-            .postLoad(() => this.props.setState({ loadingSectors: false }))
+            .preLoad(() => this.props.setLoadings({ loadingSectors: true }))
+            .postLoad(() => this.props.setLoadings({ loadingSectors: false }))
             .success((response: Sector[]) => {
                 try {
                     schema.validate(response, 'array.sector');

@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     CountryData,
     SetCountriesDataAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForCountryData,
     createParamsForCountryData,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setCountriesData(params: SetCountriesDataAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class CountriesDataGetRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class CountriesDataGetRequest implements Request<{}> {
         const request = new FgRestBuilder()
             .url(urlForCountryData)
             .params(createParamsForCountryData)
-            .preLoad(() => this.props.setState({ loadingCountryData: true }))
-            .postLoad(() => this.props.setState({ loadingCountryData: false }))
+            .preLoad(() => this.props.setLoadings({ loadingCountryData: true }))
+            .postLoad(() => this.props.setLoadings({ loadingCountryData: false }))
             .success((response: CountryData[]) => {
                 try {
                     schema.validate(response, 'array.countryData');

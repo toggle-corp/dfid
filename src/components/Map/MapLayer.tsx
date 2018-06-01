@@ -69,7 +69,6 @@ class MapLayer extends React.PureComponent<Props, States> {
     destroy() {
         const { map } = this.props;
         if (map) {
-            console.warn(map);
             this.layers.forEach(layer => map.removeLayer(layer));
             this.sources.forEach(source => map.removeSource(source));
         }

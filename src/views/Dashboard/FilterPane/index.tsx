@@ -15,7 +15,7 @@ import {
     sectorsSelector,
     programmesSelector,
     provincesSelector,
-    dashboardFilterSelector,
+    dashboardFilterPaneSelector,
     indicatorsSelector,
     mapLayersSelector,
 } from '../../../redux';
@@ -209,7 +209,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
             return (
                 <LoadingAnimation className={classNames.join(' ')} />
             );
-            
             // return this.renderPopup();
         }
 
@@ -322,7 +321,7 @@ const mapStateToProps = (state: RootState) => ({
     provinces: provincesSelector(state),
     indicators: indicatorsSelector(state),
     mapLayers: mapLayersSelector(state),
-    faramState: dashboardFilterSelector(state),
+    faramState: dashboardFilterPaneSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({

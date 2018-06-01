@@ -22,27 +22,36 @@ import {
     setSectorsAction,
     setIndicatorsAction,
     setMapLayersAction,
+    setGeoJsonsAction,
     dashboardProvincesSelector,
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
+    dashboardRequestManagerLoadingSelector,
+    geoJsonsSelector,
+    setRequestManagerLoadingAction,
 } from '../../redux';
 
 import {
-    RootState,
-    Province,
+    DashboardFilterParams,
+    DashboardRequestManagerLoadings,
+    Dictionary,
+    GeoJSONS,
+    MapLayer,
     Programme,
+    Province,
+    RootState,
     Sector,
-    SetProvincesAction,
-    SetProvincesDataAction,
     SetCountriesDataAction,
-    SetProgrammesAction,
-    SetProgrammesDataAction,
-    SetSectorsAction,
+    SetGeoJsonsAction,
     SetIndicatorsAction,
     SetMapLayersAction,
-    DashboardFilterParams,
-    MapLayer,
+    SetProgrammesAction,
+    SetProgrammesDataAction,
+    SetProvincesAction,
+    SetProvincesDataAction,
+    SetSectorsAction,
+    SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
 import Map, { LayerInfo } from '../../components/Map';
@@ -50,16 +59,9 @@ import { GeoJSON } from '../../components/Map/MapLayer';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
+import RequestManager from './RequestManager';
 
-import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
-import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
 import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
-import MapLayersGetRequest from './requests/MapLayersGetRequest';
-import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
-import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
-import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
-import ProvincesGetRequest from './requests/ProvincesGetRequest';
-import SectorsGetRequest from './requests/SectorsGetRequest';
 
 import styles from './styles.scss';
 
@@ -69,6 +71,8 @@ interface PropsFromState {
     selectedProgrammes: Programme[];
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
+    requestManagerLoadings: DashboardRequestManagerLoadings;
+    geoJsons: GeoJSONS;
 }
 interface PropsFromDispatch {
     setCountriesData(params: SetCountriesDataAction): void;
@@ -80,26 +84,14 @@ interface PropsFromDispatch {
     setIndicators(params: SetIndicatorsAction): void;
     setMapLayers(params: SetMapLayersAction): void;
     setDashboardProvince(provinceId: number): void;
+    setGeoJsons: (params: SetGeoJsonsAction) => void;
+    setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
-type Dictionary<T> = {
-    [key: string]: T;
-};
-
 interface State {
-    loadingCountryData: boolean;
-    loadingProvinceData: boolean;
-    loadingProgrammeData: boolean;
-    loadingSectorData: boolean;
-
-    loadingProvinces: boolean;
-    loadingProgrammes: boolean;
-    loadingSectors: boolean;
-    loadingIndicators: boolean;
     layersInfo: Dictionary<LayerInfo>;
-    loadingGeoJson: boolean;
 }
 
 const sameArraysIgnoreOrder = (a: any[], b: any[]) => {
@@ -118,17 +110,7 @@ const sameArraysIgnoreOrder = (a: any[], b: any[]) => {
 };
 
 export class Dashboard extends React.PureComponent<Props, State>{
-    countryDataRequest: RestRequest;
-    provinceDataRequest: RestRequest;
-    provincesRequest: RestRequest;
-    programmeRequest: RestRequest;
-    sectorRequest: RestRequest;
-    indicatorsRequest: RestRequest;
-    mapLayersRequest: RestRequest;
-    programmeDataRequest: RestRequest;
-    geoJsonRequest: RestRequest;
     mapLayerGeoJsonRequests: Dictionary<RestRequest>;
-    geoJsons: Dictionary<GeoJSON>;
     layersInfo: Dictionary<LayerInfo>;
     pendingGeoJsonRequests: number;
 
@@ -136,170 +118,25 @@ export class Dashboard extends React.PureComponent<Props, State>{
         super(props);
 
         this.state = {
-            loadingCountryData: false,
-
-            loadingProvinceData: true,
-            loadingProgrammeData: true,
-            loadingProvinces: true,
-
-            // FIXME: change to false
-            loadingSectorData: false,
-            loadingProgrammes: true,
-            loadingSectors: true,
-            loadingIndicators: true,
-            loadingGeoJson: false,
-
             layersInfo: {},
         };
         this.pendingGeoJsonRequests = 0;
 
-        this.geoJsons = {};
         this.layersInfo = {};
         this.mapLayerGeoJsonRequests = {};
     }
 
     componentDidMount() {
-        this.startRequestForCountriesData();
-        this.startRequestForProvinceData();
-        this.startRequestForProvinces();
         this.reloadProvince();
         this.reloadMunicipalities();
         this.reloadMapLayer();
         this.reloadProgramLayer();
-        this.startRequestForProgrammes();
-        this.startRequestForProgrammesData();
-        this.startRequestForSectors();
-        this.startRequestForIndicators();
-        this.startRequestForMapLayers();
     }
 
     componentWillUnmount() {
-        if (this.countryDataRequest) {
-            this.countryDataRequest.stop();
-        }
-        if (this.provinceDataRequest) {
-            this.provinceDataRequest.stop();
-        }
-        if (this.provincesRequest) {
-            this.provincesRequest.stop();
-        }
-        if (this.programmeRequest) {
-            this.programmeRequest.stop();
-        }
-        if (this.programmeDataRequest) {
-            this.programmeDataRequest.stop();
-        }
-        if (this.geoJsonRequest) {
-            this.geoJsonRequest.stop();
-        }
         Object.values(this.mapLayerGeoJsonRequests).forEach(
             r => r.stop(),
         );
-        if (this.sectorRequest) {
-            this.sectorRequest.stop();
-        }
-        if (this.indicatorsRequest) {
-            this.indicatorsRequest.stop();
-        }
-        if (this.mapLayersRequest) {
-            this.mapLayersRequest.stop();
-        }
-    }
-
-    startRequestForCountriesData = () => {
-        if (this.countryDataRequest) {
-            this.countryDataRequest.stop();
-        }
-        const countryDataRequest = new CountriesDataGetRequest({
-            setState: params => this.setState(params),
-            setCountriesData: this.props.setCountriesData,
-        });
-        this.countryDataRequest = countryDataRequest.create();
-        this.countryDataRequest.start();
-    }
-
-    startRequestForProvinceData = () => {
-        if (this.provinceDataRequest) {
-            this.provinceDataRequest.stop();
-        }
-        const provinceDataRequest = new ProvinceDataGetRequest({
-            setState: params => this.setState(params),
-            setProvincesData: this.props.setProvincesData,
-        });
-        this.provinceDataRequest = provinceDataRequest.create();
-        this.provinceDataRequest.start();
-    }
-
-    startRequestForProvinces = () => {
-        if (this.provincesRequest) {
-            this.provincesRequest.stop();
-        }
-        const provincesRequest = new ProvincesGetRequest({
-            setState: params => this.setState(params),
-            setProvinces: this.props.setProvinces,
-        });
-        this.provincesRequest = provincesRequest.create();
-        this.provincesRequest.start();
-    }
-
-    startRequestForProgrammes = () => {
-        if (this.programmeRequest) {
-            this.programmeRequest.stop();
-        }
-        const programmeRequest = new ProgrammesGetRequest({
-            setState: params => this.setState(params),
-            setProgrammes: this.props.setProgrammes,
-        });
-        this.programmeRequest = programmeRequest.create();
-        this.programmeRequest.start();
-    }
-
-    startRequestForProgrammesData = () => {
-        if (this.programmeDataRequest) {
-            this.programmeDataRequest.stop();
-        }
-        const programmeDataRequest = new ProgrammesDataGetRequest({
-            setState: params => this.setState(params),
-            setProgrammesData: this.props.setProgrammesData,
-        });
-        this.programmeDataRequest = programmeDataRequest.create();
-        this.programmeDataRequest.start();
-    }
-
-    startRequestForSectors = () => {
-        if (this.sectorRequest) {
-            this.sectorRequest.stop();
-        }
-        const sectorRequest = new SectorsGetRequest({
-            setState: params => this.setState(params),
-            setSectors: this.props.setSectors,
-        });
-        this.sectorRequest = sectorRequest.create();
-        this.sectorRequest.start();
-    }
-
-    startRequestForIndicators = () => {
-        if (this.indicatorsRequest) {
-            this.indicatorsRequest.stop();
-        }
-        const indicatorsRequest = new IndicatorsGetRequest({
-            setState: params => this.setState(params),
-            setIndicators: this.props.setIndicators,
-        });
-        this.indicatorsRequest = indicatorsRequest.create();
-        this.indicatorsRequest.start();
-    }
-
-    startRequestForMapLayers = () => {
-        if (this.mapLayersRequest) {
-            this.mapLayersRequest.stop();
-        }
-        const mapLayersRequest = new MapLayersGetRequest({
-            setState: params => this.setState(params),
-            setMapLayers: this.props.setMapLayers,
-        });
-        this.mapLayersRequest = mapLayersRequest.create();
-        this.mapLayersRequest.start();
     }
 
     startRequestForMapLayerGeoJson = (
@@ -313,16 +150,16 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
             setMapLayerGeoJson: responseHandler,
-            setGeoJsons: this.setGeoJsons,
+            setGeoJsons: this.props.setGeoJsons,
             preLoad: () => {
                 this.pendingGeoJsonRequests += 1;
-                this.setState({
+                this.props.setDashboardLoadings({
                     loadingGeoJson: this.pendingGeoJsonRequests > 0,
                 });
             },
             postLoad: () => {
                 this.pendingGeoJsonRequests -= 1;
-                this.setState({
+                this.props.setDashboardLoadings({
                     loadingGeoJson: this.pendingGeoJsonRequests > 0,
                 });
             },
@@ -330,10 +167,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         this.mapLayerGeoJsonRequests[key] = mapLayerGeoJsonRequest.create({ url });
         this.mapLayerGeoJsonRequests[key].start();
-    }
-
-    setGeoJsons = (url: string, geoJsons: GeoJSON) => {
-        this.geoJsons[url] = geoJsons;
     }
 
     setLayersInfo = (layersInfo: Dictionary<LayerInfo>) => {
@@ -426,10 +259,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 layerKey: key,
             };
 
-            if (this.geoJsons[url]) {
+            if (this.props.geoJsons[url]) {
                 layersInfo[key] = {
                     ...layerInfo,
-                    geoJson: this.geoJsons[url],
+                    geoJson: this.props.geoJsons[url],
                 };
             } else {
                 this.startRequestForMapLayerGeoJson(key, url,  (geoJson: GeoJSON) => {
@@ -544,8 +377,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     render() {
+        const { layersInfo } = this.state;
         const {
-            layersInfo,
             loadingCountryData,
             loadingProvinceData,
             loadingProgrammeData,
@@ -555,7 +388,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingSectors,
             loadingIndicators,
             loadingGeoJson,
-        } = this.state;
+        } = this.props.requestManagerLoadings;
 
         const loading = (
             loadingProvinceData || loadingProgrammeData || loadingGeoJson ||
@@ -566,6 +399,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.dashboard}>
+                <RequestManager />
                 <FilterPane
                     className={styles.left}
                     disabled={loading}
@@ -595,6 +429,8 @@ const mapStateToProps = (state: RootState) => ({
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
+    requestManagerLoadings: dashboardRequestManagerLoadingSelector(state),
+    geoJsons: geoJsonsSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
@@ -608,6 +444,9 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setSectors: (params: SetSectorsAction) => dispatch(setSectorsAction(params)),
     setIndicators: (params: SetIndicatorsAction) => dispatch(setIndicatorsAction(params)),
     setMapLayers: (params: SetMapLayersAction) => dispatch(setMapLayersAction(params)),
+    setGeoJsons: (params: SetGeoJsonsAction) => dispatch(setGeoJsonsAction(params)),
+    setDashboardLoadings: (params: SetRequestManagerLoadingAction) =>
+        dispatch(setRequestManagerLoadingAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
