@@ -2,25 +2,26 @@ import * as topojson  from 'topojson-client';
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
+import { Coordinator } from '../../../../vendor/react-store/utils/coordinate';
 
-import { GeoJSON } from '../../../components/Map/MapLayer';
+import { GeoJSON } from '../../../../components/Map/MapLayer';
 import {
     createParamsForProvinces,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import { SetGeoJsonsAction } from '../../../redux/interface';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import { SetGeoJsonsAction } from '../../../../redux/interface';
 // import schema from '../../../schema';
 
 interface Props {
     setMapLayerGeoJson(geoJson: GeoJSON): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
-    preLoad(): void;
-    postLoad(): void;
+    getCoordinator: () => Coordinator;
 }
 
 interface MapLayerGeoJsonParams {
     url: string;
+    key: string;
 }
 
 export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJsonParams> {
@@ -30,12 +31,13 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
         this.props = props;
     }
 
-    create = ({ url }: MapLayerGeoJsonParams): RestRequest => {
+    create = ({ url, key }: MapLayerGeoJsonParams): RestRequest => {
         const request = new FgRestBuilder()
             .url(url)
             .params(createParamsForProvinces)
-            .preLoad(this.props.preLoad)
-            .postLoad(this.props.postLoad)
+            .postLoad(() => {
+                this.props.getCoordinator().notifyComplete(key);
+            })
             .success((response: GeoJSON) => {
                 // schema.validate(response, 'countryGeoJson');
                 let geoJson;
@@ -48,11 +50,6 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
                     ) as GeoJSON;
                 }
                 this.props.setGeoJsons({ [url]: geoJson });
-                // Convert ids to strings to make things simpler later
-                // geoJson.features.forEach((acc: any) => {
-                //     acc.properties[geoJsonIdKey] = `${acc.properties[geoJsonIdKey]}`;
-                // });
-
                 this.props.setMapLayerGeoJson(geoJson);
             })
             .build();

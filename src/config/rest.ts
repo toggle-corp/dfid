@@ -15,7 +15,7 @@ const protocol: (string | undefined) = clientProtocol === 'https:'
     : serverProtocol || 'http';
 
 const serverEndpoint = process.env.REACT_APP_API_END;
-const url = serverEndpoint || '139.59.67.104:4000';
+const url = serverEndpoint || 'dfid.naxa.com.np';
 
 export const wsEndpoint: string  = `${protocol}://${url}/core`;
 // export const adminEndpoint: string = `${protocol}://${url}/admin/`;
