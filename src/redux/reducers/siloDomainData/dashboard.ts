@@ -63,11 +63,11 @@ const setFilters = (state: SiloDomainData, action: SetDashboardFilterAction) => 
     const settings = {
         dashboard: { $auto: {
             filterPane: { $auto: {
-                filters: { $if: [filters, { $set: filters }] },
-                faramValues: { $if: [faramValues, { $set: faramValues }] },
-                faramErrors: { $if: [faramErrors, { $set: faramErrors }] },
-                isHidden: { $if: [isHidden !== undefined, { $set: isHidden }] },
-                pristine: { $if: [pristine !== undefined, { $set: pristine }] },
+                filters: setIfDefined(filters),
+                faramValues: setIfDefined(faramValues),
+                faramErrors: setIfDefined(faramErrors),
+                isHidden: setIfDefined(isHidden),
+                pristine: setIfDefined(pristine),
             } },
         } },
     };

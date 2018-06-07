@@ -35,13 +35,15 @@ const routeToDashboard = {
 };
 
 interface ProvinceDetail {
-    label?: string;
+    label: string;
     value? : number;
     icon: string;
     isCurrency?: boolean;
 }
 
 class Province extends React.PureComponent<Props> {
+    static keyExtractor = (province: ProvinceDetail) => province.label;
+
     setDashboardProvince = (id: number) => () => {
         const { setDashboardProvince } = this.props;
         setDashboardProvince(id);
@@ -92,6 +94,7 @@ class Province extends React.PureComponent<Props> {
                 </div>
                 <ListView
                     className={styles.content}
+                    keyExtractor={Province.keyExtractor}
                     data={provinceDetailItemList}
                     modifier={this.renderProvinceDetailItem}
                 />

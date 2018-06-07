@@ -1,13 +1,22 @@
 import localforage from 'localforage';
 import { createTransform } from 'redux-persist';
+
 import { SiloDomainData } from '../redux/interface';
+import initialSiloDomainData from '../redux/initial-state/siloDomainData';
+
 import update from '../vendor/react-store/utils/immutable-update';
 
 const myTransform = createTransform(
     (inboundState: SiloDomainData) => {
-        // NOTE: clears out geoJsons
         const settings = {
+            // NOTE: clears out geoJsons
             geoJsons: { $set: {} },
+            // NOTE: clears out dashboard.loadings
+            dashboard: {
+                loadings: {
+                    $set: initialSiloDomainData.dashboard.loadings,
+                },
+            },
         };
         return update(inboundState, settings);
     },

@@ -303,22 +303,24 @@ export class RequestManager extends React.PureComponent<Props, State>{
     ) => {
         if (!url) {
             // NOTE: Ignore undefined/null urls
-            console.warn('RequestForMapLayerGeoJson: undefined/null url detected', 'key: ', key);
+            console.warn('invalid url for map layer geo json for', key);
             return;
         }
 
-        // TODO: Move preload and postload to Request class
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
             setMapLayerGeoJson: responseHandler,
             setGeoJsons: this.props.setGeoJsons,
             getCoordinator: () => this.geoJsonRequestCoordinator,
         }).create({ url, key });
+
         this.geoJsonRequestCoordinator.add(key, mapLayerGeoJsonRequest);
         this.geoJsonRequestCoordinator.start();
     }
 
     handleFilterChange = (
-        oldValues: DashboardFilterParams, values: DashboardFilterParams, props: Props,
+        oldValues: DashboardFilterParams,
+        values: DashboardFilterParams,
+        props: Props,
     ) => {
         const {
             provincesId = emptyArray,
@@ -326,6 +328,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
             sectorsId = emptyArray,
             mapLayersId = emptyArray,
         } = values;
+
         const {
             provincesId: oldProvincesId = emptyArray,
             programmesId: oldProgrammesId = emptyArray,
@@ -334,30 +337,18 @@ export class RequestManager extends React.PureComponent<Props, State>{
         } = oldValues;
 
         if (!sameArraysIgnoreOrder(oldProvincesId, provincesId)) {
-            this.handleProvinceChange(props, provincesId);
+            this.reloadProvince(props);
+            this.reloadMunicipalities(props);
         }
         if (!sameArraysIgnoreOrder(oldProgrammesId, programmesId)) {
-            this.handleProgramChange(props, programmesId);
+            this.reloadProgramLayer(props);
         }
         if (!sameArraysIgnoreOrder(oldSectorsId, sectorsId)) {
             // window.location.hash = '#/sector';
         }
         if (!sameArraysIgnoreOrder(oldMapLayersId, mapLayersId)) {
-            this.handleMapLayerChange(props, mapLayersId);
+            this.reloadMapLayer(props);
         }
-    }
-
-    handleProvinceChange = (props: Props, keys?: number[]) => {
-        this.reloadProvince(props);
-        this.reloadMunicipalities(props);
-    }
-
-    handleMapLayerChange = (props: Props, layerId?: number[]) => {
-        this.reloadMapLayer(props);
-    }
-
-    handleProgramChange = (props: Props, programmeId?: number[]) => {
-        this.reloadProgramLayer(props);
     }
 
     reloadSelectionToLayers = ({
@@ -517,7 +508,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     render() {
-        return <div />;
+        return null;
     }
 }
 

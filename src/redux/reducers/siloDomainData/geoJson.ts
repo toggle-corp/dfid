@@ -6,6 +6,7 @@ import {
 
     SetGeoJsonsAction,
 } from '../../interface';
+import { mapObjectToObject } from '../../../utils/map';
 
 // ACTION-TYPE
 
@@ -25,14 +26,13 @@ export const setGeoJsonsAction = (
 // REDUCER
 
 const setGeoJsons = (state: SiloDomainData, { geoJsons }: { geoJsons: SetGeoJsonsAction }) => {
-    const settingsGeoJsons = {};
-
-    Object.keys(geoJsons).forEach((url) => {
-        settingsGeoJsons[url] = { $set: geoJsons[url] };
-    });
+    const geoJsonSettings = mapObjectToObject<SetGeoJsonsAction, object>(
+        geoJsons,
+        geoJson => ({ $set: geoJson }),
+    );
 
     const settings = {
-        geoJsons: settingsGeoJsons,
+        geoJsons: geoJsonSettings,
     };
 
     return update(state, settings);

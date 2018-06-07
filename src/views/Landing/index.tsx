@@ -66,6 +66,9 @@ export class Landing extends React.PureComponent<Props, State> {
     defaultData: object;
     provinceDataRequest: RestRequest;
 
+    static itemKeySelector = (item: Item) => item.label;
+    static provinceKeyExtractor = (province: ProvinceData) => province.name;
+
     constructor(props: Props) {
         super(props);
 
@@ -181,10 +184,7 @@ export class Landing extends React.PureComponent<Props, State> {
             { label: 'Municipalities', value: municipalitiesCovered },
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
-            {
-                label: 'Total budget (£)',
-                value: totalBudget,
-            },
+            { label: 'Total budget (£)', value: totalBudget },
         ];
 
         return (
@@ -194,6 +194,7 @@ export class Landing extends React.PureComponent<Props, State> {
                 </h2>
                 <ListView
                     className={styles.content}
+                    keyExtractor={Landing.itemKeySelector}
                     data={items}
                     modifier={this.renderOverviewItem}
                 />
@@ -300,6 +301,7 @@ export class Landing extends React.PureComponent<Props, State> {
                                 className={styles.content}
                                 data={provincesDataList}
                                 modifier={this.renderProvince}
+                                keyExtractor={Landing.provinceKeyExtractor}
                             />
                         </div>
                     </div>
