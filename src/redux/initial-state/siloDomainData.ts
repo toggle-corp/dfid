@@ -19,6 +19,7 @@ const initialSiloDomainData: SiloDomainData = {
             loadingProgrammes: true,
             loadingSectors: true,
             loadingIndicators: true,
+            loadingIndicatorsData: true,
             loadingGeoJson: false,
         },
     },

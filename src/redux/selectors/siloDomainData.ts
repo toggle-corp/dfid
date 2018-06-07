@@ -15,6 +15,7 @@ import {
     provincesSelector,
     programmesSelector,
     sectorsSelector,
+    indicatorsDataSelector,
     mapLayersSelector,
 } from './domainData';
 
@@ -61,6 +62,11 @@ export const dashboardSectorsIdSelector = createSelector(
     filters => filters.sectorsId || emptyArray as number[],
 );
 
+export const dashboardIndicatorIdSelector = createSelector(
+    dashboardFilterSelector,
+    filters => filters.indicatorId,
+);
+
 export const dashboardMapLayersIdSelector = createSelector(
     dashboardFilterSelector,
     filters => filters.mapLayersId || emptyArray as number[],
@@ -91,6 +97,13 @@ export const dashboardSectorsSelector = createSelector(
         sectors.filter(sector => (
             sectorsId.findIndex(id => id === sector.id)) !== -1,
         ) || emptyArray as Sector[],
+);
+
+export const dashboardIndicatorSelector = createSelector(
+    indicatorsDataSelector,
+    dashboardIndicatorIdSelector,
+    (indicatorsData, indicatorId) =>
+        (indicatorsData && indicatorId) ? indicatorsData[indicatorId] : undefined,
 );
 
 export const dashboardMapLayersSelector = createSelector(

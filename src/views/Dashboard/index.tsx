@@ -121,14 +121,18 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes,
             loadingSectors,
             loadingIndicators,
+            loadingIndicatorsData,
             loadingGeoJson,
         } = this.props.requestManagerLoadings;
 
         const loading = (
-            loadingProvinceData || loadingProgrammeData || loadingGeoJson ||
-            loadingProvinces || loadingProgrammes || loadingSectors ||
-            loadingIndicators || loadingSectorData || loadingCountryData
+            loadingProvinces || loadingProvinceData ||
+            loadingProgrammes || loadingProgrammeData ||
+            loadingSectors || loadingSectorData ||
+            loadingIndicators || loadingIndicatorsData ||
+            loadingGeoJson || loadingCountryData
         );
+
 
         return (
             <div className={styles.dashboard}>
@@ -136,6 +140,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     handleMapClick={this.handleMapClick}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
+                    loading={!!loading}
                 />
                 <FilterPane
                     className={styles.left}

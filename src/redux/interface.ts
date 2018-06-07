@@ -43,6 +43,7 @@ export interface DomainData {
     sectorsData: SectorData[];
     countriesData: CountryData[];
     indicators: Indicator[];
+    indicatorsData: Dictionary<IndicatorData>;
     mapLayers: MapLayer[];
 }
 
@@ -182,7 +183,7 @@ export interface DashboardFilterParams {
     provincesId?: number[];
     programmesId?: number[];
     sectorsId?: number[];
-    indicatorsId?: number[];
+    indicatorId?: number;
     mapLayersId?: number[];
 }
 
@@ -203,9 +204,26 @@ export interface Indicator {
     name: string;
 }
 
+export interface IndicatorData {
+    id: number;
+    name: string;
+    unit: number;
+    provinces: Dictionary<{
+        provinceId: number;
+        value: number;
+    }>;
+    minValue: number;
+    maxValue: number;
+}
+
 export interface SetIndicatorsAction {
     indicators: Indicator[];
 }
+
+export interface SetIndicatorsDataAction {
+    indicatorsData: Dictionary<IndicatorData>;
+}
+
 
 // Map Layer
 
@@ -245,6 +263,7 @@ export interface DashboardRequestManagerLoadings {
     loadingProgrammes: boolean;
     loadingSectors: boolean;
     loadingIndicators: boolean;
+    loadingIndicatorsData: boolean;
     loadingGeoJson: boolean;
 }
 
