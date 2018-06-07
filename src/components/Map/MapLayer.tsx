@@ -17,9 +17,11 @@ interface Props {
     idKey?: string;
     labelKey?: string;
     visibilityKey?: string;
+    visibilityValue?: string;
 
     color?: string;
     opacity?: number;
+    strokeWidth?: number;
 
     point?: boolean;
     fill?: boolean;
@@ -86,6 +88,7 @@ class MapLayer extends React.PureComponent<Props, States> {
             stroke,
             color,
             opacity,
+            strokeWidth,
             zoomOnLoad,
         } = props;
 
@@ -130,7 +133,7 @@ class MapLayer extends React.PureComponent<Props, States> {
                 color || '#fff',
                 handleHover,
                 {
-                    'line-width': 1,
+                    'line-width': strokeWidth || 1,
                     'line-opacity': opacity || 1,
                 },
             );
@@ -150,6 +153,7 @@ class MapLayer extends React.PureComponent<Props, States> {
             layerKey,
             idKey,
             visibilityKey,
+            visibilityValue,
             showPopUp,
         } = props;
 
@@ -195,7 +199,11 @@ class MapLayer extends React.PureComponent<Props, States> {
         }
 
         if (visibilityKey) {
-            map.setFilter(`${layerKey}-${layerType}`, ['!=', visibilityKey, '']);
+            if (visibilityValue) {
+                map.setFilter(`${layerKey}-${layerType}`, ['==', visibilityKey, visibilityValue]);
+            } else {
+                map.setFilter(`${layerKey}-${layerType}`, ['!=', visibilityKey, '']);
+            }
         }
     }
 

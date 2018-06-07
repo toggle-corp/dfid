@@ -238,7 +238,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
         
         return {
             color: '#008181',
-            strokeColor: '#fff',
             opacity: fractionWithOffset,
         };
     }
@@ -382,16 +381,11 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadSelectionToLayers = ({
-        keyPrefix, selectedList, visibilityKey,
-        colorOverride, typeOverride, urlOverride, orderOverride,
+        keyPrefix, selectedList, overrides = {},
     } : {
         keyPrefix: string,
         selectedList: any[],
-        visibilityKey?: string,
-        colorOverride?: string,
-        typeOverride?: string,
-        urlOverride?: string,
-        orderOverride?: number,
+        overrides?: any,
     }) => {
         const { layersInfo } = this.props;
         const settings = {};
@@ -406,10 +400,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
 
         selectedList.forEach((selection) => {
             const key = `${keyPrefix}-${selection.id}`;
-            const url = urlOverride || selection.file;
-            const order = orderOverride || selection.order;
-            const color = colorOverride || selection.color;
-            let type = typeOverride || selection.type;
+            const url = overrides.url || selection.file;
+            let type = overrides.type || selection.type;
 
             if (type === 'Polygon') {
                 type = 'Fill';
@@ -417,10 +409,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
 
             const layerInfo = {
                 ...selection,
+                ...overrides,
                 type,
-                visibilityKey,
-                order,
-                color,
                 layerKey: key,
             };
 
@@ -478,7 +468,20 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 labelKey: 'FIRST_DIST',
                 separateStroke: true,
                 zoomOnLoad: selectedProvinces.length === 1,
+                color: '#008181',
+                strokeColor: '#fff',
                 ...this.getProvinceStyle(props, selectedProvince.id),
+            })),
+            ...selectedProvinces.map(selectedProvince => ({
+                id: `${selectedProvince.id}-border`,
+                file: urlForCountryGeoJson,
+                order: -1,
+                visibilityKey: 'Province',
+                visibilityValue: selectedProvince.id,
+                type: 'Line',
+                opacity: 1.0,
+                strokeWidth: 2,
+                color: '#fff',
             })),
         ];
 
@@ -517,11 +520,13 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.reloadSelectionToLayers({
             selectedList,
             keyPrefix: 'programmeLayer',
-            visibilityKey: 'ActLevel',
-            typeOverride: 'Fill',
-            colorOverride: getHexFromString('ipssj'),
-            urlOverride: urlForIpssjGeoJson,
-            orderOverride: 3,
+            overrides: {
+                visibility: 'ActLevel',
+                type: 'Fill',
+                color: getHexFromString('ipssj'),
+                url: urlForIpssjGeoJson,
+                order: 3,
+            },
         });
     }
 
@@ -532,7 +537,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 ...l,
                 color: getHexFromString(l.layerName),
             })),
-            orderOverride: 4,
+            overrides: {
+                order: 4,
+            },
         });
     }
 

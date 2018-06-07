@@ -50,6 +50,7 @@ export default class Map extends React.PureComponent<Props, States> {
 
     static generateSortedLayers = (layers: Props['layers']) => ([
         ...Object.values(layers)
+            .filter(l => l.order >= 0)
             .sort((l1, l2) => l1.order - l2.order),
         ...Object.values(layers)
             .filter(l => l.separateStroke)
@@ -60,8 +61,11 @@ export default class Map extends React.PureComponent<Props, States> {
                 type: 'Line',
                 geoJson: l.geoJson,
                 color: l.strokeColor || l.color,
-                opacity: l.opacity,
+                opacity: 0.5, // hack
             })),
+        ...Object.values(layers)
+            .filter(l => l.order < 0)
+            .sort((l1, l2) => l1.order - l2.order),
     ])
 
     constructor(props: Props) {
