@@ -212,6 +212,8 @@ export interface IndicatorData {
         provinceId: number;
         value: number;
     }>;
+    minValue: number;
+    maxValue: number;
 }
 
 export interface SetIndicatorsAction {

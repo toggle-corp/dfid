@@ -72,6 +72,13 @@ export default class IndicatorsGetRequest implements Request<{}> {
             },
             {},
         );
+
+        Object.keys(indicatorData).forEach((key) => {
+            const indicator = indicatorData[key];
+            const values = Object.values(indicator.provinces).map((p: any) => p.value);
+            indicator.minValue = Math.min(...values);
+            indicator.maxValue = Math.max(...values);
+        });
         return indicatorData;
     }
 

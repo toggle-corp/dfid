@@ -168,7 +168,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
             this.reloadMapLayer(nextProps);
             this.reloadProgramLayer(nextProps);
         } else {
-            if (this.props.selectedProvinces !== nextProps.selectedProvinces) {
+            if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
+                this.props.selectedIndicator !== nextProps.selectedIndicator) {
                 this.reloadProvince(nextProps);
                 this.reloadMunicipalities(nextProps);
             }
@@ -212,37 +213,28 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.geoJsonRequestCoordinator.stop();
     }
 
-    getProvinceStyle = (provinceId: number) => {
-        // Use selector from props
-        const selectedIndicator = {
-            id: 1,
-            name: 'Human Development Index',
-            unit: 0,
-            provinces: {
-                1: { value: 0.507 },
-                2: { value: 0.307 },
-                3: { value: 0.2 },
-                4: { value: 0.7 },
-                5: { value: 0.8 },
-                6: { value: 0.1 },
-                7: { value: 0.9 },
-            },
-        };
-        const minValue = 0;
-        const maxValue = 1;
+    getProvinceStyle = (props: Props, provinceId: number) => {
+        const { selectedIndicator } = props;
 
         if (!selectedIndicator) {
-            return undefined;
+            return {};
         }
 
         const value = selectedIndicator.provinces[provinceId].value;
         if (!value) {
-            return undefined;
+            return {};
+        }
+
+        const minValue = selectedIndicator.minValue;
+        const maxValue = selectedIndicator.maxValue;
+
+        if (maxValue === minValue) {
+            return {};
         }
 
         const fraction = (value - minValue) / (maxValue - minValue);
-        const offset = 0.3;
-        const fractionWithOffset = fraction * (0.85 - offset) + offset;
+        const offset = 0.1;
+        const fractionWithOffset = fraction * (0.95 - offset) + offset;
         
         return {
             color: '#008181',
@@ -486,7 +478,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 labelKey: 'FIRST_DIST',
                 separateStroke: true,
                 zoomOnLoad: selectedProvinces.length === 1,
-                ...this.getProvinceStyle(selectedProvince.id),
+                ...this.getProvinceStyle(props, selectedProvince.id),
             })),
         ];
 
