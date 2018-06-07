@@ -1,4 +1,5 @@
 import update from '../../../vendor/react-store/utils/immutable-update';
+import initialSiloDomainData from '../../initial-state/siloDomainData';
 
 import {
     SiloDomainData,
@@ -14,6 +15,7 @@ export const enum DASHBOARD_ACTION {
     setFilters = 'siloDomainData/DASHBOARD/SET_FILTERS',
     setProvince = 'siloDomainData/DASHBOARD/SET_PROVINCE',
     setRequestManagerLoading = 'siloDomainData/DASHBOARD/SET_REQUEST_MANAGER_LOADING',
+    resetRequestManagerLoading = 'siloDomainData/DASHBOARD/RESET_REQUEST_MANAGER_LOADING',
 }
 
 // ACTION-CREATOR
@@ -43,6 +45,9 @@ export const setRequestManagerLoadingAction = (
     type: DASHBOARD_ACTION.setRequestManagerLoading,
 });
 
+export const resetRequestManagerLoadingAction = () => ({
+    type: DASHBOARD_ACTION.resetRequestManagerLoading,
+});
 
 // HELPER
 
@@ -102,6 +107,7 @@ const setRequestManagerLoading = (
         loadingProgrammes,
         loadingSectors,
         loadingIndicators,
+        loadingIndicatorsData,
         loadingGeoJson,
     } = action;
     const settings = {
@@ -115,8 +121,20 @@ const setRequestManagerLoading = (
                 loadingProgrammes: setIfDefined(loadingProgrammes),
                 loadingSectors: setIfDefined(loadingSectors),
                 loadingIndicators: setIfDefined(loadingIndicators),
+                loadingIndicatorsData: setIfDefined(loadingIndicatorsData),
                 loadingGeoJson: setIfDefined(loadingGeoJson),
             } },
+        } },
+    };
+    return update(state, settings);
+};
+
+const resetRequestManagerLoading = (state: SiloDomainData) => {
+    const settings = {
+        dashboard: { $auto: {
+            loadings: {
+                $set: initialSiloDomainData.dashboard.loadings,
+            },
         } },
     };
     return update(state, settings);
@@ -126,6 +144,7 @@ const reducer: ReducerGroup<SiloDomainData> = {
     [DASHBOARD_ACTION.setFilters]: setFilters,
     [DASHBOARD_ACTION.setProvince]: setProvince,
     [DASHBOARD_ACTION.setRequestManagerLoading]: setRequestManagerLoading,
+    [DASHBOARD_ACTION.resetRequestManagerLoading]: resetRequestManagerLoading,
 };
 
 export default reducer;

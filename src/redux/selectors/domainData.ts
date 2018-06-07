@@ -13,6 +13,8 @@ import {
     ProvinceDatum,
     ProgrammeDatum,
     SectorDatum,
+    IndicatorData,
+    Dictionary,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -61,6 +63,10 @@ export const countriesDataSelector = ({ domainData }: RootState): CountryData[] 
 
 export const indicatorsSelector = ({ domainData }: RootState): Indicator[] => (
     domainData.indicators || emptyArray
+);
+
+export const indicatorsDataSelector = ({ domainData }: RootState): Dictionary<IndicatorData> => (
+    domainData.indicatorsData || emptyObject
 );
 
 export const mapLayersSelector = ({ domainData }: RootState): MapLayer[] => (

@@ -3,6 +3,7 @@ import Redux from 'redux';
 import { connect } from 'react-redux';
 
 import SelectInputWithList from '../../../vendor/react-store/components/Input/SelectInputWithList';
+import SelectInput from '../../../vendor/react-store/components/Input/SelectInput';
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
@@ -115,7 +116,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 provincesId: [],
                 programmesId: [],
                 sectorsId: [],
-                indicatorsId: [],
+                indicatorId: [],
                 mapLayersId: [],
             },
         };
@@ -288,11 +289,11 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         />
                     </div>
                     <div className={styles.layers}>
-                        <SelectInputWithList
+                        <SelectInput
                             label="Indicators"
                             className={styles.input}
                             options={indicators}
-                            faramElementName="indicatorsId"
+                            faramElementName="indicatorId"
                             keySelector={indicatorKeyExtractor}
                             labelSelector={indicatorLabelExtractor}
                             showHintAndError={false}

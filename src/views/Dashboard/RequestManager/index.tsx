@@ -26,15 +26,18 @@ import {
     setProgrammesDataAction,
     setSectorsAction,
     setIndicatorsAction,
+    setIndicatorsDataAction,
     setMapLayersAction,
     setGeoJsonsAction,
     setRequestManagerLoadingAction,
+    resetRequestManagerLoadingAction,
     dashboardFilterPaneSelector,
     dashboardProvincesSelector,
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
     geoJsonsSelector,
+    dashboardIndicatorSelector,
 } from '../../../redux';
 
 import {
@@ -46,6 +49,7 @@ import {
     SetProgrammesDataAction,
     SetSectorsAction,
     SetIndicatorsAction,
+    SetIndicatorsDataAction,
     SetMapLayersAction,
     SetRequestManagerLoadingAction,
     DashboardFilter,
@@ -56,10 +60,12 @@ import {
     GeoJSONS,
     Dictionary,
     SetGeoJsonsAction,
+    IndicatorData,
 } from '../../../redux/interface';
 
 import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
 import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
+import IndicatorsDataGetRequest from './requests/IndicatorsDataGetRequest';
 import MapLayersGetRequest from './requests/MapLayersGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
@@ -81,6 +87,7 @@ interface PropsFromState {
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
     geoJsons: GeoJSONS;
+    selectedIndicator?: IndicatorData;
 }
 interface PropsFromDispatch {
     setCountriesData(params: SetCountriesDataAction): void;
@@ -90,9 +97,11 @@ interface PropsFromDispatch {
     setProgrammesData(params: SetProgrammesDataAction): void;
     setSectors(params: SetSectorsAction): void;
     setIndicators(params: SetIndicatorsAction): void;
+    setIndicatorsData: (params: SetIndicatorsDataAction) => void;
     setMapLayers(params: SetMapLayersAction): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
     setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
+    resetRequestManagerLoading(): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
@@ -103,6 +112,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
     geoJsonRequestCoordinator: Coordinator;
     countryDataRequest: RestRequest;
     indicatorsRequest: RestRequest;
+    indicatorsDataRequest: RestRequest;
     mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     programmeRequest: RestRequest;
@@ -128,6 +138,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
             .build();
     }
 
+    componentWillMount() {
+        this.props.resetRequestManagerLoading();
+    }
+
     componentDidMount() {
         this.startRequestForCountriesData();
         this.startRequestForProvinceData();
@@ -136,6 +150,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.startRequestForProgrammesData();
         this.startRequestForSectors();
         this.startRequestForIndicators();
+        this.startRequestForIndicatorsData();
         this.startRequestForMapLayers();
 
         if (!this.props.loading) {
@@ -187,6 +202,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
         }
         if (this.indicatorsRequest) {
             this.indicatorsRequest.stop();
+        }
+        if (this.indicatorsDataRequest) {
+            this.indicatorsDataRequest.stop();
         }
         if (this.mapLayersRequest) {
             this.mapLayersRequest.stop();
@@ -322,6 +340,19 @@ export class RequestManager extends React.PureComponent<Props, State>{
         });
         this.indicatorsRequest = indicatorsRequest.create();
         this.indicatorsRequest.start();
+    }
+
+    startRequestForIndicatorsData = () => {
+        if (this.indicatorsDataRequest) {
+            this.indicatorsDataRequest.stop();
+        }
+        const indicatorsDataRequest = new IndicatorsDataGetRequest({
+            setState: params => this.setState(params),
+            setIndicatorsData: this.props.setIndicatorsData,
+            setLoadings: this.props.setDashboardLoadings,
+        });
+        this.indicatorsDataRequest = indicatorsDataRequest.create();
+        this.indicatorsDataRequest.start();
     }
 
     startRequestForMapLayers = () => {
@@ -525,6 +556,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
     geoJsons: geoJsonsSelector(state),
+    selectedIndicator: dashboardIndicatorSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
@@ -536,10 +568,13 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
         dispatch(setProgrammesDataAction(params)),
     setSectors: (params: SetSectorsAction) => dispatch(setSectorsAction(params)),
     setIndicators: (params: SetIndicatorsAction) => dispatch(setIndicatorsAction(params)),
+    setIndicatorsData: (params: SetIndicatorsDataAction) =>
+        dispatch(setIndicatorsDataAction(params)),
     setMapLayers: (params: SetMapLayersAction) => dispatch(setMapLayersAction(params)),
     setGeoJsons: (params: SetGeoJsonsAction) => dispatch(setGeoJsonsAction(params)),
     setDashboardLoadings: (params: SetRequestManagerLoadingAction) =>
         dispatch(setRequestManagerLoadingAction(params)),
+    resetRequestManagerLoading: () => dispatch(resetRequestManagerLoadingAction()),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

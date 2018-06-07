@@ -13,6 +13,8 @@ const initialDomainDataState: DomainData = {
     countriesData: [],
 
     indicators: [],
+    indicatorsData: {},
+
     mapLayers: [],
 };
 
