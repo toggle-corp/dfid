@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     Indicator,
     SetIndicatorsAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForIndicators,
     createParamsForIndicators,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setIndicators(params: SetIndicatorsAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class IndicatorsGetRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class IndicatorsGetRequest implements Request<{}> {
         const request = new FgRestBuilder()
             .url(urlForIndicators)
             .params(createParamsForIndicators)
-            .preLoad(() => this.props.setState({ loadingIndicators: true }))
-            .postLoad(() => this.props.setState({ loadingIndicators: false }))
+            .preLoad(() => this.props.setLoadings({ loadingIndicators: true }))
+            .postLoad(() => this.props.setLoadings({ loadingIndicators: false }))
             .success((response: Indicator[]) => {
                 schema.validate(response, 'array.indicator');
                 this.props.setIndicators({

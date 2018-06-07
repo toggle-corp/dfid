@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     ProgrammeData,
     SetProgrammesDataAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForProgrammeData,
     createParamsForProgrammeData,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setProgrammesData(params: SetProgrammesDataAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class ProgrammesDataRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class ProgrammesDataRequest implements Request<{}> {
         const programmeDataRequest = new FgRestBuilder()
             .url(urlForProgrammeData)
             .params(createParamsForProgrammeData)
-            .preLoad(() => this.props.setState({ loadingProgrammeData: true }))
-            .postLoad(() => this.props.setState({ loadingProgrammeData: false }))
+            .preLoad(() => this.props.setLoadings({ loadingProgrammeData: true }))
+            .postLoad(() => this.props.setLoadings({ loadingProgrammeData: false }))
             .success((response: ProgrammeData[]) => {
                 try {
                     schema.validate(response, 'array.programmeData');

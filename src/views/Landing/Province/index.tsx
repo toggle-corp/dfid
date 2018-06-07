@@ -19,22 +19,43 @@ interface Data {
     id: number;
     name: string;
     noOfActiveProjects: number;
-    totalBudget: number;
+    totalBudget?: number;
 }
 
-interface Props {
-    setDashboardProvince(provinceId: number): void;
+interface OwnProps {
     datum: Data;
 }
+interface PropsFromDispatch {
+    setDashboardProvince(provinceId: number): void;
+}
+type Props = OwnProps & PropsFromDispatch;
 
 const routeToDashboard = {
     pathname: reverseRoute(pathNames.dashboard),
 };
 
+interface ProvinceDetail {
+    label: string;
+    value? : number;
+    icon: string;
+    isCurrency?: boolean;
+}
+
 class Province extends React.PureComponent<Props> {
+    static keyExtractor = (province: ProvinceDetail) => province.label;
+
     setDashboardProvince = (id: number) => () => {
         const { setDashboardProvince } = this.props;
         setDashboardProvince(id);
+    }
+
+    renderProvinceDetailItem = (key: string, datum: ProvinceDetail) => {
+        return (
+            <ProvinceDetailItem
+                key={key}
+                datum={datum}
+            />
+        );
     }
 
     render() {
@@ -47,7 +68,7 @@ class Province extends React.PureComponent<Props> {
             totalBudget,
         } = datum;
 
-        const provinceDetailItemList = [
+        const provinceDetailItemList: ProvinceDetail[] = [
             {
                 label: 'Active DFID projects',
                 value: noOfActiveProjects,
@@ -61,7 +82,6 @@ class Province extends React.PureComponent<Props> {
             },
         ];
 
-
         return (
             <Link
                 key={id}
@@ -74,8 +94,9 @@ class Province extends React.PureComponent<Props> {
                 </div>
                 <ListView
                     className={styles.content}
+                    keyExtractor={Province.keyExtractor}
                     data={provinceDetailItemList}
-                    renderer={ProvinceDetailItem}
+                    modifier={this.renderProvinceDetailItem}
                 />
             </Link>
         );
@@ -86,7 +107,7 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
 });
 
-export default connect<Props>(
+export default connect<undefined, PropsFromDispatch, OwnProps>(
     undefined,
     mapDispatchToProps,
 )(Province);

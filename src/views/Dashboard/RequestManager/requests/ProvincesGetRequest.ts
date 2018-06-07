@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     Province,
     SetProvincesAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForProvinces,
     createParamsForProvinces,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setProvinces(params: SetProvincesAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class ProvincesGetRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class ProvincesGetRequest implements Request<{}> {
         const provincesRequest = new FgRestBuilder()
             .url(urlForProvinces)
             .params(createParamsForProvinces)
-            .preLoad(() => this.props.setState({ loadingProvinces: true }))
-            .postLoad(() => this.props.setState({ loadingProvinces: false }))
+            .preLoad(() => this.props.setLoadings({ loadingProvinces: true }))
+            .postLoad(() => this.props.setLoadings({ loadingProvinces: false }))
             .success((response: Province[]) => {
                 try {
                     schema.validate(response, 'array.province');

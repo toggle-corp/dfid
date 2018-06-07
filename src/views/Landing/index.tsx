@@ -48,12 +48,26 @@ const routeToExplore = {
     pathname: reverseRoute(pathNames.dashboard),
 };
 
+interface Dictionary<T> {
+    [key:  string]: T;
+}
+
+interface ProvinceData {
+    id: number;
+    name: string;
+    noOfActiveProjects: number;
+    totalBudget?: number;
+}
+
 export class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
-    provincesData: object;
+    provincesData: Dictionary<ProvinceData>;
     data: Data;
     defaultData: object;
     provinceDataRequest: RestRequest;
+
+    static itemKeySelector = (item: Item) => item.label;
+    static provinceKeyExtractor = (province: ProvinceData) => province.name;
 
     constructor(props: Props) {
         super(props);
@@ -170,10 +184,7 @@ export class Landing extends React.PureComponent<Props, State> {
             { label: 'Municipalities', value: municipalitiesCovered },
             { label: 'Total projects', value: totalProjects },
             { label: 'Total sectors', value: totalSectors  },
-            {
-                label: 'Total budget (£)',
-                value: totalBudget,
-            },
+            { label: 'Total budget (£)', value: totalBudget },
         ];
 
         return (
@@ -183,6 +194,7 @@ export class Landing extends React.PureComponent<Props, State> {
                 </h2>
                 <ListView
                     className={styles.content}
+                    keyExtractor={Landing.itemKeySelector}
                     data={items}
                     modifier={this.renderOverviewItem}
                 />
@@ -229,6 +241,15 @@ export class Landing extends React.PureComponent<Props, State> {
             </div>
         </div>
     )
+
+    renderProvince = (key: string, datum: ProvinceData) => {
+        return (
+            <Province
+                key={key}
+                datum={datum}
+            />
+        );
+    }
 
     render() {
         // tslint:disable-next-line variable-name
@@ -279,7 +300,8 @@ export class Landing extends React.PureComponent<Props, State> {
                             <ListView
                                 className={styles.content}
                                 data={provincesDataList}
-                                renderer={Province}
+                                modifier={this.renderProvince}
+                                keyExtractor={Landing.provinceKeyExtractor}
                             />
                         </div>
                     </div>

@@ -1,23 +1,25 @@
 import {
     RestRequest,
     FgRestBuilder,
-} from '../../../vendor/react-store/utils/rest';
+} from '../../../../vendor/react-store/utils/rest';
 
-import { Dashboard } from '../index';
+import { RequestManager } from '../index';
 import {
     MapLayer,
     SetMapLayersAction,
-} from '../../../redux/interface';
+    SetRequestManagerLoadingAction,
+} from '../../../../redux/interface';
 import {
     urlForMapLayers,
     createParamsForMapLayers,
-} from '../../../rest';
-import { Request } from '../../../rest/interface';
-import schema from '../../../schema';
+} from '../../../../rest';
+import { Request } from '../../../../rest/interface';
+import schema from '../../../../schema';
 
 interface Props {
-    setState: Dashboard['setState'];
+    setState: RequestManager['setState'];
     setMapLayers(params: SetMapLayersAction): void;
+    setLoadings(params: SetRequestManagerLoadingAction): void;
 }
 
 export default class MapLayersGetRequest implements Request<{}> {
@@ -31,8 +33,8 @@ export default class MapLayersGetRequest implements Request<{}> {
         const request = new FgRestBuilder()
             .url(urlForMapLayers)
             .params(createParamsForMapLayers)
-            .preLoad(() => this.props.setState({ loadingIndicators: true }))
-            .postLoad(() => this.props.setState({ loadingIndicators: false }))
+            .preLoad(() => this.props.setLoadings({ loadingIndicators: true }))
+            .postLoad(() => this.props.setLoadings({ loadingIndicators: false }))
             .success((response: MapLayer[]) => {
                 schema.validate(response, 'array.mapLayer');
                 this.props.setMapLayers({

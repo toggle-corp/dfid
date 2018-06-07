@@ -8,7 +8,6 @@ import province from './province';
 import programme from './programme';
 import sector from './sector';
 import country from './country';
-import dashboard from './dashboard';
 import indicator from './indicator';
 import mapLayer from './mapLayer';
 
@@ -19,7 +18,6 @@ const domainDataReducer: ReducerGroup<DomainData> = {
     ...programme,
     ...sector,
     ...country,
-    ...dashboard,
     ...indicator,
     ...mapLayer,
 };

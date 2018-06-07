@@ -12,14 +12,6 @@ const initialDomainDataState: DomainData = {
 
     countriesData: [],
 
-    dashboardFilter: {
-        filters: {},
-        faramValues: {},
-        faramErrors: {},
-        pristine: true,
-        isHidden: false,
-    },
-
     indicators: [],
     mapLayers: [],
 };
