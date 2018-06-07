@@ -8,6 +8,7 @@ export interface LayerInfo {
     geoJson: GeoJSON;
     type: string;
     separateStroke?: boolean;
+    strokeColor?: string;
     color?: string;
     opacity?: number;
     visibilityKey?: string;
@@ -58,7 +59,7 @@ export default class Map extends React.PureComponent<Props, States> {
                 layerKey: `${l.layerKey}-stroke`,
                 type: 'Line',
                 geoJson: l.geoJson,
-                color: l.color,
+                color: l.strokeColor || l.color,
                 opacity: l.opacity,
             })),
     ])

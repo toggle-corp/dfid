@@ -136,6 +136,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     handleMapClick={this.handleMapClick}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
+                    loading={!!loading}
                 />
                 <FilterPane
                     className={styles.left}
