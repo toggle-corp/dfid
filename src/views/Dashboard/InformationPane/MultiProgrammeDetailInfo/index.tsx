@@ -26,7 +26,16 @@ type Props = OwnProps & PropsFromState;
 interface State {}
 
 export class MultiProgrammeDetailInfo extends React.PureComponent<Props, State>{
-    keyExtractor = (item: Programme) => item.id;
+    keyExtractor = (item: Programme) => String(item.id);
+
+    renderProgrammeDetail = (key: string, datum: Programme, i: number, data: Programme[]) => {
+        return (
+            <ProgrammeDetailInfo
+                key={key}
+                datum={datum}
+            />
+        );
+    }
 
     render() {
         const {
@@ -55,7 +64,7 @@ export class MultiProgrammeDetailInfo extends React.PureComponent<Props, State>{
                 className={styles.programmeList}
                 data={selectedProgrammes}
                 keyExtractor={this.keyExtractor}
-                renderer={ProgrammeDetailInfo}
+                modifier={this.renderProgrammeDetail}
             />
         );
     }

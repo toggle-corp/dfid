@@ -27,7 +27,16 @@ interface State {}
 
 
 export class MultiSectorDetailInfo extends React.PureComponent<Props, State>{
-    keyExtractor = (item: Sector) => item.id;
+    keyExtractor = (item: Sector) => String(item.id);
+
+    renderSectorDetail = (key: string, datum: Sector, i: number, data: Sector[]) => {
+        return (
+            <SectorDetailInfo
+                key={key}
+                datum={datum}
+            />
+        );
+    }
 
     render() {
         const {
@@ -56,7 +65,7 @@ export class MultiSectorDetailInfo extends React.PureComponent<Props, State>{
                 className={styles.sectorList}
                 data={selectedSectors}
                 keyExtractor={this.keyExtractor}
-                renderer={SectorDetailInfo}
+                modifier={this.renderSectorDetail}
             />
         );
     }

@@ -4,14 +4,14 @@ import Numeral from '../../../vendor/react-store/components/View/Numeral';
 import styles from './styles.scss';
 
 interface Data {
-    label: string;
+    label?: string;
     icon: string;
-    isCurrency: boolean;
-    value: string;
+    isCurrency?: boolean;
+    value?: number;
 }
 
 interface Props {
-    className: string;
+    className?: string;
     datum: Data;
 }
 

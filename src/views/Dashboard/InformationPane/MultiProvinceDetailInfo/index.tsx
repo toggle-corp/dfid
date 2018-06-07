@@ -26,7 +26,16 @@ type Props = OwnProps & PropsFromState;
 interface State {}
 
 export class MultiProvinceDetailInfo extends React.PureComponent<Props, State>{
-    keyExtractor = (item: Province) => item.id;
+    keyExtractor = (item: Province) => String(item.id);
+
+    renderProvinceDetail = (key: string, datum: Province, i: number, data: Province[]) => {
+        return (
+            <ProvinceDetailInfo
+                key={key}
+                datum={datum}
+            />
+        );
+    }
 
     render() {
         const {
@@ -55,7 +64,7 @@ export class MultiProvinceDetailInfo extends React.PureComponent<Props, State>{
                 className={styles.provinceList}
                 data={selectedProvinces}
                 keyExtractor={this.keyExtractor}
-                renderer={ProvinceDetailInfo}
+                modifier={this.renderProvinceDetail}
             />
         );
     }

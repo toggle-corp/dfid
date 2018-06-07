@@ -48,9 +48,20 @@ const routeToExplore = {
     pathname: reverseRoute(pathNames.dashboard),
 };
 
+interface Dictionary<T> {
+    [key:  string]: T;
+}
+
+interface ProvinceData {
+    id: number;
+    name: string;
+    noOfActiveProjects: number;
+    totalBudget?: number;
+}
+
 export class Landing extends React.PureComponent<Props, State> {
     provinces: number[];
-    provincesData: object;
+    provincesData: Dictionary<ProvinceData>;
     data: Data;
     defaultData: object;
     provinceDataRequest: RestRequest;
@@ -230,6 +241,15 @@ export class Landing extends React.PureComponent<Props, State> {
         </div>
     )
 
+    renderProvince = (key: string, datum: ProvinceData) => {
+        return (
+            <Province
+                key={key}
+                datum={datum}
+            />
+        );
+    }
+
     render() {
         // tslint:disable-next-line variable-name
         const Overview = this.renderOverview;
@@ -279,7 +299,7 @@ export class Landing extends React.PureComponent<Props, State> {
                             <ListView
                                 className={styles.content}
                                 data={provincesDataList}
-                                renderer={Province}
+                                modifier={this.renderProvince}
                             />
                         </div>
                     </div>

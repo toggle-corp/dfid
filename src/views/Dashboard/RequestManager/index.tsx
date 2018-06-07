@@ -306,6 +306,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
             console.warn('RequestForMapLayerGeoJson: undefined/null url detected', 'key: ', key);
             return;
         }
+
+        // TODO: Move preload and postload to Request class
         const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
             setMapLayerGeoJson: responseHandler,
             setGeoJsons: this.props.setGeoJsons,
