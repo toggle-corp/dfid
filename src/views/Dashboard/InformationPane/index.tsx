@@ -50,14 +50,14 @@ export default class InformationPane extends React.PureComponent<Props, State>{
 
         this.state = {
             isCollapsed: true,
-            activeTab: 'country',
+            activeTab: 'province',
         };
 
         this.routes = {
-            country: 'Country',
             province: 'Province',
             programme: 'Programme',
             sector: 'Sector',
+            country: 'Country',
         };
 
         this.views = {

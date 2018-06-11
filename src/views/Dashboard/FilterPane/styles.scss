@@ -31,6 +31,7 @@
             :global {
                 .multi-select-input {
                     .label {
+                        color: $color-primary;
                         font-size: $font-size-medium;
                     }
                 }
@@ -78,6 +79,15 @@
 
         .layers {
             @extend %content;
+
+            :global {
+                .single-select-input {
+                    .label {
+                        color: $color-primary;
+                        font-size: $font-size-medium;
+                    }
+                }
+            }
         }
 
         .filters {
