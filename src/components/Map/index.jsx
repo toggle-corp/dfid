@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import L from 'leaflet';
 
-import MapLayer from './MapLayerTest';
+import MapLayer from './MapLayer';
 
 const propTypes = {
     className: PropTypes.string,

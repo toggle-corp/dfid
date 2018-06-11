@@ -31,6 +31,7 @@ import {
     Dictionary,
     GeoJSONS,
     MapLayer,
+    MapLayerProps,
     Programme,
     Province,
     RootState,
@@ -47,8 +48,7 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
-import { LayerInfo } from '../../components/Map';
-import Map from '../../components/Map/test';
+import Map from '../../components/Map/index.jsx';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -82,7 +82,7 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
 interface State {
-    layersInfo: Dictionary<LayerInfo>;
+    layersInfo: Dictionary<MapLayerProps>;
 }
 
 export class Dashboard extends React.PureComponent<Props, State>{

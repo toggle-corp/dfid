@@ -5,12 +5,13 @@ import {
 } from '../../../vendor/react-store/utils/rest';
 
 import { Dashboard } from '../index';
-import { GeoJSON } from '../../../components/Map/MapLayer';
 import {
     createParamsForProvinces,
 } from '../../../rest';
 import { Request } from '../../../rest/interface';
-// import schema from '../../../schema';
+import {
+    GeoJSON,
+} from '../../../redux/interface';
 
 interface Props {
     setState: Dashboard['setState'];

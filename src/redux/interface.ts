@@ -1,5 +1,4 @@
 import { FaramErrors } from '../rest/interface';
-import { GeoJSON } from '../components/Map/MapLayer';
 
 // FIXME: Move to common interfaces
 export type Dictionary<T> = {
@@ -269,7 +268,24 @@ export interface DashboardRequestManagerLoadings {
 
 export type SetRequestManagerLoadingAction = Partial<DashboardRequestManagerLoadings>;
 
+// Map Layer Properties
+
+export interface MapLayerProps {
+    layerKey: string;
+    order: number;
+
+    geoJson: GeoJSON;
+    style: object;
+    idKey?: string;
+    labelKey?: string;
+    zoomOnLoad?: boolean;
+    handleHover?: boolean;
+    onClick?(key: String): void;
+}
+
 // GeoJSON
+
+export type GeoJSON = any;
 
 export interface GeoJSONS {
     [url: string]: GeoJSON;

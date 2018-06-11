@@ -9,8 +9,6 @@ import {
 } from '../../../vendor/react-store/utils/coordinate';
 import { getHexFromString } from '../../../vendor/react-store/utils/common';
 
-import { LayerInfo } from '../../../components/Map';
-import { GeoJSON } from '../../../components/Map/MapLayer';
 import {
     urlForCountryGeoJson,
     urlForMunicipalitiesGeoJson,
@@ -57,10 +55,12 @@ import {
     Programme,
     Sector,
     MapLayer,
+    GeoJSON,
     GeoJSONS,
     Dictionary,
     SetGeoJsonsAction,
     IndicatorData,
+    MapLayerProps,
 } from '../../../redux/interface';
 
 import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
@@ -75,7 +75,7 @@ import SectorsGetRequest from './requests/SectorsGetRequest';
 import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
 
 interface OwnProps {
-    layersInfo: Dictionary<LayerInfo>;
+    layersInfo: Dictionary<MapLayerProps>;
     handleMapClick(key: string): void;
     setLayersInfo(settings: object): void;
     loading: boolean;

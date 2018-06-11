@@ -5,12 +5,14 @@ import {
 } from '../../../../vendor/react-store/utils/rest';
 import { Coordinator } from '../../../../vendor/react-store/utils/coordinate';
 
-import { GeoJSON } from '../../../../components/Map/MapLayer';
 import {
     createParamsForProvinces,
 } from '../../../../rest';
 import { Request } from '../../../../rest/interface';
-import { SetGeoJsonsAction } from '../../../../redux/interface';
+import {
+    SetGeoJsonsAction,
+    GeoJSON,
+} from '../../../../redux/interface';
 // import schema from '../../../schema';
 
 interface Props {
