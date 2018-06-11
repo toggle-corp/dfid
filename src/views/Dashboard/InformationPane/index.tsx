@@ -106,21 +106,27 @@ export default class InformationPane extends React.PureComponent<Props, State>{
             activeTab,
         } = this.state;
 
-        const classNames = [
-            className,
-            styles.informationPane,
-        ];
 
         if (isCollapsed) {
+            const classNames = [
+                className,
+                styles.showInformationButton,
+            ];
+
             return (
                 <PrimaryButton
-                    className={styles.showInformationButton}
+                    className={classNames.join(' ')}
                     onClick={this.handleShowInformationButtonClick}
                     title="Show information pane"
                     iconName={iconNames.informationCircle}
                 />
             );
         }
+
+        const classNames = [
+            className,
+            styles.informationPane,
+        ];
 
         return (
             <div className={classNames.join(' ')}>
