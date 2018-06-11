@@ -18,17 +18,35 @@ export default class Map extends React.PureComponent {
     static propTypes = propTypes;
     static defaultProps = defaultProps;
 
-    static createLayers = layers => [
-        ...Object.values(layers).sort((l1, l2) => l1.order - l2.order),
-        ...Object.values(layers).filter(l => l.separateStroke)
-        .sort((l1, l2) => l1.order - l2.order)
-        .map(l => ({
-            ...l,
-            layerKey: `${l.layerKey}-separate-stroke`,
-            types: ['Line'],
-        })),
-    ];
+    static createSortedLayers = (layersObj) => {
+        const layers = Object.values(layersObj);
 
+        // Sort the layers
+        const sortedLayers = layers.sort((l1, l2) => l1.order - l2.order);
+
+        // Create the separate stroke layers
+        const sortedLayersSeparate = sortedLayers
+            .filter(l => l.separateStroke)
+            .map(l => ({
+                ...l,
+                layerKey: `${l.layerKey}-separate-stroke`,
+                types: ['Line'],
+            }));
+
+        return [
+            ...sortedLayers,
+            ...sortedLayersSeparate,
+        ];
+    }
+
+    // Create legend items from layers which have title and color
+    // Perhaps use some defined variable like `showLegend` instead of title and color?
+    static createLegendItems = layers => layers
+        .filter(l => l.title && l.color)
+        .map(layer => ({
+            label: layer.title,
+            color: layer.color,
+        }));
 
     constructor(props) {
         super(props);
@@ -38,7 +56,8 @@ export default class Map extends React.PureComponent {
         };
 
         this.mapContainer = React.createRef();
-        this.layers = Map.createLayers(this.props.layers);
+        this.layers = Map.createSortedLayers(this.props.layers);
+        this.legendItems = Map.createLegendItems(this.layers);
         this.reloadKey = 0;
     }
 
@@ -70,7 +89,8 @@ export default class Map extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.layers !== nextProps.layers) {
-            this.layers = Map.createLayers(nextProps.layers);
+            this.layers = Map.createSortedLayers(nextProps.layers);
+            this.legendItems = Map.createLegendItems(this.layers);
             this.reloadKey += 1;
         }
     }
@@ -101,11 +121,6 @@ export default class Map extends React.PureComponent {
     render() {
         const className = this.getClassName();
 
-        const layerLegendItems = this.layers.filter(l => l.title && l.color).map(layer => ({
-            label: layer.title,
-            color: layer.color,
-        }));
-
         return (
              <div
                 className={className}
@@ -121,7 +136,7 @@ export default class Map extends React.PureComponent {
                 ))}
                 <Legend
                     className={styles.legend}
-                    legendItems={layerLegendItems}
+                    legendItems={this.legendItems}
                 />
             </div>
         );

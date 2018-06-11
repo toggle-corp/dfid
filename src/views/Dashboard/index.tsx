@@ -48,7 +48,7 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
-import Map from '../../components/Map/index.jsx';
+import Map from '../../components/Map';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';

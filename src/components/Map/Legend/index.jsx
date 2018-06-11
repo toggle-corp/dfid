@@ -26,16 +26,7 @@ export default class Legend extends React.PureComponent {
         super(props);
         this.state = {
             inactive: [],
-            maxSize: Math.max(...props.legendItems.map(item => item.size || 10)),
         };
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.legendItems !== this.props.legendItems) {
-            this.setState({
-                maxSize: Math.max(...nextProps.legendItems.map(item => item.size || 10)),
-            });
-        }
     }
 
     getItemClassName = (item) => {
@@ -83,16 +74,13 @@ export default class Legend extends React.PureComponent {
             className={this.getItemClassName(item)}
             onClick={() => this.toggleItem(item)}
         >
-            <div
-                className={styles.iconContainer}
-                style={{ width: this.state.maxSize }}
-            >
+            <div className={styles.iconContainer}>
                 <span
                     className={styles.icon}
                     style={{
                         backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
-                        width: item.size || 10,
-                        height: item.size || 10,
+                        width: 10,
+                        height: 10,
                     }}
                 />
             </div>
