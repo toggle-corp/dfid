@@ -8,7 +8,7 @@ import update from '../../vendor/react-store/utils/immutable-update';
 
 import {
     setCountriesDataAction,
-    setDashboardProvinceAction,
+    toggleDashboardProvinceAction,
     setProvincesAction,
     setProvincesDataAction,
     setProgrammesAction,
@@ -31,6 +31,7 @@ import {
     Dictionary,
     GeoJSONS,
     MapLayer,
+    MapLayerProps,
     Programme,
     Province,
     RootState,
@@ -47,7 +48,7 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
-import Map, { LayerInfo } from '../../components/Map';
+import Map from '../../components/Map';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -73,7 +74,7 @@ interface PropsFromDispatch {
     setSectors(params: SetSectorsAction): void;
     setIndicators(params: SetIndicatorsAction): void;
     setMapLayers(params: SetMapLayersAction): void;
-    setDashboardProvince(provinceId: number): void;
+    toggleDashboardProvince(provinceId: number): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
     setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
 }
@@ -81,7 +82,7 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
 
 interface State {
-    layersInfo: Dictionary<LayerInfo>;
+    layersInfo: Dictionary<MapLayerProps>;
 }
 
 export class Dashboard extends React.PureComponent<Props, State>{
@@ -104,10 +105,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleMapClick = (key: string) => {
-        const { selectedProvinces, setDashboardProvince } = this.props;
-        if (!(selectedProvinces && selectedProvinces.length)) {
-            setDashboardProvince(parseInt(key, 10));
-        }
+        const { toggleDashboardProvince } = this.props;
+        toggleDashboardProvince(parseInt(key, 10));
     }
 
     render() {
@@ -178,7 +177,8 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setCountriesData: (params: SetCountriesDataAction) => dispatch(setCountriesDataAction(params)),
     setProvinces: (params: SetProvincesAction) => dispatch(setProvincesAction(params)),
-    setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
+    toggleDashboardProvince: (provinceId: number) =>
+        dispatch(toggleDashboardProvinceAction(provinceId)),
     setProvincesData: (params: SetProvincesDataAction) => dispatch(setProvincesDataAction(params)),
     setProgrammes: (params: SetProgrammesAction) => dispatch(setProgrammesAction(params)),
     setProgrammesData: (params: SetProgrammesDataAction) =>

@@ -16,6 +16,7 @@ export const enum DASHBOARD_ACTION {
     setProvince = 'siloDomainData/DASHBOARD/SET_PROVINCE',
     setRequestManagerLoading = 'siloDomainData/DASHBOARD/SET_REQUEST_MANAGER_LOADING',
     resetRequestManagerLoading = 'siloDomainData/DASHBOARD/RESET_REQUEST_MANAGER_LOADING',
+    toggleProvince = 'siloDomainData/DASHBOARD/TOGGLE_PROVINCE',
 }
 
 // ACTION-CREATOR
@@ -36,6 +37,13 @@ export const setDashboardProvinceAction = (
 ) => ({
     provinceId,
     type: DASHBOARD_ACTION.setProvince,
+});
+
+export const toggleDashboardProvinceAction = (
+    provinceId: number,
+) => ({
+    provinceId,
+    type: DASHBOARD_ACTION.toggleProvince,
 });
 
 export const setRequestManagerLoadingAction = (
@@ -95,6 +103,22 @@ const setProvince = (state: SiloDomainData, { provinceId }: { provinceId: number
     return update(state, settings);
 };
 
+const toggleProvince = (state: SiloDomainData, { provinceId }: { provinceId: number }) => {
+    const settings = {
+        dashboard: { $auto: {
+            filterPane: { $auto: {
+                faramValues: { $auto: {
+                    provincesId: { $autoArray: { $toggleElement: provinceId } },
+                } },
+                filters: { $auto: {
+                    provincesId: { $autoArray: { $toggleElement: provinceId } },
+                } },
+            } },
+        } },
+    };
+    return update(state, settings);
+};
+
 const setRequestManagerLoading = (
     state: SiloDomainData, action: SetRequestManagerLoadingAction,
 ) => {
@@ -143,6 +167,7 @@ const resetRequestManagerLoading = (state: SiloDomainData) => {
 const reducer: ReducerGroup<SiloDomainData> = {
     [DASHBOARD_ACTION.setFilters]: setFilters,
     [DASHBOARD_ACTION.setProvince]: setProvince,
+    [DASHBOARD_ACTION.toggleProvince]: toggleProvince,
     [DASHBOARD_ACTION.setRequestManagerLoading]: setRequestManagerLoading,
     [DASHBOARD_ACTION.resetRequestManagerLoading]: resetRequestManagerLoading,
 };
