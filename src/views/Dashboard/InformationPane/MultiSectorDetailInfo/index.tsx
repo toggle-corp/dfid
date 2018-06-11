@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Message from '../../../../vendor/react-store/components/View/Message';
-import ListView from '../../../../vendor/react-store/components/View/List/ListView';
+// import ListView from '../../../../vendor/react-store/components/View/List/ListView';
 import { dashboardSectorsSelector } from '../../../../redux';
 
 import {
@@ -61,12 +61,16 @@ export class MultiSectorDetailInfo extends React.PureComponent<Props, State>{
         }
 
         return (
-            <ListView
+           /* <ListView
                 className={styles.sectorList}
                 data={selectedSectors}
                 keyExtractor={this.keyExtractor}
                 modifier={this.renderSectorDetail}
             />
+            */
+            <Message className={styles.message}>
+                Data not available
+            </Message>
         );
     }
 }

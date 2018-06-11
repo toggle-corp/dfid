@@ -154,6 +154,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         hideLayers={loadingGeoJson}
                     />
                     <InformationPane
+                        className={styles.informationPane}
                         loadingProvinceData={loadingProvinceData}
                         loadingProgrammeData={loadingProgrammeData}
                         loadingSectorData={loadingSectorData}

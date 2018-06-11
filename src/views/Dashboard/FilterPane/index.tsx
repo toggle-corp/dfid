@@ -7,7 +7,6 @@ import SelectInput from '../../../vendor/react-store/components/Input/SelectInpu
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
-import LoadingAnimation from '../../../vendor/react-store/components/View/LoadingAnimation';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
 
@@ -18,7 +17,7 @@ import {
     provincesSelector,
     dashboardFilterPaneSelector,
     indicatorsSelector,
-    mapLayersSelector,
+    validMapLayersSelector,
 } from '../../../redux';
 
 import {
@@ -167,7 +166,8 @@ export class FilterPane extends React.PureComponent<Props, State>{
         const { onFilterClear } = this.props;
         this.props.setDashboardFilters({
             faramValues: {},
-            pristine: false,
+            filters: {},
+            pristine: true,
         });
         if (onFilterClear) {
             onFilterClear();
@@ -198,20 +198,12 @@ export class FilterPane extends React.PureComponent<Props, State>{
             faramValues,
             faramErrors,
             pristine,
-            isHidden,
         } = faramState;
 
         const classNames = [
             className,
             styles.filtersContainer,
         ];
-
-        if (isHidden || disabled) {
-            return (
-                <LoadingAnimation className={classNames.join(' ')} />
-            );
-            // return this.renderPopup();
-        }
 
         const isFilterEmpty = isObjectEmpty(faramValues);
         return (
@@ -230,7 +222,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         <WarningButton
                             title="Clear all selection"
                             onClick={this.handleClearFilter}
-                            disabled={isFilterEmpty}
+                            disabled={isFilterEmpty || disabled}
                             transparent
                         >
                            Clear
@@ -321,7 +313,7 @@ const mapStateToProps = (state: RootState) => ({
     programmes: programmesSelector(state),
     provinces: provincesSelector(state),
     indicators: indicatorsSelector(state),
-    mapLayers: mapLayersSelector(state),
+    mapLayers: validMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),
 });
 
