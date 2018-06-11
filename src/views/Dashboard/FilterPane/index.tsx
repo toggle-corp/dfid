@@ -7,7 +7,6 @@ import SelectInput from '../../../vendor/react-store/components/Input/SelectInpu
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
-import LoadingAnimation from '../../../vendor/react-store/components/View/LoadingAnimation';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
 
@@ -198,20 +197,12 @@ export class FilterPane extends React.PureComponent<Props, State>{
             faramValues,
             faramErrors,
             pristine,
-            isHidden,
         } = faramState;
 
         const classNames = [
             className,
             styles.filtersContainer,
         ];
-
-        if (isHidden || disabled) {
-            return (
-                <LoadingAnimation className={classNames.join(' ')} />
-            );
-            // return this.renderPopup();
-        }
 
         const isFilterEmpty = isObjectEmpty(faramValues);
         return (
