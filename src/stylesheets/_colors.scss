@@ -99,7 +99,7 @@ $color-background-row-light-alt: #eee;
 $color-background-row-dark-alt: #484848;
 $color-background-row-alt: get-color($color-background-row-light-alt, $color-background-row-dark-alt);
 
-$color-navbar-light: #005ea5;
+$color-navbar-light: $color-foreground;
 $color-navbar-dark: #414141;
 $color-navbar: get-color($color-navbar-light, $color-navbar-dark);
 
