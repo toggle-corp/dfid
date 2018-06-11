@@ -69,6 +69,7 @@ export default class MapLayer extends React.PureComponent {
     load = (props) => {
         const {
             map,
+            renderer,
             geoJson,
             properties,
         } = props;
@@ -89,12 +90,14 @@ export default class MapLayer extends React.PureComponent {
             },
             pointToLayer: (feature, latlng) => {
                 const featureId = feature.properties[properties.idKey];
-                return new L.CircleMarker(latlng, {
-                    radius: 10,
+                return new L.circle(latlng, {
+                    renderer,
                     ...this.getStyle(properties.style, featureId),
+                    radius: 2000,
                 });
             },
         }).addTo(map);
+
         highlightedLayers.forEach(layer => layer.bringToFront());
 
         if (properties.zoomOnLoad) {
@@ -107,38 +110,38 @@ export default class MapLayer extends React.PureComponent {
         const featureId = feature.properties[properties.idKey];
         const featureLabel = feature.properties[properties.labelKey];
 
-        if (!layer || !layer.setStyle) {
+        if (featureLabel) {
+            layer.bindTooltip(String(featureLabel), {
+                sticky: true,
+            });
+        }
+
+        if (!layer.setStyle) {
             return;
         }
 
         layer.setStyle(this.getStyle(properties.style, featureId));
 
-        layer.on('mouseover', () => {
-            const { properties } = this.props;
-            if (properties.handleHover) {
+        if (properties.handleHover) {
+            layer.on('mouseover', () => {
+                const { properties } = this.props;
                 layer.setStyle(
                     this.getStyle(properties.style, featureId, { color: 'hoverColor' })
                 );
-            }
-        });
+            });
+        }
 
-        layer.on('mouseout', () => {
-            const { properties } = this.props;
-            if (properties.handleHover) {
+        if (properties.handleHover) {
+            layer.on('mouseout', () => {
+                const { properties } = this.props;
                 layer.setStyle(this.getStyle(properties.style, featureId));
-            }
-        });
+            });
+        }
 
-        layer.on('mouseup', () => {
-            const { properties } = this.props;
-            if (properties.onClick) {
+        if (properties.onClick) {
+            layer.on('mouseup', () => {
+                const { properties } = this.props;
                 properties.onClick(featureId);
-            }
-        });
-
-        if (featureLabel) {
-            layer.bindTooltip(String(featureLabel), {
-                sticky: true,
             });
         }
     }
@@ -149,10 +152,12 @@ export default class MapLayer extends React.PureComponent {
             inputStyle = style[key];
         }
 
+        const color = inputStyle[styleKeys.color || 'color'];
+
         return {
-            color: inputStyle[styleKeys.stroke || 'stroke'],
+            color: inputStyle[styleKeys.stroke || 'stroke'] || color,
             weight: inputStyle[styleKeys.strokeWeight || 'strokeWeight'] || 1.0,
-            fillColor: inputStyle[styleKeys.color || 'color'],
+            fillColor: color,
             fillOpacity: inputStyle[styleKeys.opacity || 'opacity'] || 1.0,
         }
     }

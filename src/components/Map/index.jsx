@@ -24,16 +24,19 @@ export default class Map extends React.PureComponent {
 
         this.mapContainer = React.createRef();
         this.layers = Map.createLayers(this.props.layers);
+        this.reloadKey = 0;
     }
 
     componentDidMount() {
         this.map = L.map(this.mapContainer.current)
             .setView([51.505, -0.09], 13);
+        this.renderer = L.canvas();
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.layers !== nextProps.layers) {
             this.layers = Map.createLayers(nextProps.layers);
+            this.reloadKey += 1;
         }
     }
 
@@ -56,7 +59,7 @@ export default class Map extends React.PureComponent {
             >
                 {this.layers.map(layerInfo => (
                     <MapLayer
-                        key={layerInfo.id}
+                        key={`${layerInfo.layerKey}-layer-${this.reloadKey}`}
                         map={this.map}
                         geoJson={layerInfo.geoJson}
                         properties={layerInfo}

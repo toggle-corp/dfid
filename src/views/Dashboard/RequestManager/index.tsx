@@ -236,7 +236,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 styles[province.id] = {
                     ...styles[province.id],
                     stroke: '#000',
-                    opacity: 0.85,
                     strokeWeight: 2,
                     isHighlighted: true,
                 };
@@ -489,7 +488,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
             order: 1,
             style: {
                 color: '#fff',
-                stroke: '#e0e0e0',
+                stroke: '#c0c0c0',
             },
         }];
 
