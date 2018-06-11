@@ -1,0 +1,46 @@
+@import '../../../stylesheets/base';
+
+.legend {
+    background-color: $color-foreground;
+    padding: $spacing-small 0;
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        outline: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        padding: $spacing-small $spacing-medium;
+        text-align: left;
+        font-family: inherit;
+        font-size: inherit;
+
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 1em;
+            overflow-y: hidden;
+
+            .icon {
+                display: inline-block;
+                border-radius: 50%;
+            }
+        }
+
+        .label {
+            margin: 0 $spacing-small;
+            color: $color-text-label;
+            font-size: $font-size-small;
+        }
+
+        &.inactive {
+            opacity: .3;
+
+            .icon {
+                filter: grayscale(100%);
+            }
+        }
+    }
+}

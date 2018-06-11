@@ -141,6 +141,7 @@ export default class MapLayer extends React.PureComponent {
                 paint: {
                     'line-color': this.getPaintData(properties, 'stroke'),
                     'line-width': this.getPaintData(properties, 'strokeWidth', 1),
+                    'line-opacity': this.getPaintData(properties, 'strokeOpacity', 1),
                 },
             });
         }

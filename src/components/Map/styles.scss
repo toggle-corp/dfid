@@ -1,0 +1,15 @@
+@import '../../stylesheets/base';
+
+.map {
+    position: relative;
+
+    .legend {
+        position: absolute;
+        bottom: $spacing-small;
+        left: $spacing-small;
+        z-index: 100;
+        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+        max-height: 480px;
+        overflow-y: auto;
+    }
+}

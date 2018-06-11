@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 
 import MapLayer from './MapLayer';
+import Legend from './Legend';
+import styles from './styles.scss';
 
 const propTypes = {
     className: PropTypes.string,
@@ -16,8 +18,17 @@ export default class Map extends React.PureComponent {
     static propTypes = propTypes;
     static defaultProps = defaultProps;
 
-    static createLayers = layers => Object.values(layers)
-        .sort((l1, l2) => l1.order - l2.order);
+    static createLayers = layers => [
+        ...Object.values(layers).sort((l1, l2) => l1.order - l2.order),
+        ...Object.values(layers).filter(l => l.separateStroke)
+        .sort((l1, l2) => l1.order - l2.order)
+        .map(l => ({
+            ...l,
+            layerKey: `${l.layerKey}-separate-stroke`,
+            types: ['Line'],
+        })),
+    ];
+
 
     constructor(props) {
         super(props);
@@ -81,6 +92,7 @@ export default class Map extends React.PureComponent {
 
         const classNames = [
             className,
+            styles.map,
         ];
 
         return classNames.join(' ');
@@ -88,6 +100,12 @@ export default class Map extends React.PureComponent {
 
     render() {
         const className = this.getClassName();
+
+        const layerLegendItems = this.layers.filter(l => l.title && l.color).map(layer => ({
+            label: layer.title,
+            color: layer.color,
+        }));
+
         return (
              <div
                 className={className}
@@ -101,6 +119,10 @@ export default class Map extends React.PureComponent {
                         properties={layerInfo}
                     />
                 ))}
+                <Legend
+                    className={styles.legend}
+                    legendItems={layerLegendItems}
+                />
             </div>
         );
     }
