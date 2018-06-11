@@ -214,9 +214,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.geoJsonRequestCoordinator.stop();
     }
 
-    getProvincesStyle = (props: Props) => {
+    getSelectedProvincesStyle = (props: Props) => {
         const {
-            selectedIndicator,
             selectedProvinces,
             provinces,
         } = props;
@@ -224,12 +223,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
 
         provinces.forEach((province) => {
             styles[province.id] = {
+                color: '#fff',
+                opacity: 0,
                 stroke: '#fff',
-                strokeWidth: 1,
-                color: '#005ea5',
-                opacity: 0.85,
-                hoverColor: '#005ea5',
-                hoverOpacity: 1.0,
+                strokeWidth: 0,
             };
         });
 
@@ -237,11 +234,32 @@ export class RequestManager extends React.PureComponent<Props, State>{
             selectedProvinces.forEach((province) => {
                 styles[province.id] = {
                     ...styles[province.id],
-                    stroke: '#fff',
+                    stroke: '#000',
                     strokeWidth: 2,
                 };
             });
         }
+
+        return styles;
+    }
+
+    getProvincesStyle = (props: Props) => {
+        const {
+            selectedIndicator,
+            provinces,
+        } = props;
+        const styles = {};
+
+        provinces.forEach((province) => {
+            styles[province.id] = {
+                stroke: '#fff',
+                strokeWidth: 0.5,
+                color: '#418ed8',
+                opacity: 0.9,
+                hoverColor: '#418ed8',
+                hoverOpacity: 1.0,
+            };
+        });
 
         if (!selectedIndicator) {
             return styles;
@@ -261,10 +279,11 @@ export class RequestManager extends React.PureComponent<Props, State>{
             }
 
             const fraction = (value - minValue) / (maxValue - minValue);
-            const offset = 0.1;
+            const offset = 0.25;
             const fractionWithOffset = fraction * (0.85 - offset) + offset;
 
             styles[provinceId].color = '#008181';
+            styles[provinceId].hoverColor = '#008181';
             styles[provinceId].opacity = fractionWithOffset;
         });
 
@@ -461,11 +480,12 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadProvince = (props: Props) => {
-        const style = this.getProvincesStyle(props);
         const selections = [{
-            style,
+            style: this.getProvincesStyle(props),
             types: ['Polygon'],
             separateStroke: true,
+            separateStyle: this.getSelectedProvincesStyle(props),
+            separateStyleType: 'Line',
 
             id: 'country',
             file: urlForCountryGeoJson,
@@ -490,7 +510,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const selections = [{
             id: 'municipalities',
             file: urlForMunicipalitiesGeoJson,
-            order: 2,
+            order: 3,
             types: ['Line'],
             style: {
                 stroke: '#c0c0c0',
@@ -527,7 +547,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                     ActLevel: { color: getHexFromString('ipssj') },
                 },
                 url: urlForIpssjGeoJson,
-                order: 3,
+                order: 9,
             },
         });
     }
@@ -543,7 +563,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 style: {
                     color: getHexFromString(l.layerName),
                 },
-                order: (l.type === 'Polygon') ? -1 : 4,
+                order: (l.type === 'Polygon') ? -1 : 10,
             })),
         });
     }

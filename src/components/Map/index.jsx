@@ -25,7 +25,7 @@ export default class Map extends React.PureComponent {
         const sortedLayers = layers.sort((l1, l2) => l1.order - l2.order);
 
         // Create the separate stroke layers
-        const sortedLayersSeparate = sortedLayers
+        const separatedStrokeLayers = sortedLayers
             .filter(l => l.separateStroke)
             .map(l => ({
                 ...l,
@@ -33,9 +33,20 @@ export default class Map extends React.PureComponent {
                 types: ['Line'],
             }));
 
+        // Create the layers with seprate style
+        const separateStyleLayers = sortedLayers
+            .filter(l => l.separateStyle)
+            .map(l => ({
+                ...l,
+                layerKey: `${l.layerKey}-separate-style`,
+                types: [l.separateStyleType],
+                style: l.separateStyle,
+            }));
+
         return [
             ...sortedLayers,
-            ...sortedLayersSeparate,
+            ...separatedStrokeLayers,
+            ...separateStyleLayers,
         ];
     }
 

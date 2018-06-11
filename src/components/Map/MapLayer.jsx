@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 import turf from 'turf';
-import { mapToList } from '../../vendor/react-store/utils/common';
+import { isTruthy, mapToList } from '../../vendor/react-store/utils/common';
 
 
 const stylePropType = PropTypes.shape({
@@ -11,7 +11,6 @@ const stylePropType = PropTypes.shape({
     strokeWeight: PropTypes.number,
     opacity: PropTypes.number,
     hoverColor: PropTypes.string,
-    isHighlighted: PropTypes.bool,
 });
 
 
@@ -252,23 +251,25 @@ export default class MapLayer extends React.PureComponent {
     }
 
     getPaintData = (properties, key, defaultValue) => {
+        const val = v => isTruthy(v) ? v : defaultValue;
+
         const style = properties.style;
         if (!properties.stylePerElement) {
-            return style[key] || defaultValue;
+            return val(style[key]);
         }
 
         if (properties.integerId) {
             return {
                 property: properties.idKey,
                 type: 'categorical',
-                stops: mapToList(style, (v, k) => [parseInt(k, 10), v[key] || defaultValue]),
+                stops: mapToList(style, (v, k) => [parseInt(k, 10), val(v[key])]),
             };
         }
 
         return {
             property: properties.idKey,
             type: 'categorical',
-            stops: mapToList(style, (v, k) => [k, v[key] || defaultValue]),
+            stops: mapToList(style, (v, k) => [k, val(v[key])]),
         };
     }
 
