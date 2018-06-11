@@ -543,9 +543,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             selectedList,
             keyPrefix: 'programmeLayer',
             overrides: {
-                style: {
-                    ActLevel: { color: getHexFromString('ipssj') },
-                },
+                idKey: 'id',
+                style: { color: getHexFromString('ipssj') },
+                visibleCondition: ['!=', 'Act_level', ''],
                 url: urlForIpssjGeoJson,
                 order: 9,
             },

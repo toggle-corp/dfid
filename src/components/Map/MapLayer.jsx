@@ -25,6 +25,7 @@ const propTypes = {
             PropTypes.objectOf(stylePropType),
         ]),
         stylePerElement: PropTypes.bool,
+        visibleCondition: PropTypes.arrayOf(PropTypes.string),
         idKey: PropTypes.string,
         integerId: PropTypes.bool,
         labelKey: PropTypes.string,
@@ -94,8 +95,6 @@ export default class MapLayer extends React.PureComponent {
             return;
         }
 
-        // TODO Remove isHighlighted prop
-
         if (properties.zoomOnLoad) {
             const bounds = turf.bbox(geoJson);
             map.fitBounds(
@@ -164,28 +163,35 @@ export default class MapLayer extends React.PureComponent {
         layerType,
         idKey,
         labelKey,
+        visibleCondition,
         paint,
         hoverPaint = undefined,
     }) => {
+        const layerId = `${layerKey}-${layerType}`;
+
         map.addLayer({
-            id: `${layerKey}-${layerType}`,
+            id: layerId,
             type: layerType,
             source: layerKey,
             paint,
         });
-        this.layers.push(`${layerKey}-${layerType}`);
+        this.layers.push(layerId);
 
         if (hoverPaint) {
             map.addLayer({
-                id: `${layerKey}-${layerType}-hover`,
+                id: `${layerId}-hover`,
                 type: layerType,
                 source: layerKey,
                 paint: hoverPaint,
                 filter: ['==', idKey, ''],
             });
 
-            this.layers.push(`${layerKey}-${layerType}-hover`);
-            this.handleHover(map, `${layerKey}-${layerType}`, labelKey);
+            this.layers.push(`${layerId}-hover`);
+            this.handleHover(map, layerId, labelKey);
+        }
+
+        if (visibleCondition) {
+            map.setFilter(layerId, visibleCondition);
         }
     }
 
