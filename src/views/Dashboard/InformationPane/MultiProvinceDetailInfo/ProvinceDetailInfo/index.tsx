@@ -39,6 +39,7 @@ const renderPound = (data: number) => (
         prefix="£"
     />
 );
+
 const renderDollar = (data: number) => (
     <Numeral
         precision={0}
@@ -46,9 +47,24 @@ const renderDollar = (data: number) => (
         prefix="$"
     />
 );
+
 const renderNumeral = (data: number) => (
     <Numeral
         precision={0}
+        value={data}
+    />
+);
+
+const renderPercent = (data: number) => (
+    <Numeral
+        precision={2}
+        suffix=" %"
+        value={data * 100}
+    />
+);
+
+const renderNormalNumeral = (data: number) => (
+    <Numeral
         value={data}
     />
 );
@@ -101,6 +117,7 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
                 <Item
                     label="No. of districts"
                     value={district}
+                    valueModifier={renderNumeral}
                 />
                 <Item
                     label="Area (sq.km)"
@@ -108,12 +125,14 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
                     valueModifier={renderNumeral}
                 />
                 <Item
-                    label="Population density"
+                    label="Population density (sq.km)"
                     value={populationDensity}
+                    valueModifier={renderNumeral}
                 />
                 <Item
                     label="Poverty rate"
                     value={povertyRate}
+                    valueModifier={renderPercent}
                 />
                 <Item
                     label="Population under poverty"
@@ -128,18 +147,22 @@ export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
                 <Item
                     label="HH by lowest wealth quantiles"
                     value={hhByLowestWealthQuantiles}
+                    valueModifier={renderNormalNumeral}
                 />
                 <Item
                     label="HDI"
                     value={humanDevelopmentIndex}
+                    valueModifier={renderNormalNumeral}
                 />
                 <Item
-                    label="Minute access to"
+                    label="Minute access to health care"
                     value={minuteAccessTo}
+                    valueModifier={renderNormalNumeral}
                 />
                 <Item
                     label="Vulnerability index"
                     value={vulnerabilityIndex}
+                    valueModifier={renderNormalNumeral}
                 />
                 <Item
                     label="GDP"

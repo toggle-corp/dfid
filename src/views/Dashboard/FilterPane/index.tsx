@@ -17,7 +17,7 @@ import {
     provincesSelector,
     dashboardFilterPaneSelector,
     indicatorsSelector,
-    mapLayersSelector,
+    validMapLayersSelector,
 } from '../../../redux';
 
 import {
@@ -166,7 +166,8 @@ export class FilterPane extends React.PureComponent<Props, State>{
         const { onFilterClear } = this.props;
         this.props.setDashboardFilters({
             faramValues: {},
-            pristine: false,
+            filters: {},
+            pristine: true,
         });
         if (onFilterClear) {
             onFilterClear();
@@ -221,7 +222,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         <WarningButton
                             title="Clear all selection"
                             onClick={this.handleClearFilter}
-                            disabled={isFilterEmpty}
+                            disabled={isFilterEmpty || disabled}
                             transparent
                         >
                            Clear
@@ -312,7 +313,7 @@ const mapStateToProps = (state: RootState) => ({
     programmes: programmesSelector(state),
     provinces: provincesSelector(state),
     indicators: indicatorsSelector(state),
-    mapLayers: mapLayersSelector(state),
+    mapLayers: validMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),
 });
 

@@ -79,6 +79,12 @@ export const countryDataSelector = createSelector(
     countriesData =>  countriesData[0] || emptyObject,
 );
 
+export const validMapLayersSelector = createSelector(
+    mapLayersSelector,
+    mapLayers => mapLayers.filter(mapLayer => mapLayer.file),
+);
+
+
 // Dashboard
 export const provinceDataSelector = createSelector(
     provincesDataSelector,
