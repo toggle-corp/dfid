@@ -12,7 +12,6 @@ import { getHexFromString } from '../../../vendor/react-store/utils/common';
 import { LayerInfo } from '../../../components/Map';
 import { GeoJSON } from '../../../components/Map/MapLayer';
 import {
-    createUrlForProvinceGeoJson,
     urlForCountryGeoJson,
     urlForMunicipalitiesGeoJson,
     urlForIpssjGeoJson,
@@ -38,6 +37,7 @@ import {
     dashboardMapLayersSelector,
     geoJsonsSelector,
     dashboardIndicatorSelector,
+    provincesSelector,
 } from '../../../redux';
 
 import {
@@ -88,6 +88,7 @@ interface PropsFromState {
     selectedMapLayers: MapLayer[];
     geoJsons: GeoJSONS;
     selectedIndicator?: IndicatorData;
+    provinces: Province[];
 }
 interface PropsFromDispatch {
     setCountriesData(params: SetCountriesDataAction): void;
@@ -213,33 +214,62 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.geoJsonRequestCoordinator.stop();
     }
 
-    getProvinceStyle = (props: Props, provinceId: number) => {
-        const { selectedIndicator } = props;
+    getProvincesStyle = (props: Props) => {
+        const {
+            selectedIndicator,
+            selectedProvinces,
+            provinces,
+        } = props;
+        const styles = {};
 
-        if (!selectedIndicator) {
-            return {};
+        provinces.forEach((province) => {
+            styles[province.id] = {
+                stroke: '#a0a0a0',
+                color: '#fff',
+                opacity: 0.5,
+                hoverColor: '#a0a0a0',
+            };
+        });
+
+        if (selectedProvinces) {
+            selectedProvinces.forEach((province) => {
+                styles[province.id] = {
+                    ...styles[province.id],
+                    stroke: '#000',
+                    opacity: 0.85,
+                    strokeWeight: 2,
+                    isHighlighted: true,
+                };
+            });
         }
 
-        const value = selectedIndicator.provinces[provinceId].value;
-        if (!value) {
-            return {};
+        if (!selectedIndicator) {
+            return styles;
         }
 
         const minValue = selectedIndicator.minValue;
         const maxValue = selectedIndicator.maxValue;
 
-        if (maxValue === minValue) {
-            return {};
-        }
+        Object.keys(selectedIndicator.provinces).forEach((provinceId) => {
+            if (maxValue === minValue) {
+                return;
+            }
 
-        const fraction = (value - minValue) / (maxValue - minValue);
-        const offset = 0.1;
-        const fractionWithOffset = fraction * (0.95 - offset) + offset;
-        
-        return {
-            color: '#008181',
-            opacity: fractionWithOffset,
-        };
+            const value = selectedIndicator.provinces[provinceId].value;
+            if (!value) {
+                return;
+            }
+
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.1;
+            const fractionWithOffset = fraction * (0.85 - offset) + offset;
+
+            styles[provinceId].stroke = '#fff';
+            styles[provinceId].color = '#008181';
+            styles[provinceId].opacity = fractionWithOffset;
+        });
+
+        return styles;
     }
 
     startRequestForCountriesData = () => {
@@ -401,16 +431,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
         selectedList.forEach((selection) => {
             const key = `${keyPrefix}-${selection.id}`;
             const url = overrides.url || selection.file;
-            let type = overrides.type || selection.type;
-
-            if (type === 'Polygon') {
-                type = 'Fill';
-            }
 
             const layerInfo = {
                 ...selection,
                 ...overrides,
-                type,
                 layerKey: key,
             };
 
@@ -438,52 +462,19 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadProvince = (props: Props) => {
-        const { selectedProvinces } = props;
-
-        const country = {
+        const style = this.getProvincesStyle(props);
+        const selections = [{
+            style,
             id: 'country',
             file: urlForCountryGeoJson,
-            type: 'Fill',
-            order: 1,
+            order: 2,
             zoomOnLoad: true,
             handleHover: true,
             showPopUp: true,
             idKey: 'Province',
             labelKey: 'Province',
             onClick: this.props.handleMapClick,
-            separateStroke: true,
-            opacity: (selectedProvinces.length > 0) ? 0.35 : 0.8,
-        };
-
-        const selections = [
-            country,
-            ...selectedProvinces.map(selectedProvince => ({
-                id: selectedProvince.id,
-                file: createUrlForProvinceGeoJson(selectedProvince.id),
-                type: 'Fill',
-                order: 1,
-                handleHover: true,
-                showPopUp: true,
-                idKey: 'FIRST_DCOD',
-                labelKey: 'FIRST_DIST',
-                separateStroke: true,
-                zoomOnLoad: selectedProvinces.length === 1,
-                color: '#008181',
-                strokeColor: '#fff',
-                ...this.getProvinceStyle(props, selectedProvince.id),
-            })),
-            ...selectedProvinces.map(selectedProvince => ({
-                id: `${selectedProvince.id}-border`,
-                file: urlForCountryGeoJson,
-                order: -1,
-                visibilityKey: 'Province',
-                visibilityValue: selectedProvince.id,
-                type: 'Line',
-                opacity: 1.0,
-                strokeWidth: 2,
-                color: '#fff',
-            })),
-        ];
+        }];
 
         this.reloadSelectionToLayers({
             keyPrefix: 'province',
@@ -492,13 +483,14 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadMunicipalities = (props: Props) => {
-        const { selectedProvinces } = props;
-        const selections = selectedProvinces.length > 0 ? [] : [{
+        const selections = [{
             id: 'municipalities',
             file: urlForMunicipalitiesGeoJson,
-            type: 'Line',
-            order: 2,
-            opacity: 0.2,
+            order: 1,
+            style: {
+                color: '#fff',
+                stroke: '#e0e0e0',
+            },
         }];
 
         this.reloadSelectionToLayers({
@@ -521,9 +513,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             selectedList,
             keyPrefix: 'programmeLayer',
             overrides: {
-                visibility: 'ActLevel',
-                type: 'Fill',
-                color: getHexFromString('ipssj'),
+                style: {
+                    ActLevel: { color: getHexFromString('ipssj') },
+                },
                 url: urlForIpssjGeoJson,
                 order: 3,
             },
@@ -535,7 +527,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             keyPrefix: 'mapLayer',
             selectedList: props.selectedMapLayers.map(l => ({
                 ...l,
-                color: getHexFromString(l.layerName),
+                style: {
+                    color: getHexFromString(l.layerName),
+                },
             })),
             overrides: {
                 order: 4,
@@ -556,6 +550,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedMapLayers: dashboardMapLayersSelector(state),
     geoJsons: geoJsonsSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
+    provinces: provincesSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({

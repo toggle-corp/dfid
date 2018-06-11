@@ -47,7 +47,8 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
-import Map, { LayerInfo } from '../../components/Map';
+import { LayerInfo } from '../../components/Map';
+import Map from '../../components/Map/test';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -104,10 +105,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleMapClick = (key: string) => {
-        const { selectedProvinces, setDashboardProvince } = this.props;
-        if (!(selectedProvinces && selectedProvinces.length)) {
-            setDashboardProvince(parseInt(key, 10));
-        }
+        const { setDashboardProvince } = this.props;
+        setDashboardProvince(parseInt(key, 10));
     }
 
     render() {
