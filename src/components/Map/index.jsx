@@ -8,10 +8,14 @@ import styles from './styles.scss';
 
 const propTypes = {
     className: PropTypes.string,
+    layers: PropTypes.arrayOf(PropTypes.object),
+    hideLayers: PropTypes.bool,
 };
 
 const defaultProps = {
     className: '',
+    layers: [],
+    hideLayers: false
 };
 
 export default class Map extends React.PureComponent {
@@ -129,15 +133,15 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
-    render() {
-        const className = this.getClassName();
+    renderMapLayers = () => {
+        const showMapLayers = this.state.map && !this.props.hideLayers;
+        if (!showMapLayers) {
+            return null;
+        }
 
         return (
-             <div
-                className={className}
-                ref={this.mapContainer}
-            >
-                {this.state.map && this.layers.map(layerInfo => (
+            <React.Fragment>
+                {this.layers.map(layerInfo => (
                     <MapLayer
                         key={`${layerInfo.layerKey}-layer-${this.reloadKey}`}
                         map={this.state.map}
@@ -145,6 +149,20 @@ export default class Map extends React.PureComponent {
                         properties={layerInfo}
                     />
                 ))}
+            </React.Fragment>
+        );
+    }
+
+    render() {
+        const className = this.getClassName();
+        const MapLayers = this.renderMapLayers;
+
+        return (
+             <div
+                className={className}
+                ref={this.mapContainer}
+            >
+                <MapLayers />
                 <Legend
                     className={styles.legend}
                     legendItems={this.legendItems}
