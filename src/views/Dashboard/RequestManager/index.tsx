@@ -224,10 +224,12 @@ export class RequestManager extends React.PureComponent<Props, State>{
 
         provinces.forEach((province) => {
             styles[province.id] = {
-                stroke: '#a0a0a0',
+                stroke: '#666',
+                strokeWidth: 1,
                 color: '#fff',
                 opacity: 0.5,
-                hoverColor: '#a0a0a0',
+                hoverColor: '#fff',
+                hoverOpacity: 0.5,
             };
         });
 
@@ -236,7 +238,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 styles[province.id] = {
                     ...styles[province.id],
                     stroke: '#000',
-                    strokeWeight: 2,
+                    strokeWidth: 2,
                     isHighlighted: true,
                 };
             });
@@ -263,7 +265,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
             const offset = 0.1;
             const fractionWithOffset = fraction * (0.85 - offset) + offset;
 
-            styles[provinceId].stroke = '#fff';
             styles[provinceId].color = '#008181';
             styles[provinceId].opacity = fractionWithOffset;
         });
@@ -464,13 +465,16 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const style = this.getProvincesStyle(props);
         const selections = [{
             style,
+            types: ['Polygon', 'Line'],
             id: 'country',
             file: urlForCountryGeoJson,
             order: 2,
+            stylePerElement: true,
             zoomOnLoad: true,
             handleHover: true,
             showPopUp: true,
             idKey: 'Province',
+            integerId: true,
             labelKey: 'Province',
             onClick: this.props.handleMapClick,
         }];
@@ -486,8 +490,8 @@ export class RequestManager extends React.PureComponent<Props, State>{
             id: 'municipalities',
             file: urlForMunicipalitiesGeoJson,
             order: 1,
+            types: ['Line'],
             style: {
-                color: '#fff',
                 stroke: '#c0c0c0',
             },
         }];
@@ -512,6 +516,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
             selectedList,
             keyPrefix: 'programmeLayer',
             overrides: {
+                types: ['Line'],
                 style: {
                     ActLevel: { color: getHexFromString('ipssj') },
                 },
@@ -526,13 +531,12 @@ export class RequestManager extends React.PureComponent<Props, State>{
             keyPrefix: 'mapLayer',
             selectedList: props.selectedMapLayers.map(l => ({
                 ...l,
+                types: [l.type],
                 style: {
                     color: getHexFromString(l.layerName),
                 },
+                order: (l.type === 'Polygon') ? -1 : 4,
             })),
-            overrides: {
-                order: 4,
-            },
         });
     }
 
