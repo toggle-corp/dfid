@@ -1,19 +1,27 @@
 @import '../../stylesheets/base';
 
-$width-left: 720px;
-$width-right: 320px;
+$width-body-max: 1200px;
+$height-logo: 96px;
 
 .landing {
     .header {
-        display: flex;
-        position: relative;
-        justify-content: space-between;
         border-bottom: $width-separator-thin solid $color-separator;
+        background-color: $color-foreground;
+
+        .content {
+            display: flex;
+            position: relative;
+            justify-content: space-between;
+            margin: auto;
+            max-width: $width-body-max;
+        }
 
         .logo {
             display: block;
-            padding: $spacing-large;
-            height: 240px;
+            padding: $spacing-medium;
+            height: $height-logo;
+            object-fit: contain;
+            object-position: left center;
         }
 
         %abs {
@@ -52,53 +60,52 @@ $width-right: 320px;
     }
 
     .body {
-        display: flex;
-        justify-content: center;
+        margin: auto;
+        max-width: $width-body-max;
 
-        .left {
+        %section {
+            .heading {
+                padding: $spacing-small $spacing-medium;
+                color: $color-primary;
+                font-weight: $font-weight-bold;
+            }
+
+            .content {
+                padding: $spacing-small $spacing-medium;
+            }
+        }
+
+        .map-section {
+            display: flex;
             margin: $spacing-medium 0;
-            background-color: $color-foreground-alt;
-            width: $width-left;
 
-            %section {
-                padding: $spacing-medium 0;
-
-                .heading {
-                    padding: $spacing-small $spacing-large;
-                }
-
-                .content {
-                    padding: $spacing-small $spacing-large;
-                }
+            .province-map {
+                flex-grow: 1;
+                margin-right: $spacing-medium;
+                height: 480px;
             }
 
             .overview {
+                flex-shrink: 0;
+                background-color: $color-foreground-alt;
                 @extend %section;
 
                 .content {
                     @include transition-medium;
-                    display: flex;
-                    align-content: center;
-                    align-items: center;
-                    flex-grow: 1;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                    padding: 0 $spacing-large - $spacing-medium;
 
                     .item {
-                        flex-basis: calc(calc(100% / 3) - #{2 * $spacing-medium}); 
-                        margin: $spacing-medium;
-                        border: $width-separator-thin solid $color-accent;
-                        background-color: rgba(255, 255, 255, 0.8);
-                        padding: $spacing-small $spacing-medium;
+                        display: flex;
+                        align-items: baseline;
 
                         .label {
+                            padding: $spacing-small;
                             color: $color-text-label;
-                            font-size: $font-size-large;
-                            font-weight: $font-weight-bold;
                         }
 
                         .value {
+                            // display: table-cell;
+                            padding: $spacing-small;
+                            text-align: right;
                             color: $color-accent;
                             font-size: $font-size-ultra-large;
                             font-weight: $font-weight-light;
@@ -106,57 +113,85 @@ $width-right: 320px;
                     }
                 }
             }
+        }
 
-            .about {
-                @extend %section;
+        .charts {
+            display: flex;
 
-                .content {
-                    line-height: 1.6;
+            .chart-container {
+                display: flex;
+                flex-basis: 50%;
+                flex-direction: column;
+                margin-bottom: $spacing-medium;
+                background-color: $color-foreground-alt;
+                height: 400px;
+
+                &:first-child {
+                    margin-right: $spacing-medium;
+                }
+
+                .heading {
+                    flex-shrink: 0;
+                    padding: $spacing-small $spacing-medium;
+                    color: $color-primary;
+                    font-weight: $font-weight-bold;
+                }
+
+                .chart {
+                    flex-grow: 1;
+                }
+            }
+        }
+
+        .about {
+            @extend %section;
+            background-color: $color-foreground-alt;
+            margin-bottom: $spacing-medium;
+            // padding: $spacing-large 0;
+
+            .content {
+                display: flex;
+                padding: $spacing-large;
+
+                .text {
+                    max-width: 720px;
+                    line-height: 1.8;
 
                     p {
                         margin: 0 0 $spacing-medium 0;
                         text-align: justify;
                     }
                 }
+
+                .right-box {
+                    flex-grow: 1;
+                    margin-left: $spacing-large;
+                    border: $width-separator-thin solid $color-separator;
+                }
             }
         }
 
-        .right {
-            width: $width-right;
 
-            %section {
-                margin: $spacing-medium;
-                background-color: $color-background-alt;
+        .province-list {
+            @extend %section;
 
-                .heading {
-                    padding: $spacing-small $spacing-medium;
-                }
-
-                .content {
-                    padding: $spacing-small $spacing-medium;
-                }
-            }
-
-            .links {
-                @extend %section;
-            }
-
-            .province-list {
-                @extend %section;
-
-                .content {
-                    padding: 0;
-                }
+            .content {
+                padding: 0;
             }
         }
     }
 
     .footer {
-        display: flex;
-        align-items: baseline;
         background-color: $color-foreground-dark;
-        padding: $spacing-large;
+        padding: $spacing-large $spacing-medium;
         color: $color-text-on-dark;
+
+        .content {
+            margin: auto;
+            max-width: $width-body-max;
+            display: flex;
+            align-items: baseline;
+        }
 
         .address {
             .title {
