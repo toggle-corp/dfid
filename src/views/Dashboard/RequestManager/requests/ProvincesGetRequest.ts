@@ -34,7 +34,7 @@ export default class ProvincesGetRequest implements Request<{}> {
             .url(urlForProvinces)
             .params(createParamsForProvinces)
             .preLoad(() => this.props.setLoadings({ loadingProvinces: true }))
-            .postLoad(() => this.props.setLoadings({ loadingProvinces: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingProvinces: false }))
             .success((response: Province[]) => {
                 try {
                     schema.validate(response, 'array.province');

@@ -44,6 +44,11 @@ interface OwnProps {
     onFilterClear?(): void;
     // onChange when filters are applied
     onChange?(oldValues: DashboardFilterParams, values: DashboardFilterParams): void;
+    loadingProvinces?: boolean;
+    loadingProgrammes?: boolean;
+    loadingSectors?: boolean;
+    loadingIndicators?: boolean;
+    loadingLayers?: boolean;
 }
 
 interface PropsFromState {
@@ -192,7 +197,21 @@ export class FilterPane extends React.PureComponent<Props, State>{
             indicators,
             mapLayers,
             className,
+
+            loadingProvinces,
+            loadingProgrammes,
+            loadingSectors,
+            loadingIndicators,
+            loadingLayers,
         } = this.props;
+
+        console.warn(
+            loadingProvinces,
+            loadingProgrammes,
+            loadingSectors,
+            loadingIndicators,
+            loadingLayers,
+        );
 
         const {
             faramValues,
@@ -249,58 +268,68 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 </header>
                 <div className={styles.container}>
                     <div className={styles.filters}>
-                        <SelectInputWithList
-                            label="Provinces"
-                            className={styles.input}
-                            faramElementName="provincesId"
-                            options={provinces}
-                            keySelector={provinceKeyExtractor}
-                            labelSelector={provinceLabelExtractor}
-                            showHintAndError={false}
-                            listProps={{ emptyComponent: renderProvinceEmpty }}
-                        />
-                        <SelectInputWithList
-                            label="Programmes"
-                            className={styles.input}
-                            options={programmes}
-                            faramElementName="programmesId"
-                            keySelector={programmeKeyExtractor}
-                            labelSelector={programmeLabelExtractor}
-                            showHintAndError={false}
-                            listProps={{ emptyComponent: renderProgramEmpty }}
-                        />
-                        <SelectInputWithList
-                            label="Sectors"
-                            className={styles.input}
-                            options={sectors}
-                            faramElementName="sectorsId"
-                            keySelector={sectorKeyExtractor}
-                            labelSelector={sectorLabelExtractor}
-                            showHintAndError={false}
-                            listProps={{ emptyComponent: renderSectorEmpty }}
-                        />
+                        { !loadingProvinces &&
+                            <SelectInputWithList
+                                label="Provinces"
+                                className={styles.input}
+                                faramElementName="provincesId"
+                                options={provinces}
+                                keySelector={provinceKeyExtractor}
+                                labelSelector={provinceLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderProvinceEmpty }}
+                            />
+                        }
+                        { !loadingProgrammes &&
+                            <SelectInputWithList
+                                label="Programmes"
+                                className={styles.input}
+                                options={programmes}
+                                faramElementName="programmesId"
+                                keySelector={programmeKeyExtractor}
+                                labelSelector={programmeLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderProgramEmpty }}
+                            />
+                        }
+                        { !loadingSectors &&
+                            <SelectInputWithList
+                                label="Sectors"
+                                className={styles.input}
+                                options={sectors}
+                                faramElementName="sectorsId"
+                                keySelector={sectorKeyExtractor}
+                                labelSelector={sectorLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderSectorEmpty }}
+                            />
+                        }
                     </div>
                     <div className={styles.layers}>
-                        <SelectInput
-                            label="Indicators"
-                            className={styles.input}
-                            options={indicators}
-                            faramElementName="indicatorId"
-                            keySelector={indicatorKeyExtractor}
-                            labelSelector={indicatorLabelExtractor}
-                            showHintAndError={false}
-                            listProps={{ emptyComponent: renderIndicatorEmpty }}
-                        />
-                        <SelectInputWithList
-                            label="Layers"
-                            className={styles.input}
-                            options={mapLayers}
-                            faramElementName="mapLayersId"
-                            keySelector={mapLayerKeyExtractor}
-                            labelSelector={mapLayerLabelExtractor}
-                            showHintAndError={false}
-                            listProps={{ emptyComponent: renderLayerEmpty }}
-                        />
+                        { !loadingIndicators &&
+                            <SelectInput
+                                label="Indicators"
+                                className={styles.input}
+                                options={indicators}
+                                faramElementName="indicatorId"
+                                keySelector={indicatorKeyExtractor}
+                                labelSelector={indicatorLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderIndicatorEmpty }}
+                            />
+                        }
+                        { !loadingLayers &&
+                            <SelectInputWithList
+                                label="Layers"
+                                className={styles.input}
+                                options={mapLayers}
+                                faramElementName="mapLayersId"
+                                keySelector={mapLayerKeyExtractor}
+                                labelSelector={mapLayerLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderLayerEmpty }}
+                            />
+                        }
                     </div>
                 </div>
             </Faram>

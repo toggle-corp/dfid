@@ -33,8 +33,8 @@ export default class MapLayersGetRequest implements Request<{}> {
         const request = new FgRestBuilder()
             .url(urlForMapLayers)
             .params(createParamsForMapLayers)
-            .preLoad(() => this.props.setLoadings({ loadingIndicators: true }))
-            .postLoad(() => this.props.setLoadings({ loadingIndicators: false }))
+            .preLoad(() => this.props.setLoadings({ loadingLayers: true }))
+            .afterLoad(() => this.props.setLoadings({ loadingLayers: false }))
             .success((response: MapLayer[]) => {
                 schema.validate(response, 'array.mapLayer');
                 this.props.setMapLayers({

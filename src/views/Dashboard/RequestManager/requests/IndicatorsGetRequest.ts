@@ -34,7 +34,7 @@ export default class IndicatorsGetRequest implements Request<{}> {
             .url(urlForIndicators)
             .params(createParamsForIndicators)
             .preLoad(() => this.props.setLoadings({ loadingIndicators: true }))
-            .postLoad(() => this.props.setLoadings({ loadingIndicators: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingIndicators: false }))
             .success((response: Indicator[]) => {
                 schema.validate(response, 'array.indicator');
                 this.props.setIndicators({

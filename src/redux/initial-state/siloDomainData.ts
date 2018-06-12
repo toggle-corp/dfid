@@ -20,6 +20,7 @@ const initialSiloDomainData: SiloDomainData = {
             loadingSectors: true,
             loadingIndicators: true,
             loadingIndicatorsData: true,
+            loadingLayers: true,
             loadingGeoJson: false,
         },
     },

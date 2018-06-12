@@ -34,7 +34,7 @@ export default class ProgrammesGetRequest implements Request<{}> {
             .url(urlForProgrammes)
             .params(createParamsForProgrammes)
             .preLoad(() => this.props.setLoadings({ loadingProgrammes: true }))
-            .postLoad(() => this.props.setLoadings({ loadingProgrammes: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingProgrammes: false }))
             .success((response: Programme[]) => {
                 try {
                     schema.validate(response, 'array.programme');

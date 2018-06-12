@@ -34,7 +34,7 @@ export default class CountriesDataGetRequest implements Request<{}> {
             .url(urlForCountryData)
             .params(createParamsForCountryData)
             .preLoad(() => this.props.setLoadings({ loadingCountryData: true }))
-            .postLoad(() => this.props.setLoadings({ loadingCountryData: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingCountryData: false }))
             .success((response: CountryData[]) => {
                 try {
                     schema.validate(response, 'array.countryData');

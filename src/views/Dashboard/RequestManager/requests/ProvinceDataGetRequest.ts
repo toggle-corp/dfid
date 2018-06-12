@@ -34,7 +34,7 @@ export default class ProvinceDataGetRequest implements Request<{}> {
             .url(urlForProvinceData)
             .params(createParamsForProvinceData)
             .preLoad(() => this.props.setLoadings({ loadingProvinceData: true }))
-            .postLoad(() => this.props.setLoadings({ loadingProvinceData: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingProvinceData: false }))
             .success((response: ProvinceData[]) => {
                 try {
                     schema.validate(response, 'array.provinceData');

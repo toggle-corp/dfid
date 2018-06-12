@@ -37,7 +37,7 @@ export default class MapLayerGeoJsonGetRequest implements Request<MapLayerGeoJso
         const request = new FgRestBuilder()
             .url(url)
             .params(createParamsForProvinces)
-            .postLoad(() => {
+            .afterLoad(() => {
                 this.props.getCoordinator().notifyComplete(key);
             })
             .success((response: GeoJSON) => {

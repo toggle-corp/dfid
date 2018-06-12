@@ -122,6 +122,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingIndicators,
             loadingIndicatorsData,
             loadingGeoJson,
+            loadingLayers,
         } = this.props.requestManagerLoadings;
 
         const loading = (
@@ -129,9 +130,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingProgrammes || loadingProgrammeData ||
             loadingSectors || loadingSectorData ||
             loadingIndicators || loadingIndicatorsData ||
-            loadingGeoJson || loadingCountryData
-        );
-
+            loadingGeoJson || loadingCountryData ||
+            loadingLayers
+         );
 
         return (
             <div className={styles.dashboard}>
@@ -144,6 +145,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <FilterPane
                     className={styles.left}
                     disabled={loading}
+                    loadingProvinces={loadingProvinces}
+                    loadingProgrammes={loadingProgrammes}
+                    loadingSectors={loadingSectors}
+                    loadingIndicators={loadingIndicators}
+                    loadingLayers={loadingLayers}
                 />
                 <div className={styles.right}>
                     {loadingGeoJson && <LoadingAnimation />}
