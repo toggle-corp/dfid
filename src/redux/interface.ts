@@ -264,6 +264,7 @@ export interface DashboardRequestManagerLoadings {
     loadingIndicators: boolean;
     loadingIndicatorsData: boolean;
     loadingGeoJson: boolean;
+    loadingLayers: boolean;
 }
 
 export type SetRequestManagerLoadingAction = Partial<DashboardRequestManagerLoadings>;

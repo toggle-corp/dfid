@@ -97,7 +97,7 @@ export default class IndicatorsGetRequest implements Request<{}> {
             .url(urlForIndicatorsData)
             .params(createParamsForIndicatorsData)
             .preLoad(() => this.props.setLoadings({ loadingIndicatorsData: true }))
-            .postLoad(() => this.props.setLoadings({ loadingIndicatorsData: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingIndicatorsData: false }))
             .success(this.success)
             .build();
         return request;

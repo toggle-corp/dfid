@@ -133,6 +133,7 @@ const setRequestManagerLoading = (
         loadingIndicators,
         loadingIndicatorsData,
         loadingGeoJson,
+        loadingLayers,
     } = action;
     const settings = {
         dashboard: { $auto: {
@@ -147,6 +148,7 @@ const setRequestManagerLoading = (
                 loadingIndicators: setIfDefined(loadingIndicators),
                 loadingIndicatorsData: setIfDefined(loadingIndicatorsData),
                 loadingGeoJson: setIfDefined(loadingGeoJson),
+                loadingLayers: setIfDefined(loadingLayers),
             } },
         } },
     };

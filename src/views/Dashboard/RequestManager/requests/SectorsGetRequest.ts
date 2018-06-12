@@ -34,7 +34,7 @@ export default class SectorsGetRequest implements Request<{}> {
             .url(urlForSectors)
             .params(createParamsForSectors)
             .preLoad(() => this.props.setLoadings({ loadingSectors: true }))
-            .postLoad(() => this.props.setLoadings({ loadingSectors: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingSectors: false }))
             .success((response: Sector[]) => {
                 try {
                     schema.validate(response, 'array.sector');

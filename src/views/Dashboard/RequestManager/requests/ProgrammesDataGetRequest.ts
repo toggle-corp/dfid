@@ -34,7 +34,7 @@ export default class ProgrammesDataRequest implements Request<{}> {
             .url(urlForProgrammeData)
             .params(createParamsForProgrammeData)
             .preLoad(() => this.props.setLoadings({ loadingProgrammeData: true }))
-            .postLoad(() => this.props.setLoadings({ loadingProgrammeData: false }))
+            .afterLoad(() => this.props.setLoadings({ loadingProgrammeData: false }))
             .success((response: ProgrammeData[]) => {
                 try {
                     schema.validate(response, 'array.programmeData');

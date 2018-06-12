@@ -352,6 +352,7 @@ export class Landing extends React.PureComponent<Props, State> {
         if (redirectTo) {
             return (
                 <Redirect
+                    push
                     to={redirectTo}
                 />
             );
