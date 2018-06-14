@@ -2,7 +2,9 @@ import { createSelector } from 'reselect';
 import {
     RootState,
     Province,
+    ProvinceData,
     Programme,
+    ProgrammeData,
     Sector,
     MapLayer,
     Dashboard,
@@ -13,6 +15,8 @@ import {
 } from '../interface';
 import {
     provincesSelector,
+    provincesDataSelector,
+    programmesDataSelector,
     programmesSelector,
     sectorsSelector,
     indicatorsDataSelector,
@@ -36,6 +40,16 @@ export const geoJsonsSelector = ({ siloDomainData }: RootState): GeoJSONS => (
 );
 
 // Dashboard
+
+export const informationPaneStateSelector = createSelector(
+    dashboardSelector,
+    dashboard => dashboard.informationPaneState,
+);
+
+export const dashboardShowCompareSelector = createSelector(
+    dashboardSelector,
+    dashboard => dashboard.showCompare,
+);
 
 export const dashboardFilterPaneSelector = createSelector(
     dashboardSelector,
@@ -81,6 +95,15 @@ export const dashboardProvincesSelector = createSelector(
         ) || emptyArray as Province[],
 );
 
+export const dashboardProvincesDataSelector = createSelector(
+    provincesDataSelector,
+    dashboardProvincesIdSelector,
+    (provincesData, provincesId) =>
+        provincesData.filter(provinceData => (
+            provincesId.findIndex(id => id === provinceData.id)) !== -1,
+        ) || emptyArray as ProvinceData[],
+);
+
 export const dashboardProgrammesSelector = createSelector(
     programmesSelector,
     dashboardProgrammesIdSelector,
@@ -88,6 +111,15 @@ export const dashboardProgrammesSelector = createSelector(
         programmes.filter(programme => (
             programmesId.findIndex(id => id === programme.id)) !== -1,
         ) || emptyArray as Programme[],
+);
+
+export const dashboardProgrammesDataSelector = createSelector(
+    programmesDataSelector,
+    dashboardProgrammesIdSelector,
+    (programmesData, programmesId) =>
+        programmesData.filter(programmeData => (
+            programmesId.findIndex(id => id === programmeData.id)) !== -1,
+        ) || emptyArray as ProgrammeData[],
 );
 
 export const dashboardSectorsSelector = createSelector(

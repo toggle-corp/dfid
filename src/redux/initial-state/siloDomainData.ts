@@ -2,6 +2,11 @@ import { SiloDomainData } from '../interface';
 
 const initialSiloDomainData: SiloDomainData = {
     dashboard: {
+        showCompare: false,
+        informationPaneState: {
+            isCollapsed: true,
+            activeTab: 'province',
+        },
         filterPane: {
             filters: {},
             faramValues: {},

@@ -19,6 +19,9 @@ import {
     indicatorsSelector,
     validMapLayersSelector,
     validRasterMapLayersSelector,
+    setDashboardShowCompareAction,
+    dashboardShowCompareSelector,
+    setInformationPaneStateAction,
 } from '../../../redux';
 
 import {
@@ -28,9 +31,10 @@ import {
     Sector,
     Indicator,
     MapLayer,
-    SetDashboardFilterAction,
     DashboardFilterParams,
     DashboardFilter,
+    SetDashboardFilterAction,
+    SetInformationPaneStateAction,
 } from '../../../redux/interface';
 import {
     FaramErrors,
@@ -60,10 +64,13 @@ interface PropsFromState {
     mapLayers: MapLayer[];
     rasterMapLayers: MapLayer[];
     faramState: DashboardFilter;
+    showCompare: boolean;
 }
 
 interface PropsFromDispatch {
     setDashboardFilters(params: SetDashboardFilterAction): void;
+    setDashboardShowCompare(showBoolean: boolean): void;
+    setInformationPaneState(params: SetInformationPaneStateAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
@@ -190,6 +197,11 @@ export class FilterPane extends React.PureComponent<Props, State>{
         });
     }
 
+    toggleShowCompare = () => {
+        this.props.setDashboardShowCompare(!this.props.showCompare);
+        this.props.setInformationPaneState({ isCollapsed: false });
+    }
+
     render() {
         const {
             disabled,
@@ -201,6 +213,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
             mapLayers,
             rasterMapLayers,
             className,
+            showCompare,
 
             loadingProvinces,
             loadingProgrammes,
@@ -340,6 +353,14 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         }
                     </div>
                 </div>
+                <WarningButton
+                    title={showCompare ? 'Show Map' : 'Show Compare'}
+                    onClick={this.toggleShowCompare}
+                    disabled={disabled}
+                    transparent
+                >
+                    {showCompare ? 'Show Map' : 'Show Compare'}
+                </WarningButton>
             </Faram>
         );
     }
@@ -353,11 +374,16 @@ const mapStateToProps = (state: RootState) => ({
     mapLayers: validMapLayersSelector(state),
     rasterMapLayers: validRasterMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),
+    showCompare: dashboardShowCompareSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setDashboardFilters: (params: SetDashboardFilterAction) =>
         dispatch(setDashboardFiltersAction(params)),
+    setDashboardShowCompare: (showCompare: boolean) =>
+        dispatch(setDashboardShowCompareAction(showCompare)),
+    setInformationPaneState: (params: SetInformationPaneStateAction) =>
+        dispatch(setInformationPaneStateAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

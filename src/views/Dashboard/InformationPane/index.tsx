@@ -1,4 +1,6 @@
 import React from 'react';
+import Redux from 'redux';
+import { connect } from 'react-redux';
 
 import Button from '../../../vendor/react-store/components/Action/Button';
 import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
@@ -6,14 +8,27 @@ import FixedTabs from '../../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../../vendor/react-store/components/View/MultiViewContainer';
 
 import MultiProgrammeDetailInfo from './MultiProgrammeDetailInfo';
+import CompareProgrammeDetailInfo from './CompareProgrammeDetailInfo';
 import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
+import CompareProvinceDetailInfo from './CompareProvinceDetailInfo';
 import MultiSectorDetailInfo from './MultiSectorDetailInfo';
+
+import {
+    RootState,
+    InformationPaneState,
+    SetInformationPaneStateAction,
+} from '../../../redux/interface';
+import {
+    informationPaneStateSelector,
+    dashboardShowCompareSelector,
+    setInformationPaneStateAction,
+} from '../../../redux';
 
 import { iconNames } from '../../../constants';
 
 import styles from './styles.scss';
 
-interface Props {
+interface OwnProps {
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
@@ -21,10 +36,18 @@ interface Props {
     className?: string;
 }
 
-interface State {
-    isCollapsed: boolean;
-    activeTab: string;
+interface PropsFromState {
+    state: InformationPaneState;
+    showCompare: boolean;
 }
+
+interface PropsFromDispatch {
+    setInformationPaneState(params: SetInformationPaneStateAction): void;
+}
+
+type Props = OwnProps & PropsFromState & PropsFromDispatch;
+
+interface State {}
 
 interface Routes {
     province: string;
@@ -38,17 +61,12 @@ interface Views {
     sector: object;
 }
 
-export default class InformationPane extends React.PureComponent<Props, State>{
+export class InformationPane extends React.PureComponent<Props, State>{
     routes: Routes;
     views: Views;
 
     constructor(props: Props) {
         super(props);
-
-        this.state = {
-            isCollapsed: true,
-            activeTab: 'province',
-        };
 
         this.routes = {
             province: 'Province',
@@ -59,13 +77,17 @@ export default class InformationPane extends React.PureComponent<Props, State>{
         this.views = {
             province: {
                 component: () => (
-                    <MultiProvinceDetailInfo loading={this.props.loadingProvinceData} />
+                    this.props.showCompare ?
+                    <CompareProvinceDetailInfo loading={this.props.loadingProvinceData} />
+                    : <MultiProvinceDetailInfo loading={this.props.loadingProvinceData} />
                 ),
             },
 
             programme: {
                 component: () => (
-                    <MultiProgrammeDetailInfo loading={this.props.loadingProgrammeData} />
+                    this.props.showCompare ?
+                    <CompareProgrammeDetailInfo loading={this.props.loadingProgrammeData} />
+                    : <MultiProgrammeDetailInfo loading={this.props.loadingProgrammeData} />
                 ),
             },
 
@@ -78,24 +100,26 @@ export default class InformationPane extends React.PureComponent<Props, State>{
     }
 
     handleCollapseButtonClick = () => {
-        this.setState({ isCollapsed: true });
+        this.props.setInformationPaneState({ isCollapsed: true });
     }
 
     handleShowInformationButtonClick = () => {
-        this.setState({ isCollapsed: false });
+        this.props.setInformationPaneState({ isCollapsed: false });
     }
 
     handleTabChange = (tab: string) => {
-        this.setState({ activeTab: tab });
+        this.props.setInformationPaneState({ activeTab: tab });
     }
 
     render() {
-        const { className } = this.props;
         const {
-            isCollapsed,
-            activeTab,
-        } = this.state;
-
+            className,
+            state: {
+                isCollapsed,
+                activeTab,
+            },
+            showCompare,
+        } = this.props;
 
         if (isCollapsed) {
             const classNames = [
@@ -126,12 +150,14 @@ export default class InformationPane extends React.PureComponent<Props, State>{
                     active={activeTab}
                     onClick={this.handleTabChange}
                 >
-                    <Button
-                        title="Collapse information pane"
-                        onClick={this.handleCollapseButtonClick}
-                        iconName={iconNames.chevronUp}
-                        transparent
-                    />
+                    { !showCompare &&
+                        <Button
+                            title="Collapse information pane"
+                            onClick={this.handleCollapseButtonClick}
+                            iconName={iconNames.chevronUp}
+                            transparent
+                        />
+                    }
                 </FixedTabs>
                 <MultiViewContainer
                     active={activeTab}
@@ -141,3 +167,17 @@ export default class InformationPane extends React.PureComponent<Props, State>{
         );
     }
 }
+
+const mapStateToProps = (state: RootState) => ({
+    state: informationPaneStateSelector(state),
+    showCompare: dashboardShowCompareSelector(state),
+});
+
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setInformationPaneState: (params: SetInformationPaneStateAction) =>
+        dispatch(setInformationPaneStateAction(params)),
+});
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
+    mapStateToProps, mapDispatchToProps,
+)(InformationPane);
