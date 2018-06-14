@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment }  from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
@@ -18,6 +18,7 @@ import {
     dashboardFilterPaneSelector,
     indicatorsSelector,
     validMapLayersSelector,
+    validRasterMapLayersSelector,
 } from '../../../redux';
 
 import {
@@ -57,6 +58,7 @@ interface PropsFromState {
     sectors: Sector[];
     indicators: Indicator[];
     mapLayers: MapLayer[];
+    rasterMapLayers: MapLayer[];
     faramState: DashboardFilter;
 }
 
@@ -122,6 +124,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 sectorsId: [],
                 indicatorId: [],
                 mapLayersId: [],
+                rasterMapLayerId: [],
             },
         };
     }
@@ -196,6 +199,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
             sectors,
             indicators,
             mapLayers,
+            rasterMapLayers,
             className,
 
             loadingProvinces,
@@ -204,14 +208,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
             loadingIndicators,
             loadingLayers,
         } = this.props;
-
-        console.warn(
-            loadingProvinces,
-            loadingProgrammes,
-            loadingSectors,
-            loadingIndicators,
-            loadingLayers,
-        );
 
         const {
             faramValues,
@@ -225,6 +221,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
         ];
 
         const isFilterEmpty = isObjectEmpty(faramValues);
+
         return (
             <Faram
                 className={classNames.join(' ')}
@@ -319,16 +316,27 @@ export class FilterPane extends React.PureComponent<Props, State>{
                             />
                         }
                         { !loadingLayers &&
-                            <SelectInputWithList
-                                label="Layers"
-                                className={styles.input}
-                                options={mapLayers}
-                                faramElementName="mapLayersId"
-                                keySelector={mapLayerKeyExtractor}
-                                labelSelector={mapLayerLabelExtractor}
-                                showHintAndError={false}
-                                listProps={{ emptyComponent: renderLayerEmpty }}
-                            />
+                            <Fragment>
+                                <SelectInput
+                                    label="Background Layers"
+                                    className={styles.input}
+                                    options={rasterMapLayers}
+                                    faramElementName="rasterMapLayerId"
+                                    keySelector={mapLayerKeyExtractor}
+                                    labelSelector={mapLayerLabelExtractor}
+                                    showHintAndError={false}
+                                />
+                                <SelectInputWithList
+                                    label="Layers"
+                                    className={styles.input}
+                                    options={mapLayers}
+                                    faramElementName="mapLayersId"
+                                    keySelector={mapLayerKeyExtractor}
+                                    labelSelector={mapLayerLabelExtractor}
+                                    showHintAndError={false}
+                                    listProps={{ emptyComponent: renderLayerEmpty }}
+                                />
+                            </Fragment>
                         }
                     </div>
                 </div>
@@ -343,6 +351,7 @@ const mapStateToProps = (state: RootState) => ({
     provinces: provincesSelector(state),
     indicators: indicatorsSelector(state),
     mapLayers: validMapLayersSelector(state),
+    rasterMapLayers: validRasterMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),
 });
 

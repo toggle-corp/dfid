@@ -81,7 +81,16 @@ export const countryDataSelector = createSelector(
 
 export const validMapLayersSelector = createSelector(
     mapLayersSelector,
-    mapLayers => mapLayers.filter(mapLayer => mapLayer.file),
+    mapLayers => (
+        mapLayers.filter(mapLayer => mapLayer.type !== 'Raster' && mapLayer.file)
+    ),
+);
+
+export const validRasterMapLayersSelector = createSelector(
+    mapLayersSelector,
+    mapLayers => (
+        mapLayers.filter(mapLayer => mapLayer.type === 'Raster' && mapLayer.layerServerUrl)
+    ),
 );
 
 

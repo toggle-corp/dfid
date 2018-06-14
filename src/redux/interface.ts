@@ -184,6 +184,7 @@ export interface DashboardFilterParams {
     sectorsId?: number[];
     indicatorId?: number;
     mapLayersId?: number[];
+    rasterMapLayerId?: number;
 }
 
 export interface DashboardFilter {
@@ -229,6 +230,7 @@ export interface SetIndicatorsDataAction {
 export interface MapLayer {
     id: number;
     layerName: string;
+    layerServerUrl?: string;
     type: string;
     file: string;
     sectors: { code: string }[];

@@ -8,13 +8,13 @@ import styles from './styles.scss';
 
 const propTypes = {
     className: PropTypes.string,
-    layers: PropTypes.arrayOf(PropTypes.object),
+    layers: PropTypes.object,
     hideLayers: PropTypes.bool,
 };
 
 const defaultProps = {
     className: '',
-    layers: [],
+    layers: {},
     hideLayers: false
 };
 
