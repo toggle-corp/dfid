@@ -85,10 +85,16 @@ export default class Map extends React.PureComponent {
             mapboxgl.accessToken = token;
         }
         const map = new mapboxgl.Map({
-            center: [50, 10],
+            center: [84.1240, 28.3949], // longitude, latitude of nepal
             container: this.mapContainer.current,
             style: process.env.REACT_APP_MAPBOX_STYLE,
-            zoom: 2,
+            zoom: 3,
+            minZoom: 3,
+            maxZoom: 10,
+            logoPosition: 'top-left',
+            doubleClickZoom: false,
+            // failIfMajorPerformanceCaveat: true,
+            // maxBounds: [[76.477634, 25.361567], [92.338761, 31.891382]],
         });
 
         map.on('load', () => {

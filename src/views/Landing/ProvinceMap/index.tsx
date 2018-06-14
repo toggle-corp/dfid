@@ -66,7 +66,11 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
             center: [84.1240, 28.3949], // longitude, latitude of nepal
             container: this.mapElement,
             style: process.env.REACT_APP_MAPBOX_STYLE,
-            zoom: 1,
+            zoom: 5,
+            interactive: false,
+            // dragPan: false,
+            // scrollZoom: false,
+            // doubleClickZoom: false,
         });
 
         map.on('load', () => {
