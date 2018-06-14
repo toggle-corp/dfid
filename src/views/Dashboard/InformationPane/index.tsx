@@ -37,7 +37,7 @@ interface OwnProps {
 }
 
 interface PropsFromState {
-    state: InformationPaneState;
+    uiState: InformationPaneState;
     showCompare: boolean;
 }
 
@@ -99,6 +99,31 @@ export class InformationPane extends React.PureComponent<Props, State>{
         };
     }
 
+    getClassName = () => {
+        const {
+            className,
+            uiState: {
+                isCollapsed,
+            },
+            showCompare,
+        } = this.props;
+
+        const classNames = [
+            className,
+            styles.informationPane,
+        ];
+
+        if (isCollapsed) {
+            classNames.push(styles.collapsed);
+        }
+
+        if (showCompare) {
+            classNames.push(styles.showCompare);
+        }
+
+        return classNames.join(' ');
+    }
+
     handleCollapseButtonClick = () => {
         this.props.setInformationPaneState({ isCollapsed: true });
     }
@@ -111,10 +136,30 @@ export class InformationPane extends React.PureComponent<Props, State>{
         this.props.setInformationPaneState({ activeTab: tab });
     }
 
-    render() {
+    renderShowInformationButton = () => {
         const {
-            className,
-            state: {
+            uiState: {
+                isCollapsed,
+            },
+        } = this.props;
+
+        if (!isCollapsed) {
+            return null;
+        }
+
+        return (
+            <PrimaryButton
+                className={styles.showInformationButton}
+                onClick={this.handleShowInformationButtonClick}
+                title="Show information pane"
+                iconName={iconNames.informationCircle}
+            />
+        );
+    }
+
+    renderInformation = () => {
+        const {
+            uiState: {
                 isCollapsed,
                 activeTab,
             },
@@ -122,28 +167,11 @@ export class InformationPane extends React.PureComponent<Props, State>{
         } = this.props;
 
         if (isCollapsed) {
-            const classNames = [
-                className,
-                styles.showInformationButton,
-            ];
-
-            return (
-                <PrimaryButton
-                    className={classNames.join(' ')}
-                    onClick={this.handleShowInformationButtonClick}
-                    title="Show information pane"
-                    iconName={iconNames.informationCircle}
-                />
-            );
+            return null;
         }
 
-        const classNames = [
-            className,
-            styles.informationPane,
-        ];
-
         return (
-            <div className={classNames.join(' ')}>
+            <div className={styles.information}>
                 <FixedTabs
                     className={styles.fixedTabs}
                     tabs={this.routes}
@@ -166,10 +194,27 @@ export class InformationPane extends React.PureComponent<Props, State>{
             </div>
         );
     }
+
+    render() {
+        // tslint:disable-next-line variable-name
+        const ShowInformationButton = this.renderShowInformationButton;
+
+        // tslint:disable-next-line variable-name
+        const Information = this.renderInformation;
+
+        const className = this.getClassName();
+
+        return (
+            <div className={className}>
+                <ShowInformationButton />
+                <Information />
+            </div>
+        );
+    }
 }
 
 const mapStateToProps = (state: RootState) => ({
-    state: informationPaneStateSelector(state),
+    uiState: informationPaneStateSelector(state),
     showCompare: dashboardShowCompareSelector(state),
 });
 

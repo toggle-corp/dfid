@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import SelectInputWithList from '../../../vendor/react-store/components/Input/SelectInputWithList';
 import SelectInput from '../../../vendor/react-store/components/Input/SelectInput';
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
+import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
@@ -353,14 +354,14 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         }
                     </div>
                 </div>
-                <WarningButton
+                <AccentButton
                     title={showCompare ? 'Show Map' : 'Show Compare'}
                     onClick={this.toggleShowCompare}
                     disabled={disabled}
                     transparent
                 >
                     {showCompare ? 'Show Map' : 'Show Compare'}
-                </WarningButton>
+                </AccentButton>
             </Faram>
         );
     }
@@ -387,5 +388,3 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
-    mapStateToProps, mapDispatchToProps,
-)(FilterPane);

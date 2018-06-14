@@ -3,19 +3,41 @@
 $width-information-pane: 380px;
 
 .information-pane {
+    @include transition-medium;
     display: flex;
     flex-direction: column;
     opacity: .9;
     background-color: $color-background-row;
-    width: $width-information-pane;
-    height: calc(100% - #{$spacing-medium * 2});
 
-    .fixed-tabs {
-        flex-shrink: 0;
+    &.collapsed {
+        width: 38px;
+        height: 38px;
+    }
+
+    &:not(.collapsed) {
+        width: $width-information-pane;
+        height: calc(100% - #{$spacing-medium * 2});
+    }
+
+    &.show-compare {
+        width: calc(100% - #{$spacing-medium * 2});
+    }
+
+    .information {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .fixed-tabs {
+            flex-shrink: 0;
+        }
+    }
+
+    .show-information-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: $font-size-extra-large;
     }
 }
 
-.show-information-button {
-    padding: $spacing-small $spacing-medium;
-    font-size: $font-size-extra-large;
-}
