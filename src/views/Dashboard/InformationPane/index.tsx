@@ -5,7 +5,6 @@ import PrimaryButton from '../../../vendor/react-store/components/Action/Button/
 import FixedTabs from '../../../vendor/react-store/components/View/FixedTabs';
 import MultiViewContainer from '../../../vendor/react-store/components/View/MultiViewContainer';
 
-import CountryDetailInfo from './CountryDetailInfo';
 import MultiProgrammeDetailInfo from './MultiProgrammeDetailInfo';
 import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
 import MultiSectorDetailInfo from './MultiSectorDetailInfo';
@@ -31,14 +30,12 @@ interface Routes {
     province: string;
     programme: string;
     sector: string;
-    country: string;
 }
 
 interface Views {
     province: object;
     programme: object;
     sector: object;
-    country: object;
 }
 
 export default class InformationPane extends React.PureComponent<Props, State>{
@@ -57,7 +54,6 @@ export default class InformationPane extends React.PureComponent<Props, State>{
             province: 'Province',
             programme: 'Programme',
             sector: 'Sector',
-            country: 'Country',
         };
 
         this.views = {
@@ -76,12 +72,6 @@ export default class InformationPane extends React.PureComponent<Props, State>{
             sector: {
                 component: () => (
                     <MultiSectorDetailInfo loading={this.props.loadingSectorData} />
-                ),
-            },
-
-            country: {
-                component: () => (
-                    <CountryDetailInfo loading={this.props.loadingCountryData} />
                 ),
             },
         };
