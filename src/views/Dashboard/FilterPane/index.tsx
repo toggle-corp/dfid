@@ -280,18 +280,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 listProps={{ emptyComponent: renderProvinceEmpty }}
                             />
                         }
-                        { !loadingProgrammes &&
-                            <SelectInputWithList
-                                label="Programmes"
-                                className={styles.input}
-                                options={programmes}
-                                faramElementName="programmesId"
-                                keySelector={programmeKeyExtractor}
-                                labelSelector={programmeLabelExtractor}
-                                showHintAndError={false}
-                                listProps={{ emptyComponent: renderProgramEmpty }}
-                            />
-                        }
                         { !loadingSectors &&
                             <SelectInputWithList
                                 label="Sectors"
@@ -302,6 +290,18 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 labelSelector={sectorLabelExtractor}
                                 showHintAndError={false}
                                 listProps={{ emptyComponent: renderSectorEmpty }}
+                            />
+                        }
+                        { !loadingProgrammes &&
+                            <SelectInputWithList
+                                label="Programmes"
+                                className={styles.input}
+                                options={programmes}
+                                faramElementName="programmesId"
+                                keySelector={programmeKeyExtractor}
+                                labelSelector={programmeLabelExtractor}
+                                showHintAndError={false}
+                                listProps={{ emptyComponent: renderProgramEmpty }}
                             />
                         }
                     </div>
