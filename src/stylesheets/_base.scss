@@ -2,7 +2,7 @@
 @import 'dimens';
 @import 'utils';
 
-$font-family-sans-serif: 'Lato', sans-serif;
+$font-family-sans-serif: 'Asap', sans-serif;
 $font-family-monospace: 'Oxygen Mono', monospace;
 $font-family-icons: 'Ionicons';
 
@@ -27,7 +27,7 @@ $font-family-icons: 'Ionicons';
 body {
     margin: 0;
     padding: 0;
-    line-height: 1.6;
+    line-height: 1.5;
     color: $color-text;
     font-family: $font-family-sans-serif;
     font-size: $font-size-default;
