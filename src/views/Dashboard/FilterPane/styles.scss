@@ -31,8 +31,9 @@
             :global {
                 .multi-select-input {
                     .label {
-                        color: $color-primary;
+                        color: $color-accent;
                         font-size: $font-size-medium;
+                        font-weight: $font-weight-normal;
                     }
                 }
 
@@ -73,7 +74,7 @@
     .container {
         display: flex;
         flex-direction: column;
-        flex-grow: 0;
+        flex-grow: 1;
         padding: 0 $spacing-medium;
         overflow-y: auto;
 
@@ -83,8 +84,9 @@
             :global {
                 .single-select-input {
                     .label {
-                        color: $color-primary;
+                        color: $color-accent;
                         font-size: $font-size-medium;
+                        font-weight: $font-weight-normal;
                     }
                 }
             }
@@ -93,5 +95,11 @@
         .filters {
             @extend %content;
         }
+    }
+
+    .toggle-compare-button {
+        align-self: center;
+        flex-shrink: 0;
+        font-size: $font-size-medium;
     }
 }

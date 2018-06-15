@@ -198,7 +198,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
         });
     }
 
-    toggleShowCompare = () => {
+    handleToggleCompareButtonClick = () => {
         this.props.setDashboardShowCompare(!this.props.showCompare);
         this.props.setInformationPaneState({ isCollapsed: false });
     }
@@ -356,11 +356,11 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 </div>
                 <AccentButton
                     title={showCompare ? 'Show Map' : 'Show Compare'}
-                    onClick={this.toggleShowCompare}
+                    onClick={this.handleToggleCompareButtonClick}
                     disabled={disabled}
-                    transparent
+                    className={styles.toggleCompareButton}
                 >
-                    {showCompare ? 'Show Map' : 'Show Compare'}
+                    {showCompare ? 'Show Map' : 'Show Comparision'}
                 </AccentButton>
             </Faram>
         );
@@ -388,3 +388,5 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
+    mapStateToProps, mapDispatchToProps,
+)(FilterPane);

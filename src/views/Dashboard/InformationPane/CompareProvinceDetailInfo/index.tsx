@@ -262,12 +262,13 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
         }
 
         return (
-            <Table
-                data={selectedProvincesData}
-                headers={this.headers}
-                keyExtractor={this.keyExtractor}
-                // styleName="ipo-fpo-table"
-            />
+            <div className={styles.compareProvinceDetailInfo}>
+                <Table
+                    data={selectedProvincesData}
+                    headers={this.headers}
+                    keyExtractor={this.keyExtractor}
+                />
+            </div>
         );
     }
 }

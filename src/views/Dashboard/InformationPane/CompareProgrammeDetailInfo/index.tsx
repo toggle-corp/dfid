@@ -116,12 +116,13 @@ export class CompareProgrammeDetailInfo extends React.PureComponent<Props, State
         }
 
         return (
-            <Table
-                data={selectedProgrammesData}
-                headers={this.headers}
-                keyExtractor={this.keyExtractor}
-                // styleName="ipo-fpo-table"
-            />
+            <div className={styles.compareProgrammeDetailInfo}>
+                <Table
+                    data={selectedProgrammesData}
+                    headers={this.headers}
+                    keyExtractor={this.keyExtractor}
+                />
+            </div>
         );
     }
 }
