@@ -31,6 +31,15 @@ export const routes: Map<RouteSetting> = {
         links: allLinks,
     },
 
+    glossary: {
+        order: 6,
+        type: ROUTE.public,
+        path: '/glossary',
+        loader: () => import('../../views/Glossary'),
+        links: allLinks,
+    },
+
+
     // NOTE: 404 page should always be at the end
     notFound: {
         order: 7,

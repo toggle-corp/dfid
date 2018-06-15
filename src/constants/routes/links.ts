@@ -30,6 +30,7 @@ export const allLinks = mapObjectToObject<string, CloakSettings>(
     {
         dashboard: '',
         explore: '',
+        glossary: '',
     },
     prepareSettings,
 );
