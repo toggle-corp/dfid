@@ -53,6 +53,10 @@ const routeToExplore = {
     pathname: reverseRoute(pathNames.dashboard),
 };
 
+const routeToGlossary = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
 interface Dictionary<T> {
     [key:  string]: T;
 }
@@ -342,6 +346,12 @@ export class Landing extends React.PureComponent<Props, State> {
                     >
                         Explore
                     </Link>
+                    <Link
+                        className={styles.link}
+                        to={routeToGlossary}
+                    >
+                        Glossary
+                    </Link>
                 </div>
             </div>
         </footer>
@@ -388,6 +398,12 @@ export class Landing extends React.PureComponent<Props, State> {
                                 to={routeToExplore}
                             >
                                 Explore
+                            </Link>
+                            <Link
+                                className={styles.link}
+                                to={routeToGlossary}
+                            >
+                                  Glossary
                             </Link>
                         </div>
                     </div>

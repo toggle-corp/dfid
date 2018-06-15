@@ -93,6 +93,7 @@ class Navbar extends React.PureComponent<Props, State> {
         const navLinks = [
             'dashboard',
             'explore',
+            'glossary',
         ];
 
         /*
