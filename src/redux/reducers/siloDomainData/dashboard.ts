@@ -7,6 +7,7 @@ import {
 
     SetRequestManagerLoadingAction,
     SetDashboardFilterAction,
+    SetInformationPaneStateAction,
 } from '../../interface';
 
 // ACTION-TYPE
@@ -17,6 +18,8 @@ export const enum DASHBOARD_ACTION {
     setRequestManagerLoading = 'siloDomainData/DASHBOARD/SET_REQUEST_MANAGER_LOADING',
     resetRequestManagerLoading = 'siloDomainData/DASHBOARD/RESET_REQUEST_MANAGER_LOADING',
     toggleProvince = 'siloDomainData/DASHBOARD/TOGGLE_PROVINCE',
+    setInformationPaneState = 'siloDomainData/DASHBOARD/INFORMATION_PANE/STATE',
+    setDashboardShowCompare = 'siloDomainData/DASHBOARD/SHOW_COMPARE',
 }
 
 // ACTION-CREATOR
@@ -55,6 +58,19 @@ export const setRequestManagerLoadingAction = (
 
 export const resetRequestManagerLoadingAction = () => ({
     type: DASHBOARD_ACTION.resetRequestManagerLoading,
+});
+
+export const setInformationPaneStateAction  = (
+    { isCollapsed, activeTab }: SetInformationPaneStateAction,
+) => ({
+    isCollapsed,
+    activeTab,
+    type: DASHBOARD_ACTION.setInformationPaneState,
+});
+
+export const setDashboardShowCompareAction = (showCompare: boolean) => ({
+    showCompare,
+    type: DASHBOARD_ACTION.setDashboardShowCompare,
 });
 
 // HELPER
@@ -166,12 +182,39 @@ const resetRequestManagerLoading = (state: SiloDomainData) => {
     return update(state, settings);
 };
 
+const setDashboardShowCompare = (
+    state: SiloDomainData, { showCompare }: { showCompare: boolean },
+) => {
+    const settings = {
+        dashboard: { $auto: {
+            showCompare: setIfDefined(showCompare),
+        } },
+    };
+    return update(state, settings);
+};
+
+const setInformationPaneState = (
+    state: SiloDomainData, { isCollapsed, activeTab }: SetInformationPaneStateAction,
+) => {
+    const settings = {
+        dashboard: { $auto: {
+            informationPaneState: { $auto: {
+                isCollapsed: setIfDefined(isCollapsed),
+                activeTab: setIfDefined(activeTab),
+            } },
+        } },
+    };
+    return update(state, settings);
+};
+
 const reducer: ReducerGroup<SiloDomainData> = {
     [DASHBOARD_ACTION.setFilters]: setFilters,
     [DASHBOARD_ACTION.setProvince]: setProvince,
     [DASHBOARD_ACTION.toggleProvince]: toggleProvince,
     [DASHBOARD_ACTION.setRequestManagerLoading]: setRequestManagerLoading,
     [DASHBOARD_ACTION.resetRequestManagerLoading]: resetRequestManagerLoading,
+    [DASHBOARD_ACTION.setInformationPaneState]: setInformationPaneState,
+    [DASHBOARD_ACTION.setDashboardShowCompare]: setDashboardShowCompare,
 };
 
 export default reducer;

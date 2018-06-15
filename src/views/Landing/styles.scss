@@ -53,7 +53,7 @@ $height-logo: 96px;
             .link {
                 display: inline-block;
                 padding: $spacing-medium;
-                color: $color-accent;
+                color: $color-primary;
                 font-weight: $font-weight-bold;
             }
         }
@@ -66,7 +66,7 @@ $height-logo: 96px;
         %section {
             .heading {
                 padding: $spacing-small $spacing-medium;
-                color: $color-primary;
+                color: $color-accent;
                 font-weight: $font-weight-bold;
             }
 
@@ -133,7 +133,7 @@ $height-logo: 96px;
                 .heading {
                     flex-shrink: 0;
                     padding: $spacing-small $spacing-medium;
-                    color: $color-primary;
+                    color: $color-accent;
                     font-weight: $font-weight-bold;
                 }
 

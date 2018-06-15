@@ -68,8 +68,15 @@ export interface ReducerGroup<T> {
 
 // Dashboard
 export interface Dashboard {
+    showCompare: boolean;
     filterPane: DashboardFilter;
     loadings: DashboardRequestManagerLoadings;
+    informationPaneState: InformationPaneState;
+}
+
+export interface InformationPaneState {
+    isCollapsed: boolean;
+    activeTab?: string;
 }
 
 export interface ProgrammeName {
@@ -125,6 +132,8 @@ export interface SetProvincesAction {
 export interface SetProvincesDataAction {
     provincesData: ProvinceData[];
 }
+
+export type SetInformationPaneStateAction = Partial<InformationPaneState>;
 
 // Programme
 export interface Programme {
