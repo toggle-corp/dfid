@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Message from '../../../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../../../vendor/react-store/components/View/Numeral';
 import { provinceDataSelector } from '../../../../../redux';
 
 import {
@@ -15,6 +14,13 @@ import {
 import ListItem from '../../../ListItem';
 
 import Item from '../../../../../components/Item';
+import {
+    renderPound,
+    renderDollar,
+    renderNumeral,
+    renderPercent,
+    renderNormalNumeral,
+} from '../../../../../components/Renderer';
 
 import styles from './styles.scss';
 
@@ -31,43 +37,6 @@ interface State {
 }
 
 const renderProgrammeName = (datum: ProgrammeName) => datum.programName;
-
-const renderPound = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-        prefix="£"
-    />
-);
-
-const renderDollar = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-        prefix="$"
-    />
-);
-
-const renderNumeral = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-    />
-);
-
-const renderPercent = (data: number) => (
-    <Numeral
-        precision={2}
-        suffix=" %"
-        value={data * 100}
-    />
-);
-
-const renderNormalNumeral = (data: number) => (
-    <Numeral
-        value={data}
-    />
-);
 
 export class ProvinceDetailInfo extends React.PureComponent<Props, State>{
 

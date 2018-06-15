@@ -13,6 +13,11 @@ export const createParamsForProvinces = () => ({
     ...commonHeaderForGet,
 });
 
+export const urlForProvincesInfo = `${wsEndpoint}/province-info/`;
+export const createParamsForProvincesInfo = () => ({
+    ...commonHeaderForGet,
+});
+
 export const createUrlForProvinceGeoJson = (provinceId: number) => (
     `${wsEndpoint}/geojson/province/${provinceId}/`
 );

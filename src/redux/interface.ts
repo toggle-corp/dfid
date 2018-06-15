@@ -34,8 +34,10 @@ export interface Auth {
 }
 
 export interface DomainData {
+    landingOverviewData: LandingOverviewData;
     provinces: Province[];
     provincesData: ProvinceData[];
+    provincesInfo: ProvinceInfo[];
     programmes: Programme[];
     programmesData: ProgrammeData[];
     sectors: Sector[];
@@ -110,6 +112,14 @@ export interface ProvinceData {
     description: string;
 }
 
+export interface ProvinceInfo {
+    id: number;
+    provinceId: number;
+    name: string;
+    activeProgrammes: number;
+    totalBudget: number;
+}
+
 export interface ProgrammeData {
     id: number;
     program: string;
@@ -134,6 +144,10 @@ export interface SetProvincesDataAction {
 }
 
 export type SetInformationPaneStateAction = Partial<InformationPaneState>;
+
+export interface SetProvincesInfoAction {
+    provincesInfo: ProvinceInfo[];
+}
 
 // Programme
 export interface Programme {
@@ -304,3 +318,14 @@ export interface GeoJSONS {
 }
 
 export type SetGeoJsonsAction = GeoJSONS;
+
+// Landing
+
+export interface LandingOverviewData {
+    provincesCovered: number;
+    districtReached: number;
+    municipalitiesCovered: number;
+    totalProjects: number;
+    totalSectors: number;
+    totalBudget: number;
+}

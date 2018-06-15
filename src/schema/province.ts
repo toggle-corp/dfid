@@ -48,6 +48,24 @@ const provinceSchema: SchemaGroup = [];
 }
 
 {
+    const name = 'provinceInfo';
+    const schema = {
+        doc: {
+            name: 'Province Info',
+            description: 'Info for each province [For Landing Page]',
+        },
+        fields: {
+            id: { type: 'uint', required: true },
+            provinceId: { type: 'uint', required: true },
+            name: { type: 'string', required: true },
+            activeProgrammes: { type: 'number' },
+            totalBudget: { type: 'number' },
+        },
+    };
+    provinceSchema.push({ name, schema });
+}
+
+{
     const name = 'province';
     const schema = {
         doc: {

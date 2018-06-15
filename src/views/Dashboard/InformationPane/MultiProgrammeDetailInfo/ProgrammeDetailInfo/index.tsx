@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Message from '../../../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../../../vendor/react-store/components/View/Numeral';
 
 import { programmeDataSelector } from '../../../../../redux';
 
@@ -15,6 +14,7 @@ import {
 
 import ListItem from '../../../ListItem';
 import Item from '../../../../../components/Item';
+import { renderNumeral } from '../../../../../components/Renderer';
 
 import styles from './styles.scss';
 
@@ -29,13 +29,6 @@ type Props = OwnProps & PropsFromState ;
 interface State {
     programmeData: object;
 }
-
-const renderBudget = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-    />
-);
 
 const renderSectorName = (data: ProgrammeSectorName) => data.sectorName;
 
@@ -70,7 +63,7 @@ export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
                 <Item
                     label="Budget"
                     value={programBudget}
-                    valueModifier={renderBudget}
+                    valueModifier={renderNumeral}
                 />
                 <Item
                     label="Description"
