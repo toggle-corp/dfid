@@ -10,20 +10,16 @@ import { pathNames } from '../../../constants';
 import budgetIcon from '../../../resources/img/budget.png';
 import projectIcon from '../../../resources/img/project.png';
 
-import { RootState } from '../../../redux/interface';
+import {
+    RootState,
+    ProvinceInfo,
+} from '../../../redux/interface';
 import { setDashboardProvinceAction } from '../../../redux';
 import ProvinceDetailItem from '../ProvinceDetailItem';
 import styles from './styles.scss';
 
-interface Data {
-    id: number;
-    name: string;
-    noOfActiveProjects: number;
-    totalBudget?: number;
-}
-
 interface OwnProps {
-    datum: Data;
+    datum: ProvinceInfo;
 }
 interface PropsFromDispatch {
     setDashboardProvince(provinceId: number): void;
@@ -64,14 +60,14 @@ class Province extends React.PureComponent<Props> {
         const {
             id,
             name = '-',
-            noOfActiveProjects,
+            activeProgrammes,
             totalBudget,
         } = datum;
 
         const provinceDetailItemList: ProvinceDetail[] = [
             {
                 label: 'Active DFID projects',
-                value: noOfActiveProjects,
+                value: activeProgrammes,
                 icon: projectIcon,
             },
             {

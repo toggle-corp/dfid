@@ -3,6 +3,7 @@ import {
     RootState,
     Province,
     ProvinceData,
+    ProvinceInfo,
     Programme,
     ProgrammeData,
     Sector,
@@ -15,6 +16,7 @@ import {
     SectorDatum,
     IndicatorData,
     Dictionary,
+    LandingOverviewData,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -33,12 +35,20 @@ const sectorIdFromPropsSelector = (
     state: RootState, props: { datum: SectorDatum },
 ) => (props.datum.id);
 
+export const landingOverviewDataSelector = ({ domainData }: RootState): LandingOverviewData => (
+    domainData.landingOverviewData
+);
+
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
     domainData.provinces || emptyArray
 );
 
 export const provincesDataSelector = ({ domainData }: RootState): ProvinceData[] => (
     domainData.provincesData || emptyArray
+);
+
+export const provincesInfoSelector = ({ domainData }: RootState): ProvinceInfo[] => (
+    domainData.provincesInfo || emptyArray
 );
 
 export const programmesSelector = ({ domainData }: RootState): Programme[] => (

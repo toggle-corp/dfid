@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 
 import { RestRequest } from '../../../../vendor/react-store/utils/rest';
 import Message from '../../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../../vendor/react-store/components/View/Numeral';
 
 import {
     RootState,
@@ -14,6 +13,11 @@ import {
 } from '../../../../redux';
 
 import Item from '../../../../components/Item';
+import {
+    renderNumeral,
+    renderPercent,
+    renderDollar,
+} from '../../../../components/Renderer';
 
 import styles from './styles.scss';
 
@@ -31,29 +35,6 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 interface State {
     countryData?: CountryData;
 }
-
-const renderNumeral = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-    />
-);
-
-const renderPercent = (data: number) => (
-    <Numeral
-        precision={2}
-        suffix=" %"
-        value={data ? data * 100 : undefined}
-    />
-);
-
-const renderDollar = (data: number) => (
-    <Numeral
-        precision={0}
-        value={data}
-        prefix="$"
-    />
-);
 
 export class CountryDetailInfo extends React.PureComponent<Props, State>{
     countryDataRequest: RestRequest;
