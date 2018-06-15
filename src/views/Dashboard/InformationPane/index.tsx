@@ -70,8 +70,8 @@ export class InformationPane extends React.PureComponent<Props, State>{
 
         this.routes = {
             province: 'Province',
-            programme: 'Programme',
             sector: 'Sector',
+            programme: 'Programme',
         };
 
         this.views = {

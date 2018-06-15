@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Message from '../../../../vendor/react-store/components/View/Message';
 import Numeral from '../../../../vendor/react-store/components/View/Numeral';
+import HorizontalBar from '../../../../vendor/react-store/components/Visualization/HorizontalBar';
 import Table, {
     Header,
 } from '../../../../vendor/react-store/components/View/Table';
@@ -18,6 +19,12 @@ import {
     ProvinceData,
     ProgrammeName,
 } from '../../../../redux/interface';
+
+import {
+    renderPercentText,
+    renderDollarText,
+} from '../../../../components/Renderer';
+import { colorScheme } from '../../../../config/theme';
 
 import ListItem from '../../ListItem';
 
@@ -37,6 +44,14 @@ interface State {}
 const renderProgrammeName = (datum: ProgrammeName) => datum.programName;
 
 const keySelector = (data: ProgrammeName) => data.programID;
+
+const provinceDataLabelAccessor = (d: ProvinceData) => d.province;
+
+const activeProjectValueAccessor = (d: ProvinceData) => d.activeProgrammes.length;
+const povertyRateValueAccessor = (d: ProvinceData) => d.povertyRate;
+const povertyRateValueLabelAccessor = (d: number) => renderPercentText(d);
+const perCapitaIncomeValueAccessor = (d: ProvinceData) => d.perCapitaIncome;
+const perCapitaIncomeValueLabelAccessor = (d: number) => renderDollarText(d);
 
 export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>{
     headers: Header<ProvinceData>[];
@@ -272,6 +287,44 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                     headers={this.headers}
                     keyExtractor={this.keyExtractor}
                 />
+                <div className={styles.chartContainer}>
+                    <h3 className={styles.heading}>
+                        Active DFID projects
+                    </h3>
+                    <HorizontalBar
+                        colorScheme={colorScheme}
+                        className={styles.chart}
+                        data={selectedProvincesData}
+                        labelAccessor={provinceDataLabelAccessor}
+                        valueAccessor={activeProjectValueAccessor}
+                    />
+                </div>
+                <div className={styles.chartContainer}>
+                    <h3 className={styles.heading}>
+                        Poverty Rate
+                    </h3>
+                    <HorizontalBar
+                        colorScheme={colorScheme}
+                        className={styles.chart}
+                        data={selectedProvincesData}
+                        labelAccessor={provinceDataLabelAccessor}
+                        valueAccessor={povertyRateValueAccessor}
+                        valueLabelAccessor={povertyRateValueLabelAccessor}
+                    />
+                </div>
+                <div className={styles.chartContainer}>
+                    <h3 className={styles.heading}>
+                        Per Capita Income
+                    </h3>
+                    <HorizontalBar
+                        colorScheme={colorScheme}
+                        className={styles.chart}
+                        data={selectedProvincesData}
+                        labelAccessor={provinceDataLabelAccessor}
+                        valueAccessor={perCapitaIncomeValueAccessor}
+                        valueLabelAccessor={perCapitaIncomeValueLabelAccessor}
+                    />
+                </div>
             </div>
         );
     }
