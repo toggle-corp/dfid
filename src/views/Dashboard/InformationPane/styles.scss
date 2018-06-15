@@ -6,7 +6,7 @@ $width-information-pane: 380px;
     @include transition-medium;
     display: flex;
     flex-direction: column;
-    opacity: .9;
+    opacity: .96;
     background-color: $color-background-row;
 
     &.collapsed {

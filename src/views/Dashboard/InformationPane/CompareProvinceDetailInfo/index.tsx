@@ -70,7 +70,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'No. of districts',
                 order: 3,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.district, b.district),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -83,7 +83,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Area (sq.km)',
                 order: 4,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.area, b.area),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -96,7 +96,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Population density (sq.km)',
                 order: 5,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.populationDensity, b.populationDensity),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -109,7 +109,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Poverty rate',
                 order: 6,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.povertyRate, b.povertyRate),
                 modifier: d => (
                     <Numeral
                         precision={2}
@@ -123,7 +123,8 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Population under poverty',
                 order: 7,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) =>
+                    compareNumber(a.populationUnderPovertyLine, b.populationUnderPovertyLine),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -136,7 +137,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Per capita income',
                 order: 8,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.perCapitaIncome, b.perCapitaIncome),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -150,7 +151,8 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'HH by lowest wealth quantiles',
                 order: 9,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) =>
+                    compareNumber(a.hhByLowestWealthQuantiles, b.hhByLowestWealthQuantiles),
                 modifier: d => (
                     <Numeral
                         value={d.hhByLowestWealthQuantiles}
@@ -162,7 +164,8 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'HDI',
                 order: 10,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) =>
+                    compareNumber(a.humanDevelopmentIndex, b.humanDevelopmentIndex),
                 modifier: d => (
                     <Numeral
                         value={d.humanDevelopmentIndex}
@@ -174,7 +177,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Minute access to health care',
                 order: 11,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.minuteAccessTo, b.minuteAccessTo),
                 modifier: d => (
                     <Numeral
                         value={d.minuteAccessTo}
@@ -186,7 +189,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Vulnerability index',
                 order: 12,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.vulnerabilityIndex, b.vulnerabilityIndex),
                 modifier: d => (
                     <Numeral
                         value={d.vulnerabilityIndex}
@@ -198,7 +201,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'GDP',
                 order: 13,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.gdp, b.gdp),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -212,7 +215,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                 label: 'Total budget',
                 order: 14,
                 sortable: true,
-                comparator: (a, b) => compareNumber(a.totalPopulation, b.totalPopulation),
+                comparator: (a, b) => compareNumber(a.totalBudget, b.totalBudget),
                 modifier: d => (
                     <Numeral
                         precision={0}
@@ -264,6 +267,7 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
         return (
             <div className={styles.compareProvinceDetailInfo}>
                 <Table
+                    className={styles.table}
                     data={selectedProvincesData}
                     headers={this.headers}
                     keyExtractor={this.keyExtractor}

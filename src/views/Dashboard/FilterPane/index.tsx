@@ -355,12 +355,11 @@ export class FilterPane extends React.PureComponent<Props, State>{
                     </div>
                 </div>
                 <AccentButton
-                    title={showCompare ? 'Show Map' : 'Show Compare'}
                     onClick={this.handleToggleCompareButtonClick}
                     disabled={disabled}
                     className={styles.toggleCompareButton}
                 >
-                    {showCompare ? 'Show Map' : 'Show Comparision'}
+                    {showCompare ? 'Show list' : 'Show Comparision'}
                 </AccentButton>
             </Faram>
         );
