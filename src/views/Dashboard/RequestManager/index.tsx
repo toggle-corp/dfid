@@ -36,6 +36,7 @@ import {
     geoJsonsSelector,
     dashboardIndicatorSelector,
     provincesSelector,
+    setMunicipalitiesAction,
 } from '../../../redux';
 
 import {
@@ -61,6 +62,7 @@ import {
     SetGeoJsonsAction,
     IndicatorData,
     MapLayerProps,
+    SetMunicipalitiesAction,
 } from '../../../redux/interface';
 
 import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
@@ -73,6 +75,7 @@ import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
 import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
+import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 
 interface OwnProps {
     layersInfo: Dictionary<MapLayerProps>;
@@ -102,6 +105,7 @@ interface PropsFromDispatch {
     setMapLayers(params: SetMapLayersAction): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
     setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
+    setMunicipalities(params: SetMunicipalitiesAction): void;
     resetRequestManagerLoading(): void;
 }
 
@@ -120,6 +124,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
     provinceDataRequest: RestRequest;
     provincesRequest: RestRequest;
     sectorRequest: RestRequest;
+    municipalitiesRequest: RestRequest;
 
     constructor(props: Props) {
         super(props);
@@ -153,6 +158,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.startRequestForIndicators();
         this.startRequestForIndicatorsData();
         this.startRequestForMapLayers();
+        this.startRequestForMunicipalities();
 
         if (!this.props.loading) {
             this.reloadProvince(this.props);
@@ -210,6 +216,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
         }
         if (this.mapLayersRequest) {
             this.mapLayersRequest.stop();
+        }
+        if (this.municipalitiesRequest) {
+            this.municipalitiesRequest.stop();
         }
         this.geoJsonRequestCoordinator.stop();
     }
@@ -407,6 +416,19 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.mapLayersRequest.start();
     }
 
+    startRequestForMunicipalities = () => {
+        if (this.municipalitiesRequest) {
+            this.municipalitiesRequest.stop();
+        }
+        const municipalitiesRequest = new MunicipalitiesGetRequest({
+            setState: params => this.setState(params),
+            setMunicipalities: this.props.setMunicipalities,
+            setLoadings: this.props.setDashboardLoadings,
+        });
+        this.municipalitiesRequest = municipalitiesRequest.create();
+        this.municipalitiesRequest.start();
+    }
+
     addRequestForMapLayerGeoJson = (
         key: string,
         url: string,
@@ -599,6 +621,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setGeoJsons: (params: SetGeoJsonsAction) => dispatch(setGeoJsonsAction(params)),
     setDashboardLoadings: (params: SetRequestManagerLoadingAction) =>
         dispatch(setRequestManagerLoadingAction(params)),
+    setMunicipalities: (params: SetMunicipalitiesAction) =>
+        dispatch(setMunicipalitiesAction(params)),
     resetRequestManagerLoading: () => dispatch(resetRequestManagerLoadingAction()),
 });
 

@@ -8,3 +8,8 @@ export const createParamsForCountryData = () => ({
     ...commonHeaderForGet,
 });
 
+export const urlForMunicipalities = `${wsEndpoint}/municipalities/`;
+export const createParamsForMunicipalities = () => ({
+    ...commonHeaderForGet,
+});
+

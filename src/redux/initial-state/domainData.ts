@@ -21,6 +21,7 @@ const initialDomainDataState: DomainData = {
     sectorsData: [],
 
     countriesData: [],
+    municipalities: [],
 
     indicators: [],
     indicatorsData: {},

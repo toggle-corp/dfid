@@ -1,22 +1,23 @@
 import { createSelector } from 'reselect';
 import {
-    RootState,
-    Province,
-    ProvinceData,
-    ProvinceInfo,
+    CountryData,
+    Dictionary,
+    Indicator,
+    IndicatorData,
+    LandingOverviewData,
+    MapLayer,
+    Municipality,
     Programme,
     ProgrammeData,
+    ProgrammeDatum,
+    Province,
+    ProvinceData,
+    ProvinceDatum,
+    ProvinceInfo,
+    RootState,
     Sector,
     SectorData,
-    CountryData,
-    Indicator,
-    MapLayer,
-    ProvinceDatum,
-    ProgrammeDatum,
     SectorDatum,
-    IndicatorData,
-    Dictionary,
-    LandingOverviewData,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -69,6 +70,10 @@ export const sectorsDataSelector = ({ domainData }: RootState): SectorData[] => 
 
 export const countriesDataSelector = ({ domainData }: RootState): CountryData[] => (
     domainData.countriesData || emptyArray
+);
+
+export const municipalitiesSelector = ({ domainData }: RootState): Municipality[] => (
+    domainData.municipalities || emptyArray
 );
 
 export const indicatorsSelector = ({ domainData }: RootState): Indicator[] => (

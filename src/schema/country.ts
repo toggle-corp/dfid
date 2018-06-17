@@ -28,6 +28,7 @@ const countrySchema: SchemaGroup = [];
     };
     countrySchema.push({ name, schema });
 }
+
 {
     // TODO: Not Complete
     const name = 'countryGeoJson';
@@ -38,6 +39,58 @@ const countrySchema: SchemaGroup = [];
         },
         fields: {
             features: { type: 'array', required: true },
+        },
+    };
+    countrySchema.push({ name, schema });
+}
+
+{
+    const name = 'municipalityPartners';
+    const schema = {
+        doc: {
+            name: 'Municipality Data',
+            description: 'Municipality Data',
+        },
+        fields: {
+            name: { type: 'string' },
+            description: { type: 'string' },
+        },
+    };
+    countrySchema.push({ name, schema });
+}
+
+{
+    const name = 'municipalityProgram';
+    const schema = {
+        doc: {
+            name: 'Municipality Data',
+            description: 'Municipality Data',
+        },
+        fields: {
+            programId : { type: 'number' },
+            program : { type: 'string' },
+            partners : { type: 'array.municipalityPartners', required: true },
+            programBudget : { type: 'number' },
+            totalNoOfPartners : { type: 'number' },
+        },
+    };
+    countrySchema.push({ name, schema });
+}
+{
+    const name = 'municipality';
+    const schema = {
+        doc: {
+            name: 'Municipality Data',
+            description: 'Municipality Data',
+        },
+        fields: {
+            id: { type: 'uint', required: true },
+            hlcitCode: { type: 'string' },
+            type: { type: 'string' },
+            localName: { type: 'string' },
+            programs: { type: 'array.municipalityProgram' },
+            totalProgramBudget: { type: 'number' },
+            totalNoOfProgrammes: { type: 'number' },
         },
     };
     countrySchema.push({ name, schema });
