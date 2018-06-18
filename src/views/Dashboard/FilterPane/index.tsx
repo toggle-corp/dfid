@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import SelectInputWithList from '../../../vendor/react-store/components/Input/SelectInputWithList';
 import SelectInput from '../../../vendor/react-store/components/Input/SelectInput';
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
-import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
@@ -20,9 +19,6 @@ import {
     indicatorsSelector,
     validMapLayersSelector,
     validRasterMapLayersSelector,
-    setDashboardShowCompareAction,
-    dashboardShowCompareSelector,
-    setInformationPaneStateAction,
 } from '../../../redux';
 
 import {
@@ -35,7 +31,6 @@ import {
     DashboardFilterParams,
     DashboardFilter,
     SetDashboardFilterAction,
-    SetInformationPaneStateAction,
 } from '../../../redux/interface';
 import {
     FaramErrors,
@@ -65,13 +60,10 @@ interface PropsFromState {
     mapLayers: MapLayer[];
     rasterMapLayers: MapLayer[];
     faramState: DashboardFilter;
-    showCompare: boolean;
 }
 
 interface PropsFromDispatch {
     setDashboardFilters(params: SetDashboardFilterAction): void;
-    setDashboardShowCompare(showBoolean: boolean): void;
-    setInformationPaneState(params: SetInformationPaneStateAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
@@ -198,11 +190,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
         });
     }
 
-    handleToggleCompareButtonClick = () => {
-        this.props.setDashboardShowCompare(!this.props.showCompare);
-        this.props.setInformationPaneState({ isCollapsed: false });
-    }
-
     render() {
         const {
             disabled,
@@ -214,7 +201,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
             mapLayers,
             rasterMapLayers,
             className,
-            showCompare,
 
             loadingProvinces,
             loadingProgrammes,
@@ -354,13 +340,6 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         }
                     </div>
                 </div>
-                <AccentButton
-                    onClick={this.handleToggleCompareButtonClick}
-                    disabled={disabled}
-                    className={styles.toggleCompareButton}
-                >
-                    {showCompare ? 'Show list' : 'Show Comparision'}
-                </AccentButton>
             </Faram>
         );
     }
@@ -374,16 +353,11 @@ const mapStateToProps = (state: RootState) => ({
     mapLayers: validMapLayersSelector(state),
     rasterMapLayers: validRasterMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),
-    showCompare: dashboardShowCompareSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setDashboardFilters: (params: SetDashboardFilterAction) =>
         dispatch(setDashboardFiltersAction(params)),
-    setDashboardShowCompare: (showCompare: boolean) =>
-        dispatch(setDashboardShowCompareAction(showCompare)),
-    setInformationPaneState: (params: SetInformationPaneStateAction) =>
-        dispatch(setInformationPaneStateAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

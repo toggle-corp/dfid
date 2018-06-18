@@ -10,6 +10,7 @@ $width-information-pane: 380px;
     background-color: $color-background-row;
 
     &.collapsed {
+        background-color: transparent;
         width: 38px;
         height: 38px;
     }
@@ -17,11 +18,12 @@ $width-information-pane: 380px;
     &:not(.collapsed) {
         width: $width-information-pane;
         height: calc(100% - #{$spacing-medium * 2});
+
+        &.show-compare {
+            width: calc(100% - #{$spacing-medium * 2});
+        }
     }
 
-    &.show-compare {
-        width: calc(100% - #{$spacing-medium * 2});
-    }
 
     .information {
         display: flex;

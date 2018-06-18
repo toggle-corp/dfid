@@ -14,7 +14,7 @@ import {
 
 import ListItem from '../../../ListItem';
 import Item from '../../../../../components/Item';
-import { renderNumeral } from '../../../../../components/Renderer';
+import { renderPound } from '../../../../../components/Renderer';
 
 import styles from './styles.scss';
 
@@ -63,7 +63,7 @@ export class ProgrammeDetailInfo extends React.PureComponent<Props, State>{
                 <Item
                     label="Budget"
                     value={programBudget}
-                    valueModifier={renderNumeral}
+                    valueModifier={renderPound}
                 />
                 <Item
                     label="Description"

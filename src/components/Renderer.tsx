@@ -41,3 +41,30 @@ export const renderNormalNumeral = (data: number) => (
     />
 );
 
+// Render Text
+
+export const renderPercentText = (data: number) => (
+    Numeral.renderText({
+        precision: 2,
+        suffix: '%',
+        value: data ? data * 100 : undefined,
+    })
+);
+
+export const renderDollarText = (data: number) => (
+    Numeral.renderText({
+        precision: 0,
+        value: data,
+        prefix: '$',
+    })
+);
+
+export const renderPoundText = (data: number) => (
+    Numeral.renderText({
+        precision: 1,
+        value: data,
+        prefix: '£',
+        lang: 'en',
+        normal: true,
+    })
+);

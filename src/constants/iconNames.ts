@@ -12,6 +12,8 @@ const iconNames: Readonly<{
     chevronUp: 'ion-chevron-up',
     information: 'ion-information',
     informationCircle: 'ion-information-circled',
+    list: 'ion-android-list',
+    grid: 'ion-android-apps',
 };
 
 export default iconNames;

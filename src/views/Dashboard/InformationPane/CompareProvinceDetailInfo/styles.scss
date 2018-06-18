@@ -7,47 +7,79 @@
 
 .compare-province-detail-info {
     flex-grow: 1;
-    overflow: auto;
+    overflow-y: auto;
 
-    .table {
-        :global {
-            .header {
-                &.activeProgrammes {
-                    >div {
-                        width: 320px;
-                    }
-                }
+    .scroll-wrapper {
+        overflow-x: auto;
 
-                &.province {
-                    position: sticky;
-                    left: 0;
-                    z-index: 2;
-                    box-shadow: $spacing-extra-small 0 $radius-blur-small $radius-spread-small $color-shadow-light;
-                }
-            }
-
-            .body {
-                .row {
-                    .cell {
-                        &.province {
-                            position: sticky;
-                            left: 0;
-                            z-index: 1;
-                            background-color: $color-background-row-alt;
-                            color: $color-primary;
-                            font-weight: $font-weight-bold;
-                            box-shadow: $spacing-extra-small 0 $radius-blur-small $radius-spread-small $color-shadow-light;
+        .table {
+            :global {
+                .header {
+                    &.activeProgrammes {
+                        >div {
+                            width: 320px;
                         }
                     }
 
-                    &:nth-child(odd) {
+                    &.province {
+                        position: sticky;
+                        left: 0;
+                        z-index: 2;
+                        box-shadow: $spacing-extra-small 0 $radius-blur-small $radius-spread-small $color-shadow-light;
+                    }
+                }
+
+                .body {
+                    .row {
                         .cell {
                             &.province {
-                                background-color: $color-background-row;
+                                position: sticky;
+                                left: 0;
+                                z-index: 1;
+                                box-shadow: $spacing-extra-small 0 $radius-blur-small $radius-spread-small $color-shadow-light;
+                                background-color: $color-background-row-alt;
+                                color: $color-primary;
+                                font-weight: $font-weight-bold;
+                            }
+                        }
+
+                        &:nth-child(odd) {
+                            .cell {
+                                &.province {
+                                    background-color: $color-background-row;
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    .charts {
+        display: flex;
+
+        .chart-container {
+            display: flex;
+            flex-basis: calc(100% / 3);
+            flex-direction: column;
+            margin-bottom: $spacing-medium;
+            background-color: $color-foreground-alt;
+            height: 320px;
+
+            &:first-child {
+                margin-right: $spacing-medium;
+            }
+
+            .heading {
+                flex-shrink: 0;
+                padding: $spacing-small $spacing-medium;
+                color: $color-accent;
+                font-weight: $font-weight-bold;
+            }
+
+            .chart {
+                flex-grow: 1;
             }
         }
     }
