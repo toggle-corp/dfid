@@ -5,6 +5,7 @@ import {
     Indicator,
     IndicatorData,
     LandingOverviewData,
+    GlossaryData,
     MapLayer,
     Municipality,
     Programme,
@@ -39,6 +40,11 @@ const sectorIdFromPropsSelector = (
 export const landingOverviewDataSelector = ({ domainData }: RootState): LandingOverviewData => (
     domainData.landingOverviewData
 );
+
+export const glossaryDataSelector = ({ domainData }: RootState): GlossaryData[] => (
+    domainData.glossaryData
+);
+
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
     domainData.provinces || emptyArray
