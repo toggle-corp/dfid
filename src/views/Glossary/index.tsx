@@ -1,8 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Redux from 'redux';
 
+import { RestRequest } from '../../vendor/react-store/utils/rest';
 import styles from './styles.scss';
 
+import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import Table, {
     Header,
 } from '../../vendor/react-store/components/View/Table';
@@ -14,9 +17,15 @@ import SearchInput from '../../vendor/react-store/components/Input/SearchInput';
 import {
     RootState,
     GlossaryData,
+    SetGlossaryDataAction,
 } from '../../redux/interface';
 
-import { glossaryDataSelector } from '../../redux';
+import {
+    glossaryDataSelector,
+    setGlossaryDataAction,
+} from '../../redux';
+
+import GlossaryDataGetRequest from './requests/GlossaryDataGetRequest';
 interface OwnProps {
     loading?: boolean;
 }
@@ -24,19 +33,24 @@ interface PropsFromState {
     glossaryData: GlossaryData[];
 }
 
-interface PropsFromDispatch {}
-type Props = OwnProps & PropsFromState;
+interface PropsFromDispatch {
+    setGlossaryData(params: SetGlossaryDataAction): void;
+}
+type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
-interface State {}
+interface State {
+    loadingGlossaryData: boolean;
+}
 
 
 export class Glossary extends React.PureComponent<Props, State> {
     headers: Header<GlossaryData>[];
+    glossaryDataRequest: RestRequest;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-
+            loadingGlossaryData: true,
         };
         this.headers = [
             {
@@ -66,6 +80,29 @@ export class Glossary extends React.PureComponent<Props, State> {
         ];
     }
 
+    componentWillMount() {
+        this.startRequestForGlossaryData();
+    }
+
+    componentWillUnmount() {
+        if (this.glossaryDataRequest) {
+            this.glossaryDataRequest.stop();
+        }
+    }
+
+    startRequestForGlossaryData = () => {
+        if (this.glossaryDataRequest) {
+            this.glossaryDataRequest.stop();
+        }
+        const glossaryDataRequest = new GlossaryDataGetRequest({
+            setState: params => this.setState(params),
+            setGlossaryData: this.props.setGlossaryData,
+        });
+        this.glossaryDataRequest = glossaryDataRequest.create();
+        this.glossaryDataRequest.start();
+    }
+
+
     keyExtractor = (item: GlossaryData) => item.id;
     render() {
         return (
@@ -77,6 +114,7 @@ export class Glossary extends React.PureComponent<Props, State> {
                    />
                 </div>
                 <div className={styles.table}>
+                    {this.state.loadingGlossaryData && <LoadingAnimation />}
                     <Table
                          data={this.props.glossaryData}
                          headers={this.headers}
@@ -92,6 +130,10 @@ const mapStateToProps = (state: RootState) => ({
     glossaryData: glossaryDataSelector(state),
 });
 
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setGlossaryData: (params: SetGlossaryDataAction) => dispatch(setGlossaryDataAction(params)),
+});
+
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
-    mapStateToProps,
+    mapStateToProps, mapDispatchToProps,
 )(Glossary);

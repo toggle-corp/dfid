@@ -344,6 +344,9 @@ export interface GlossaryData {
     description: string;
 }
 
+export interface SetGlossaryDataAction {
+    glossaryData: GlossaryData[];
+}
 
 // Municipality
 

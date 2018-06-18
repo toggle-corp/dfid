@@ -13,6 +13,7 @@ export * from './reducers/domainData/sector';
 export * from './reducers/domainData/country';
 export * from './reducers/domainData/indicator';
 export * from './reducers/domainData/mapLayer';
+export * from './reducers/domainData/glossary';
 
 // Silo Domain Data Reducers
 export * from './reducers/siloDomainData/dashboard';

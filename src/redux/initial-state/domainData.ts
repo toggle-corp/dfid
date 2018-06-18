@@ -10,27 +10,7 @@ const initialDomainDataState: DomainData = {
         totalBudget: 4900000,
     },
 
-    glossaryData: [
-        {
-            id: 1,
-            title: 'HDI',
-            source: '',
-            description: 'Human Development Index',
-        },
-        {
-            id: 2,
-            title: 'GDP',
-            source: '',
-            description: 'Gross Domestic Product',
-        },
-        {
-            id: 3,
-            title: 'MPI',
-            source: '',
-            description: 'Multidimensional Poverty Index',
-        },
-
-    ],
+    glossaryData: [],
     provinces: [],
     provincesData: [],
     provincesInfo: [],
