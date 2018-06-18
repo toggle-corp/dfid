@@ -15,6 +15,7 @@ const initialSiloDomainData: SiloDomainData = {
             isHidden: false,
         },
         loadings: {
+            loadingMunicipalities: true,
             loadingCountryData: true,
             loadingProvinceData: true,
             loadingProgrammeData: true,

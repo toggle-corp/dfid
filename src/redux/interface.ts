@@ -43,6 +43,7 @@ export interface DomainData {
     sectors: Sector[];
     sectorsData: SectorData[];
     countriesData: CountryData[];
+    municipalities: Municipality[];
     indicators: Indicator[];
     indicatorsData: Dictionary<IndicatorData>;
     mapLayers: MapLayer[];
@@ -278,6 +279,7 @@ export interface SectorDatum {
 // Request Manager
 
 export interface DashboardRequestManagerLoadings {
+    loadingMunicipalities: boolean;
     loadingCountryData: boolean;
     loadingProvinceData: boolean;
     loadingProgrammeData: boolean;
@@ -328,4 +330,30 @@ export interface LandingOverviewData {
     totalProjects: number;
     totalSectors: number;
     totalBudget: number;
+}
+
+// Municipality
+
+export interface Municipality {
+    id: number;
+    hlcitCode: string;
+    type: string;
+    localName: string;
+    programs: MunicipalityProgramme[];
+    totalProgramBudget: number;
+    totalNoOfProgrammes: number;
+}
+
+export interface MunicipalityProgramme {
+    programId: number;
+    program: string;
+    partners: MunicipalityPartner[];
+    programBudge: number;
+    totalNoOfPartner: number;
+}
+
+export interface MunicipalityPartner { }
+
+export interface SetMunicipalitiesAction {
+    municipalities: Municipality[];
 }

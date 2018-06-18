@@ -1,18 +1,20 @@
 import { createSelector } from 'reselect';
 import {
-    RootState,
-    Province,
-    ProvinceData,
-    Programme,
-    ProgrammeData,
-    Sector,
-    MapLayer,
     Dashboard,
     DashboardFilter,
     DashboardFilterParams,
     DashboardRequestManagerLoadings,
     GeoJSONS,
+    MapLayer,
+    Municipality,
+    Programme,
+    ProgrammeData,
+    Province,
+    ProvinceData,
+    RootState,
+    Sector,
 } from '../interface';
+
 import {
     provincesSelector,
     provincesDataSelector,
@@ -21,6 +23,7 @@ import {
     sectorsSelector,
     indicatorsDataSelector,
     mapLayersSelector,
+    municipalitiesSelector,
 } from './domainData';
 
 // NOTE: Use these to make sure reference don't change
@@ -31,6 +34,7 @@ const emptyFaram: object = {
     faramErrors: {},
 };
 
+// Selectors
 export const dashboardSelector = ({ siloDomainData }: RootState): Dashboard => (
     siloDomainData.dashboard || emptyObject as Dashboard
 );
@@ -145,6 +149,24 @@ export const dashboardMapLayersSelector = createSelector(
         mapLayers.filter(mapLayer => (
             mapLayersId.findIndex(id => id === mapLayer.id)) !== -1,
         ) || emptyArray as MapLayer[],
+);
+
+export const dashboardMunicipalitiesSelector = createSelector(
+    municipalitiesSelector,
+    dashboardProgrammesIdSelector,
+    (municipalities, programmesId) =>
+        programmesId.length ?
+            municipalities.filter((muncipality) => {
+                if (!muncipality.programs) {
+                    return;
+                }
+                return muncipality.programs.findIndex(program => (
+                    programmesId.findIndex(programmeId => (
+                        programmeId === program.programId
+                    )) !== -1
+                )) !== -1;
+            })
+            : emptyArray as Municipality[],
 );
 
 // Dasboard Request Manager Loadings Selector

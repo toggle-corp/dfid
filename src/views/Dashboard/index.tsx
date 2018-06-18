@@ -112,6 +112,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
     render() {
         const { layersInfo } = this.state;
         const {
+            loadingMunicipalities,
             loadingCountryData,
             loadingProvinceData,
             loadingProgrammeData,
@@ -131,7 +132,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingSectors || loadingSectorData ||
             loadingIndicators || loadingIndicatorsData ||
             loadingGeoJson || loadingCountryData ||
-            loadingLayers
+            loadingLayers || loadingMunicipalities
          );
 
         return (
