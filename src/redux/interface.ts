@@ -35,6 +35,7 @@ export interface Auth {
 
 export interface DomainData {
     landingOverviewData: LandingOverviewData;
+    glossaryData: GlossaryData[];
     provinces: Province[];
     provincesData: ProvinceData[];
     provincesInfo: ProvinceInfo[];
@@ -226,6 +227,9 @@ export type SetDashboardFilterAction = Partial<DashboardFilter>;
 export interface Indicator {
     id: number;
     name: string;
+    source: string;
+    glossary: string;
+
 }
 
 export interface IndicatorData {
@@ -330,6 +334,18 @@ export interface LandingOverviewData {
     totalProjects: number;
     totalSectors: number;
     totalBudget: number;
+}
+
+// Glossary
+export interface GlossaryData {
+    id: number;
+    title?: string;
+    source?: string;
+    description?: string;
+}
+
+export interface SetGlossaryDataAction {
+    glossaryData: GlossaryData[];
 }
 
 // Municipality

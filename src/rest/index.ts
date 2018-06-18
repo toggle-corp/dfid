@@ -56,3 +56,4 @@ export * from './sectors';
 export * from './country';
 export * from './indicator';
 export * from './mapLayer';
+export * from './glossary';

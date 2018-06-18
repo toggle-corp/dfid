@@ -10,6 +10,7 @@ const initialDomainDataState: DomainData = {
         totalBudget: 4900000,
     },
 
+    glossaryData: [],
     provinces: [],
     provincesData: [],
     provincesInfo: [],
