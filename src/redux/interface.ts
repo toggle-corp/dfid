@@ -339,9 +339,9 @@ export interface LandingOverviewData {
 // Glossary
 export interface GlossaryData {
     id: number;
-    title: string;
-    source: string;
-    description: string;
+    title?: string;
+    source?: string;
+    description?: string;
 }
 
 export interface SetGlossaryDataAction {

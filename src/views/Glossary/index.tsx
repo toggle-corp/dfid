@@ -40,17 +40,49 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State {
     loadingGlossaryData: boolean;
+    glossaryData: GlossaryData[];
+    searchValue?: string;
 }
 
+
+const safeString = (value: string | undefined | null): string => {
+    if (value === undefined || value === null) {
+        return '';
+    }
+    return value;
+};
 
 export class Glossary extends React.PureComponent<Props, State> {
     headers: Header<GlossaryData>[];
     glossaryDataRequest: RestRequest;
 
+    static filterGlossaryData = (data: GlossaryData[], searchValue?: string) => {
+        if (!searchValue) {
+            return data;
+        }
+
+        const filterFn = (datum: GlossaryData) => {
+            const {
+                description,
+                title,
+                source,
+            } = datum;
+            return (
+                safeString(description).toLocaleLowerCase().includes(searchValue) ||
+                safeString(title).toLocaleLowerCase().includes(searchValue) ||
+                safeString(source).toLocaleLowerCase().includes(searchValue)
+            );
+        };
+
+        return data.filter(filterFn);
+    }
+
     constructor(props: Props) {
         super(props);
         this.state = {
             loadingGlossaryData: true,
+            searchValue: undefined,
+            glossaryData: this.props.glossaryData,
         };
         this.headers = [
             {
@@ -84,6 +116,17 @@ export class Glossary extends React.PureComponent<Props, State> {
         this.startRequestForGlossaryData();
     }
 
+    componentWillReceiveProps(nextProps: Props) {
+        if (this.props.glossaryData !== nextProps.glossaryData) {
+            this.setState({
+                glossaryData: Glossary.filterGlossaryData(
+                    nextProps.glossaryData,
+                    this.state.searchValue,
+                ),
+            });
+        }
+    }
+
     componentWillUnmount() {
         if (this.glossaryDataRequest) {
             this.glossaryDataRequest.stop();
@@ -104,6 +147,19 @@ export class Glossary extends React.PureComponent<Props, State> {
 
 
     keyExtractor = (item: GlossaryData) => item.id;
+
+    handleSearch = (value: string) => {
+        const searchValue = value.toLocaleLowerCase();
+
+        this.setState({
+            searchValue,
+            glossaryData: Glossary.filterGlossaryData(
+                this.props.glossaryData,
+                searchValue,
+            ),
+        });
+    }
+
     render() {
         return (
             <div className={styles.glossary}>
@@ -111,12 +167,14 @@ export class Glossary extends React.PureComponent<Props, State> {
                    <SearchInput
                         label="Search"
                         showHintAndError={false}
+                        value={this.state.searchValue}
+                        onChange={this.handleSearch}
                    />
                 </div>
                 <div className={styles.table}>
                     {this.state.loadingGlossaryData && <LoadingAnimation />}
                     <Table
-                         data={this.props.glossaryData}
+                         data={this.state.glossaryData}
                          headers={this.headers}
                          keyExtractor={this.keyExtractor}
                     />
