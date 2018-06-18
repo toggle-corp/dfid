@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
@@ -22,6 +22,7 @@ import {
     informationPaneStateSelector,
     dashboardShowCompareSelector,
     setInformationPaneStateAction,
+    setDashboardShowCompareAction,
 } from '../../../redux';
 
 import { iconNames } from '../../../constants';
@@ -43,6 +44,7 @@ interface PropsFromState {
 
 interface PropsFromDispatch {
     setInformationPaneState(params: SetInformationPaneStateAction): void;
+    setDashboardShowCompare(showBoolean: boolean): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
@@ -136,6 +138,10 @@ export class InformationPane extends React.PureComponent<Props, State>{
         this.props.setInformationPaneState({ activeTab: tab });
     }
 
+    handleToggleCompareButtonClick = () => {
+        this.props.setDashboardShowCompare(!this.props.showCompare);
+    }
+
     renderShowInformationButton = () => {
         const {
             uiState: {
@@ -178,14 +184,20 @@ export class InformationPane extends React.PureComponent<Props, State>{
                     active={activeTab}
                     onClick={this.handleTabChange}
                 >
-                    { !showCompare &&
+                    <Fragment>
+                        <Button
+                            onClick={this.handleToggleCompareButtonClick}
+                            iconName={showCompare ? iconNames.list : iconNames.grid}
+                            title={showCompare ? 'Show list' : 'Show Comparision'}
+                            transparent
+                        />
                         <Button
                             title="Collapse information pane"
                             onClick={this.handleCollapseButtonClick}
                             iconName={iconNames.chevronUp}
                             transparent
                         />
-                    }
+                    </Fragment>
                 </FixedTabs>
                 <MultiViewContainer
                     active={activeTab}
@@ -221,6 +233,8 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setInformationPaneState: (params: SetInformationPaneStateAction) =>
         dispatch(setInformationPaneStateAction(params)),
+    setDashboardShowCompare: (showCompare: boolean) =>
+        dispatch(setDashboardShowCompareAction(showCompare)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

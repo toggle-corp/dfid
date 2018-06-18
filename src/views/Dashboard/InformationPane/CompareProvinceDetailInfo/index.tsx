@@ -281,48 +281,52 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
 
         return (
             <div className={styles.compareProvinceDetailInfo}>
-                <Table
-                    className={styles.table}
-                    data={selectedProvincesData}
-                    headers={this.headers}
-                    keyExtractor={this.keyExtractor}
-                />
-                <div className={styles.chartContainer}>
-                    <h3 className={styles.heading}>
-                        Active DFID projects
-                    </h3>
-                    <HorizontalBar
-                        colorScheme={colorScheme}
-                        className={styles.chart}
-                        data={selectedProvincesData}
-                        labelAccessor={provinceDataLabelAccessor}
-                        valueAccessor={activeProjectValueAccessor}
-                    />
+                <div className={styles.charts}>
+                    <div className={styles.chartContainer}>
+                        <h3 className={styles.heading}>
+                            Active DFID projects
+                        </h3>
+                        <HorizontalBar
+                            colorScheme={colorScheme}
+                            className={styles.chart}
+                            data={selectedProvincesData}
+                            labelAccessor={provinceDataLabelAccessor}
+                            valueAccessor={activeProjectValueAccessor}
+                        />
+                    </div>
+                    <div className={styles.chartContainer}>
+                        <h3 className={styles.heading}>
+                            Poverty Rate
+                        </h3>
+                        <HorizontalBar
+                            colorScheme={colorScheme}
+                            className={styles.chart}
+                            data={selectedProvincesData}
+                            labelAccessor={provinceDataLabelAccessor}
+                            valueAccessor={povertyRateValueAccessor}
+                            valueLabelAccessor={povertyRateValueLabelAccessor}
+                        />
+                    </div>
+                    <div className={styles.chartContainer}>
+                        <h3 className={styles.heading}>
+                            Per Capita Income
+                        </h3>
+                        <HorizontalBar
+                            colorScheme={colorScheme}
+                            className={styles.chart}
+                            data={selectedProvincesData}
+                            labelAccessor={provinceDataLabelAccessor}
+                            valueAccessor={perCapitaIncomeValueAccessor}
+                            valueLabelAccessor={perCapitaIncomeValueLabelAccessor}
+                        />
+                    </div>
                 </div>
-                <div className={styles.chartContainer}>
-                    <h3 className={styles.heading}>
-                        Poverty Rate
-                    </h3>
-                    <HorizontalBar
-                        colorScheme={colorScheme}
-                        className={styles.chart}
+                <div className={styles.scrollWrapper}>
+                    <Table
+                        className={styles.table}
                         data={selectedProvincesData}
-                        labelAccessor={provinceDataLabelAccessor}
-                        valueAccessor={povertyRateValueAccessor}
-                        valueLabelAccessor={povertyRateValueLabelAccessor}
-                    />
-                </div>
-                <div className={styles.chartContainer}>
-                    <h3 className={styles.heading}>
-                        Per Capita Income
-                    </h3>
-                    <HorizontalBar
-                        colorScheme={colorScheme}
-                        className={styles.chart}
-                        data={selectedProvincesData}
-                        labelAccessor={provinceDataLabelAccessor}
-                        valueAccessor={perCapitaIncomeValueAccessor}
-                        valueLabelAccessor={perCapitaIncomeValueLabelAccessor}
+                        headers={this.headers}
+                        keyExtractor={this.keyExtractor}
                     />
                 </div>
             </div>
