@@ -21,6 +21,7 @@ import {
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
+    dashboardIndicatorSelector,
     dashboardRequestManagerLoadingSelector,
     geoJsonsSelector,
     setRequestManagerLoadingAction,
@@ -31,6 +32,7 @@ import {
     Dictionary,
     GeoJSONS,
     MapLayer,
+    IndicatorData,
     MapLayerProps,
     Programme,
     Province,
@@ -49,6 +51,7 @@ import {
 } from '../../redux/interface';
 
 import Map from '../../components/Map';
+import ScaleLegend from '../../components/Map/ScaleLegend';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -62,6 +65,7 @@ interface PropsFromState {
     selectedProgrammes: Programme[];
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
+    selectedIndicator?: IndicatorData;
     requestManagerLoadings: DashboardRequestManagerLoadings;
     geoJsons: GeoJSONS;
 }
@@ -109,6 +113,34 @@ export class Dashboard extends React.PureComponent<Props, State>{
         toggleDashboardProvince(parseInt(key, 10));
     }
 
+    renderMapChildren = () => {
+        const { selectedIndicator } = this.props;
+        if (!selectedIndicator) {
+            return null;
+        }
+
+        const { minValue, maxValue } = selectedIndicator;
+
+        const calcOpacity = (value: number) => {
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            return fraction * (0.85 - offset) + offset;
+        };
+
+        const minColor = `rgba(0, 129, 129, ${calcOpacity(minValue)})`;
+        const maxColor = `rgba(0, 129, 129, ${calcOpacity(maxValue)})`;
+
+        return (
+            <ScaleLegend
+                className={styles.scaleLegend}
+                minValue={String(minValue)}
+                maxValue={String(maxValue)}
+                minColor={minColor}
+                maxColor={maxColor}
+            />
+        );
+    }
+
     render() {
         const { layersInfo } = this.state;
         const {
@@ -133,7 +165,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
             loadingIndicators || loadingIndicatorsData ||
             loadingGeoJson || loadingCountryData ||
             loadingLayers || loadingMunicipalities
-         );
+        );
 
         return (
             <div className={styles.dashboard}>
@@ -158,7 +190,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         className={styles.map}
                         layers={layersInfo}
                         hideLayers={loadingGeoJson}
-                    />
+                    >
+                        {this.renderMapChildren()}
+                    </Map>
                     <InformationPane
                         className={styles.informationPane}
                         loadingProvinceData={loadingProvinceData}
@@ -178,6 +212,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
+    selectedIndicator: dashboardIndicatorSelector(state),
     requestManagerLoadings: dashboardRequestManagerLoadingSelector(state),
     geoJsons: geoJsonsSelector(state),
 });
