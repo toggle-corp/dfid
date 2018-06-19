@@ -144,22 +144,31 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
+    renderMapLayer = (layerInfo) => {
+        let key = `${layerInfo.layerKey}-layer`;
+        if (!layerInfo.donotReload) {
+            key = `${key}-${this.reloadKey}`;
+        }
+
+        return (
+            <MapLayer
+                key={key}
+                map={this.state.map}
+                properties={layerInfo}
+            />
+        );
+    }
+
     renderMapLayers = () => {
         const showMapLayers = this.state.map && !this.props.hideLayers;
         if (!showMapLayers) {
             return null;
         }
 
+        // TODO: Use List
         return (
             <React.Fragment>
-                {this.layers.map(layerInfo => (
-                    <MapLayer
-                        key={`${layerInfo.layerKey}-layer-${this.reloadKey}`}
-                        map={this.state.map}
-                        geoJson={layerInfo.geoJson}
-                        properties={layerInfo}
-                    />
-                ))}
+                {this.layers.map(layerInfo => this.renderMapLayer(layerInfo))}
             </React.Fragment>
         );
     }

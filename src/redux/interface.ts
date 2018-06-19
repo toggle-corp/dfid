@@ -262,6 +262,7 @@ export interface MapLayer {
     layerServerUrl?: string;
     type: string;
     file: string;
+    layerPath?: string;
     sectors: { code: string }[];
 }
 
@@ -311,8 +312,8 @@ export interface MapLayerProps {
     layerKey: string;
     order: number;
 
-    geoJson: GeoJSON;
-    style: object;
+    geoJson?: GeoJSON;
+    style?: object;
     idKey?: string;
     labelKey?: string;
     zoomOnLoad?: boolean;

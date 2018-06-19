@@ -2,6 +2,8 @@ import React from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
+import mapStyles from '../../../constants/mapStyles';
+
 import { RestRequest } from '../../../vendor/react-store/utils/rest';
 import {
     CoordinatorBuilder,
@@ -13,6 +15,7 @@ import {
     urlForCountryGeoJson,
     urlForMunicipalitiesGeoJson,
     urlForIpssjGeoJson,
+    createUrlForTileLayer,
 } from '../../../rest';
 
 import {
@@ -33,6 +36,7 @@ import {
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
+    dashboardRasterMapLayerSelector,
     geoJsonsSelector,
     dashboardIndicatorSelector,
     provincesSelector,
@@ -89,6 +93,7 @@ interface PropsFromState {
     selectedProgrammes: Programme[];
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
+    selectedRasterMapLayer?: MapLayer;
     geoJsons: GeoJSONS;
     selectedIndicator?: IndicatorData;
     provinces: Province[];
@@ -161,6 +166,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.startRequestForMunicipalities();
 
         if (!this.props.loading) {
+            this.reloadRasterMapLayer(this.props);
             this.reloadProvince(this.props);
             this.reloadMunicipalities(this.props);
             this.reloadMapLayer(this.props);
@@ -175,6 +181,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             this.reloadMapLayer(nextProps);
             this.reloadProgramLayer(nextProps);
         } else {
+            if (this.props.selectedRasterMapLayer !== nextProps.selectedRasterMapLayer) {
+                this.reloadRasterMapLayer(nextProps);
+            }
             if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
                 this.props.selectedIndicator !== nextProps.selectedIndicator) {
                 this.reloadProvince(nextProps);
@@ -231,21 +240,13 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const styles = {};
 
         provinces.forEach((province) => {
-            styles[province.id] = {
-                color: '#fff',
-                opacity: 0,
-                stroke: '#fff',
-                strokeWidth: 0,
-            };
+            // everything except the selected province is transparent
+            styles[province.id] = mapStyles.transparent;
         });
 
         if (selectedProvinces) {
             selectedProvinces.forEach((province) => {
-                styles[province.id] = {
-                    ...styles[province.id],
-                    stroke: '#000',
-                    strokeWidth: 2,
-                };
+                styles[province.id] = mapStyles.selectedProvinces;
             });
         }
 
@@ -260,14 +261,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const styles = {};
 
         provinces.forEach((province) => {
-            styles[province.id] = {
-                stroke: '#fff',
-                strokeWidth: 0.5,
-                color: '#418ed8',
-                opacity: 0.9,
-                hoverColor: '#418ed8',
-                hoverOpacity: 1.0,
-            };
+            styles[province.id] = mapStyles.provinces;
         });
 
         if (!selectedIndicator) {
@@ -291,9 +285,11 @@ export class RequestManager extends React.PureComponent<Props, State>{
             const offset = 0.25;
             const fractionWithOffset = fraction * (0.85 - offset) + offset;
 
-            styles[provinceId].color = '#008181';
-            styles[provinceId].hoverColor = '#008181';
-            styles[provinceId].opacity = fractionWithOffset;
+            styles[provinceId] = {
+                ...styles[provinceId],
+                ...mapStyles.indicator,
+                opacity: fractionWithOffset,
+            };
         });
 
         return styles;
@@ -534,10 +530,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
             file: urlForMunicipalitiesGeoJson,
             order: 3,
             types: ['Line'],
-            style: {
-                stroke: '#c0c0c0',
-                strokeOpacity: 0.35,
-            },
+            style: mapStyles.municipalities,
         }];
 
         this.reloadSelectionToLayers({
@@ -590,6 +583,41 @@ export class RequestManager extends React.PureComponent<Props, State>{
         });
     }
 
+    reloadRasterMapLayer = (props: Props) => {
+        const { selectedRasterMapLayer: mapLayer, setLayersInfo } = props;
+        if (!mapLayer) {
+            setLayersInfo({
+                $unset: ['rasterLayer'],
+            });
+            return;
+        }
+        const url = createUrlForTileLayer(mapLayer.layerServerUrl || '', {
+            format: 'image/png',
+            version: '1.1.0',
+            service: 'WMS',
+            request: 'GetMap',
+            srs: 'EPSG:3857',
+            width: 256,
+            height: 256,
+            transparent: 'true',
+            layers: mapLayer.layerPath || '',
+        });
+
+        const settings = {
+            rasterLayer: {
+                $set: {
+                    layerKey: 'rasterLayer',
+                    types: ['Tile'],
+                    tiles: [`${url}&bbox={bbox-epsg-3857}`],
+                    tileSize: 256,
+                    order: -100,
+                    donotReload: true,
+                },
+            },
+        };
+        setLayersInfo(settings);
+    }
+
     render() {
         return null;
     }
@@ -601,6 +629,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
+    selectedRasterMapLayer: dashboardRasterMapLayerSelector(state),
     geoJsons: geoJsonsSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
     provinces: provincesSelector(state),

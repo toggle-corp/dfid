@@ -95,6 +95,11 @@ export const dashboardMunicipalitiesIdSelector = createSelector(
     filters => filters.municipalitiesId || emptyArray as number[],
 );
 
+export const dashboardRasterMapLayerIdSelector = createSelector(
+    dashboardFilterSelector,
+    filters => filters.rasterMapLayerId,
+);
+
 export const dashboardProvincesSelector = createSelector(
     provincesSelector,
     dashboardProvincesIdSelector,
@@ -154,6 +159,13 @@ export const dashboardMapLayersSelector = createSelector(
         mapLayers.filter(mapLayer => (
             mapLayersId.findIndex(id => id === mapLayer.id)) !== -1,
         ) || emptyArray as MapLayer[],
+);
+
+export const dashboardRasterMapLayerSelector = createSelector(
+    mapLayersSelector,
+    dashboardRasterMapLayerIdSelector,
+    (mapLayers, mapLayerId) =>
+        mapLayers.find(mapLayer => mapLayer.id === mapLayerId),
 );
 
 export const dashboardMunicipalitiesSelector = createSelector(

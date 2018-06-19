@@ -1,4 +1,6 @@
 import {
+    UrlParams,
+    p,
     wsEndpoint,
     commonHeaderForGet,
 } from '../config/rest';
@@ -9,3 +11,7 @@ export const createUrlForMapLayer = (id: number) => `${wsEndpoint}/layer-data/${
 export const createParamsForMapLayers = () => ({
     ...commonHeaderForGet,
 });
+
+export const createUrlForTileLayer = (baseUrl: string, params: UrlParams) => (
+    `${baseUrl}ows?${p(params)}`
+);
