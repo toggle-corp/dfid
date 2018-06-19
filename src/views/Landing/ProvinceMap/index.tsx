@@ -10,6 +10,7 @@ import {
 
 import { GeoJSON } from '../../../redux/interface';
 import { FgRestBuilder } from '../../../vendor/react-store/utils/rest';
+import { getColorOnBgColor } from '../../../vendor/react-store/utils/common';
 
 interface MapMouseEvent extends mapboxgl.MapMouseEvent {
     features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
@@ -114,24 +115,6 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
                 const { colorScheme } = this.props;
 
                 if (map) {
-                    map.addSource('province-map', {
-                        type: 'geojson',
-                        data: geoJson,
-                    });
-
-                    const paint = {
-                        'fill-color': '#1676d3',
-                        // 'fill-opacity': 0.5,
-                        'fill-outline-color': '#ffffff',
-                    };
-
-                    map.addLayer({
-                        paint,
-                        id: 'province-map',
-                        type: 'fill',
-                        source: 'province-map',
-                    });
-
                     const bounds = turf.bbox(geoJson);
                     map.fitBounds(
                         [[
@@ -144,28 +127,63 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
                         { padding: 30 },
                     );
 
+                    map.addSource('province-map', {
+                        type: 'geojson',
+                        data: geoJson,
+                    });
+
+                    const stops = colorScheme.map((val, i) => [(i + 1), val]);
+                    const textStops = colorScheme.map(
+                        (val, i) => [(i + 1), getColorOnBgColor(val)],
+                    );
+
                     map.addLayer({
-                        id: 'province-hover',
+                        id: 'province-map',
                         type: 'fill',
                         source: 'province-map',
                         paint: {
-                            'fill-color': '#00f',
-                            'fill-opacity': 1,
+                            'fill-outline-color': '#ffffff',
+                            'fill-color': {
+                                stops,
+                                property: 'Province',
+                                type: 'categorical',
+                                default: '#088',
+                            },
+                        },
+                    });
+
+                    map.addLayer({
+                        id: 'province-map-text',
+                        type: 'symbol',
+                        source: 'province-map',
+                        layout: {
+                            'text-field': 'Province {Province}',
+                            'text-size': 12,
+                        },
+                        paint: {
+                            'text-color': {
+                                stops: textStops,
+                                property: 'Province',
+                                type: 'categorical',
+                                default: '#000',
+                            },
+                        },
+                    });
+
+                    map.addLayer({
+                        id: 'province-map-hover',
+                        type: 'line',
+                        source: 'province-map',
+                        paint: {
+                            'line-color': '#fff',
+                            'line-width': 2.5,
                         },
                         filter: ['==', 'Province', ''],
                     });
 
-                    const stops = colorScheme.map((val, i) => [(i + 1), val]);
-
-                    map.setPaintProperty('province-map', 'fill-color', {
-                        stops,
-                        property: 'Province',
-                        type: 'categorical',
-                        default: '#088',
-                    });
-
                     map.on('click', 'province-map', this.handleMouseClick);
-                    map.on('mouseenter', 'province-map', this.handleMouseEnter);
+                    map.on('mousemove', 'province-map', this.handleMouseMove);
+                    map.on('mouseleave', 'province-map', this.handleMouseLeave);
                 }
             })
             .build();
@@ -178,9 +196,26 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
         onClick(e.features[0].properties.Province);
     }
 
-    handleMouseEnter = (e: MapMouseEvent) => {
+    handleMouseMove = (e: MapMouseEvent) => {
         const { onHover } = this.props;
-        onHover(e.features[0].properties.Province);
+        const province = e.features[0].properties.Province;
+        onHover(province);
+
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+        map.setFilter('province-map-hover', ['==', 'Province', province]);
+        map.getCanvas().style.cursor = 'pointer';
+    }
+
+    handleMouseLeave = (e: MapMouseEvent) => {
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+        map.setFilter('province-map-hover', ['==', 'Province', '']);
+        map.getCanvas().style.cursor = '';
     }
 
     getClassName() {
