@@ -1,20 +1,20 @@
 const mapStyles = {
     provinces: {
-        stroke: '#795548',
+        stroke: '#444',
         strokeWidth: 1,
 
-        color: '#97ccff',
+        color: '#7fcdbb',
         opacity: 0.6,
 
-        hoverColor: '#56acff',
+        hoverColor: '#d9f0a3',
         hoverOpacity: 0.8,
     },
 
     selectedProvinces: {
         color: '#fff',
         opacity: 0,
-        stroke: '#3E2723',
-        strokeWidth: 2,
+        stroke: '#225ea8',
+        strokeWidth: 2.5,
     },
 
     municipalities: {
@@ -24,8 +24,8 @@ const mapStyles = {
     },
 
     indicator: {
-        color: '#008181',
-        hoverColor: '#9E9D24',
+        color: '#41ab5d',
+        hoverColor: '#d9f0a3',
     },
 
     transparent: {

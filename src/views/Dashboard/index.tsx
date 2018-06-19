@@ -5,6 +5,8 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import update from '../../vendor/react-store/utils/immutable-update';
+import { getRgbFromHex } from '../../vendor/react-store/utils/common';
+import mapStyles from '../../constants/mapStyles';
 
 import {
     setCountriesDataAction,
@@ -127,8 +129,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
             return fraction * (0.85 - offset) + offset;
         };
 
-        const minColor = `rgba(0, 129, 129, ${calcOpacity(minValue)})`;
-        const maxColor = `rgba(0, 129, 129, ${calcOpacity(maxValue)})`;
+        const { r, g, b } = getRgbFromHex(mapStyles.indicator.color);
+        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
+        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
 
         return (
             <ScaleLegend
@@ -137,6 +140,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 maxValue={String(maxValue)}
                 minColor={minColor}
                 maxColor={maxColor}
+                title={selectedIndicator.name}
             />
         );
     }
