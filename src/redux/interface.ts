@@ -209,6 +209,7 @@ export interface DashboardFilterParams {
     sectorsId?: number[];
     indicatorId?: number;
     mapLayersId?: number[];
+    municipalitiesId?: number[];
     rasterMapLayerId?: number;
 }
 
@@ -277,6 +278,10 @@ export interface ProgrammeDatum {
 }
 
 export interface SectorDatum {
+    id: number;
+}
+
+export interface MunicipalityDatum {
     id: number;
 }
 

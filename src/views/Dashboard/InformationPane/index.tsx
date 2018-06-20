@@ -12,6 +12,8 @@ import CompareProgrammeDetailInfo from './CompareProgrammeDetailInfo';
 import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
 import CompareProvinceDetailInfo from './CompareProvinceDetailInfo';
 import MultiSectorDetailInfo from './MultiSectorDetailInfo';
+import MultiMunicipalityDetailInfo from './MultiMunicipalityDetailInfo';
+import CompareMunicipalityDetailInfo from './CompareMunicipalityDetailInfo';
 
 import {
     RootState,
@@ -34,6 +36,7 @@ interface OwnProps {
     loadingProgrammeData: boolean;
     loadingSectorData: boolean;
     loadingCountryData: boolean;
+    loadingMunicipalities: boolean;
     className?: string;
 }
 
@@ -55,12 +58,14 @@ interface Routes {
     province: string;
     programme: string;
     sector: string;
+    municipality: string;
 }
 
 interface Views {
     province: object;
     programme: object;
     sector: object;
+    municipality: object;
 }
 
 export class InformationPane extends React.PureComponent<Props, State>{
@@ -74,6 +79,7 @@ export class InformationPane extends React.PureComponent<Props, State>{
             province: 'Province',
             sector: 'Sector',
             programme: 'Programme',
+            municipality: 'Municipality',
         };
 
         this.views = {
@@ -96,6 +102,14 @@ export class InformationPane extends React.PureComponent<Props, State>{
             sector: {
                 component: () => (
                     <MultiSectorDetailInfo loading={this.props.loadingSectorData} />
+                ),
+            },
+
+            municipality: {
+                component: () => (
+                    this.props.showCompare ?
+                    <CompareMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
+                    : <MultiMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
                 ),
             },
         };

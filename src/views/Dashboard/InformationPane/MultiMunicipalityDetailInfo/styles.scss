@@ -1,0 +1,11 @@
+@import '../../../../stylesheets/base';
+
+.message {
+    flex-grow: 1;
+    height: auto;
+}
+
+.municipality-list {
+    display: flex;
+    flex-direction: column;
+}
