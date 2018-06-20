@@ -10,12 +10,17 @@ const propTypes = {
     className: PropTypes.string,
     layers: PropTypes.object,
     hideLayers: PropTypes.bool,
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ]),
 };
 
 const defaultProps = {
     className: '',
     layers: {},
-    hideLayers: false
+    hideLayers: false,
+    children: undefined,
 };
 
 export default class Map extends React.PureComponent {
@@ -139,27 +144,37 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
+    renderMapLayer = (layerInfo) => {
+        let key = `${layerInfo.layerKey}-layer`;
+        if (!layerInfo.donotReload) {
+            key = `${key}-${this.reloadKey}`;
+        }
+
+        return (
+            <MapLayer
+                key={key}
+                map={this.state.map}
+                properties={layerInfo}
+            />
+        );
+    }
+
     renderMapLayers = () => {
         const showMapLayers = this.state.map && !this.props.hideLayers;
         if (!showMapLayers) {
             return null;
         }
 
+        // TODO: Use List
         return (
             <React.Fragment>
-                {this.layers.map(layerInfo => (
-                    <MapLayer
-                        key={`${layerInfo.layerKey}-layer-${this.reloadKey}`}
-                        map={this.state.map}
-                        geoJson={layerInfo.geoJson}
-                        properties={layerInfo}
-                    />
-                ))}
+                {this.layers.map(layerInfo => this.renderMapLayer(layerInfo))}
             </React.Fragment>
         );
     }
 
     render() {
+        const { children } =  this.props;
         const className = this.getClassName();
         const MapLayers = this.renderMapLayers;
 
@@ -169,10 +184,13 @@ export default class Map extends React.PureComponent {
                 ref={this.mapContainer}
             >
                 <MapLayers />
-                <Legend
-                    className={styles.legend}
-                    legendItems={this.legendItems}
-                />
+                <div className={styles.panels}>
+                    <Legend
+                        className={styles.legend}
+                        legendItems={this.legendItems}
+                    />
+                    { children }
+                </div>
             </div>
         );
     }

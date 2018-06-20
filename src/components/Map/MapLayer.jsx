@@ -17,7 +17,7 @@ const stylePropType = PropTypes.shape({
 const propTypes = {
     map: PropTypes.object,
     properties: PropTypes.shape({
-        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point'])),
+        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile'])),
         layerKey: PropTypes.string,
         geoJson: PropTypes.object,
         style: PropTypes.oneOfType([
@@ -62,7 +62,6 @@ export default class MapLayer extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.map !== this.props.map ||
-            nextProps.geoJson !== this.props.geoJson ||
             nextProps.properties !== this.props.properties
         ) {
             this.destroy();
@@ -87,11 +86,23 @@ export default class MapLayer extends React.PureComponent {
     load = (props) => {
         const {
             map,
-            geoJson,
             properties,
         } = props;
 
-        if (!map || !geoJson) {
+        if (!map) {
+            return;
+        }
+
+        const { geoJson } = properties;
+
+        if (properties.types.indexOf('Tile') >= 0) {
+            this.createMapBoxTileLayer({
+                ...properties,
+                map,
+            });
+        }
+
+        if (!geoJson) {
             return;
         }
 
@@ -193,6 +204,28 @@ export default class MapLayer extends React.PureComponent {
         if (visibleCondition) {
             map.setFilter(layerId, visibleCondition);
         }
+    }
+
+    createMapBoxTileLayer = ({
+        map,
+        layerKey,
+        tiles,
+        tileSize,
+    }) => {
+        map.addSource(layerKey, {
+            type: 'raster',
+            tiles,
+            tileSize,
+        });
+        this.sources.push(layerKey);
+
+        map.addLayer({
+            id: `${layerKey}-layer`,
+            type: 'raster',
+            source: layerKey,
+            paint: {}
+        });
+        this.layers.push(`${layerKey}-layer`);
     }
 
     handleHover = (map, layerId, labelKey) => {

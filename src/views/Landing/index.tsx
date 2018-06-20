@@ -123,7 +123,7 @@ export class Landing extends React.PureComponent<Props, State> {
     }
 
     handleMapHover = (province: number) => {
-        console.warn(province);
+        // console.warn(province);
     }
 
     render() {

@@ -3,13 +3,20 @@
 .map {
     position: relative;
 
-    .legend {
+    .panels {
+        display: flex;
         position: absolute;
-        bottom: $spacing-small;
-        left: $spacing-small;
+        bottom: 0;
+        left: 0;
+        align-items: flex-end;
         z-index: 100;
-        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
-        max-height: 480px;
-        overflow-y: auto;
+
+        .legend {
+            margin-bottom: $spacing-small;
+            margin-left: $spacing-small;
+            box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+            max-height: 480px;
+            overflow-y: auto;
+        }
     }
 }

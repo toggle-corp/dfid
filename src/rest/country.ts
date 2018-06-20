@@ -12,4 +12,3 @@ export const urlForMunicipalities = `${wsEndpoint}/municipalities/`;
 export const createParamsForMunicipalities = () => ({
     ...commonHeaderForGet,
 });
-

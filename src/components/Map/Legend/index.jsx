@@ -14,7 +14,6 @@ const propTypes = {
 const defaultProps = {
     className: '',
     legendItems: [],
-    fontSize: 12,
     onStateChange: undefined,
 };
 
@@ -29,16 +28,30 @@ export default class Legend extends React.PureComponent {
         };
     }
 
+    getClassName = () => {
+        const { className } = this.props;
+        const classNames = [
+            className,
+            'legend',
+            styles.legend,
+        ];
+
+        return classNames.join(' ');
+    }
+
     getItemClassName = (item) => {
         const { inactive } = this.state;
 
-        const styleNames = [styles['legend-item'], 'legend-item'];
+        const classNames = [
+            styles.legendItem,
+            'legend-item',
+        ];
 
         if (inactive.indexOf(item.label) !== -1) {
-            styleNames.push(styles.inactive);
+            classNames.push(styles.inactive);
         }
 
-        return styleNames.join(' ');
+        return classNames.join(' ');
     }
 
     toggleItem = (item) => {
@@ -69,32 +82,38 @@ export default class Legend extends React.PureComponent {
     }
 
     renderLegendItem = item => (
-        <button
-            key={item.label}
-            className={this.getItemClassName(item)}
-            onClick={() => this.toggleItem(item)}
-        >
-            <div className={styles.iconContainer}>
-                <span
-                    className={styles.icon}
-                    style={{
-                        backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
-                        width: 10,
-                        height: 10,
-                    }}
-                />
-            </div>
-            <p className={`${styles.label} label`} >
-                {item.label}
-            </p>
-        </button>
+        <div>
+            <button
+                key={item.label}
+                className={this.getItemClassName(item)}
+                onClick={() => this.toggleItem(item)}
+            >
+                <div className={styles.iconContainer}>
+                    <span
+                        className={styles.icon}
+                        style={{
+                            backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
+                            width: 10,
+                            height: 10,
+                        }}
+                    />
+                </div>
+                <p className={`${styles.label} label`} >
+                    {item.label}
+                </p>
+            </button>
+        </div>
     )
 
     render() {
-        const { className, legendItems } = this.props;
+        const { legendItems } = this.props;
+        const className = this.getClassName();
 
         return (
-            <div className={`legend ${className} ${styles.legend}`} >
+            <div className={className} >
+                {legendItems.length > 0 &&
+                    <div className={styles.header}>Layers</div>
+                }
                 {legendItems.map(item => this.renderLegendItem(item))}
             </div>
         );
