@@ -165,6 +165,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         loadingProgrammeData={loadingProgrammeData}
                         loadingSectorData={loadingSectorData}
                         loadingCountryData={loadingCountryData}
+                        loadingMunicipalities={loadingMunicipalities}
                     />
                 </div>
             </div>

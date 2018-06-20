@@ -125,6 +125,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 indicatorId: [],
                 mapLayersId: [],
                 rasterMapLayerId: [],
+                municipalitiesId: [],
             },
         };
     }

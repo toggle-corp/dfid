@@ -19,6 +19,7 @@ import {
     Sector,
     SectorData,
     SectorDatum,
+    MunicipalityDatum,
 } from '../interface';
 
 // NOTE: Use these to make sure reference don't change
@@ -37,6 +38,10 @@ const sectorIdFromPropsSelector = (
     state: RootState, props: { datum: SectorDatum },
 ) => (props.datum.id);
 
+const municipalityIdFromPropsSelector = (
+    state: RootState, props: { datum: MunicipalityDatum },
+) => (props.datum.id);
+
 export const landingOverviewDataSelector = ({ domainData }: RootState): LandingOverviewData => (
     domainData.landingOverviewData
 );
@@ -44,7 +49,6 @@ export const landingOverviewDataSelector = ({ domainData }: RootState): LandingO
 export const glossaryDataSelector = ({ domainData }: RootState): GlossaryData[] => (
     domainData.glossaryData
 );
-
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
     domainData.provinces || emptyArray
@@ -142,3 +146,14 @@ export const sectorDataSelector = createSelector(
             sectorData.id === sectorId),
         ) || emptyObject as SectorData,
 );
+
+export const municipalityDataSelector = createSelector(
+    municipalitiesSelector,
+    municipalityIdFromPropsSelector,
+    (municipalities, municipalityId) =>
+        municipalities.find(municipality => (
+            municipality.id === municipalityId),
+        ) || emptyObject as Municipality,
+);
+
+

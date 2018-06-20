@@ -1,0 +1,35 @@
+@import '../../../../stylesheets/base';
+
+.message {
+    flex-grow: 1;
+    height: auto;
+}
+
+.compare-municipality-detail-info {
+    flex-grow: 1;
+    overflow: auto;
+
+    .chart-container {
+        display: flex;
+        flex-basis: 50%;
+        flex-direction: column;
+        margin-bottom: $spacing-medium;
+        background-color: $color-foreground-alt;
+        height: 400px;
+
+        &:first-child {
+            margin-right: $spacing-medium;
+        }
+
+        .heading {
+            flex-shrink: 0;
+            padding: $spacing-small $spacing-medium;
+            color: $color-accent;
+            font-weight: $font-weight-bold;
+        }
+
+        .chart {
+            flex-grow: 1;
+        }
+    }
+}

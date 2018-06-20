@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Message from '../../../../vendor/react-store/components/View/Message';
-import Numeral from '../../../../vendor/react-store/components/View/Numeral';
 import Table, {
     Header,
 } from '../../../../vendor/react-store/components/View/Table';
@@ -11,6 +10,7 @@ import {
     compareNumber,
 } from '../../../../vendor/react-store/utils/common';
 
+import { renderPound } from '../../../../components/Renderer';
 import { dashboardProgrammesDataSelector } from '../../../../redux';
 
 import {
@@ -58,15 +58,7 @@ export class CompareProgrammeDetailInfo extends React.PureComponent<Props, State
                 order: 2,
                 sortable: true,
                 comparator: (a, b) => compareNumber(a.programBudget, b.programBudget),
-                modifier: d => (
-                    <Numeral
-                        precision={0}
-                        value={d.programBudget}
-                        lang="en"
-                        normal
-                        showSeparator
-                    />
-                ),
+                modifier: d => renderPound(d.programBudget),
             },
             {
                 key: 'description',
