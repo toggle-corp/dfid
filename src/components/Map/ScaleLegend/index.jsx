@@ -51,6 +51,7 @@ export default class Legend extends React.PureComponent {
 
         return (
             <div className={className}>
+                <div className={styles.header}>Indicator</div>
                 <div className={styles.scale} style={this.getScaleStyle()}/>
                 <div className={styles.scaleValues}>
                     <span className={styles.value}>{ minValue }</span>

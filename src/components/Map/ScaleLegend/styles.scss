@@ -3,19 +3,31 @@
 .scale-legend {
     display: flex;
     flex-direction: column;
+    border: $width-separator-thin solid $color-accent;
     background-color: $color-foreground;
-    width: 256px;
+    padding: $spacing-small 0;
+    width: 350px;
 
     .scale {
+        border-bottom: $width-separator-thin solid $color-accent;
         width: 100%;
         height: 12px;
     }
+
+    .header {
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: 0 $spacing-medium;
+        color: $color-text-label;
+        font-size: $font-size-small;
+        font-weight: 600;
+    }
+
 
     .scaleValues {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        padding: $spacing-extra-small 0;
+        padding: $spacing-small 0;
 
         span {
             margin: 0 $spacing-small;
@@ -24,6 +36,7 @@
 
             &.title {
                 text-align: center;
+                line-height: 1.1;
                 font-weight: 600;
             }
 

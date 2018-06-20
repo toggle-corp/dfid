@@ -82,25 +82,27 @@ export default class Legend extends React.PureComponent {
     }
 
     renderLegendItem = item => (
-        <button
-            key={item.label}
-            className={this.getItemClassName(item)}
-            onClick={() => this.toggleItem(item)}
-        >
-            <div className={styles.iconContainer}>
-                <span
-                    className={styles.icon}
-                    style={{
-                        backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
-                        width: 10,
-                        height: 10,
-                    }}
-                />
-            </div>
-            <p className={`${styles.label} label`} >
-                {item.label}
-            </p>
-        </button>
+        <div>
+            <button
+                key={item.label}
+                className={this.getItemClassName(item)}
+                onClick={() => this.toggleItem(item)}
+            >
+                <div className={styles.iconContainer}>
+                    <span
+                        className={styles.icon}
+                        style={{
+                            backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
+                            width: 10,
+                            height: 10,
+                        }}
+                    />
+                </div>
+                <p className={`${styles.label} label`} >
+                    {item.label}
+                </p>
+            </button>
+        </div>
     )
 
     render() {
@@ -109,6 +111,9 @@ export default class Legend extends React.PureComponent {
 
         return (
             <div className={className} >
+                {legendItems.length > 0 &&
+                    <div className={styles.header}>Layers</div>
+                }
                 {legendItems.map(item => this.renderLegendItem(item))}
             </div>
         );
