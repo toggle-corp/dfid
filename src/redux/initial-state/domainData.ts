@@ -11,6 +11,7 @@ const initialDomainDataState: DomainData = {
     },
 
     glossaryData: [],
+    exploreData: [],
     provinces: [],
     provincesData: [],
     provincesInfo: [],

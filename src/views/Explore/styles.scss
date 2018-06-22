@@ -1,17 +1,18 @@
 @import '../../stylesheets/base';
 
 .explore {
-    display: flex;
-    width: 100%;
+    padding: $spacing-medium;
     height: 100%;
 
-    .map {
-        flex-basis: 70%;
-        height: 100%;
-    }
+    .content {
+        background-color: $color-foreground;
+        padding: $spacing-medium;
+        width: 100%;
 
-    .stats {
-        display: flex;
+        .table {
+            padding: $spacing-small;
+        }
+
     }
 
 }

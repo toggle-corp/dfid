@@ -14,6 +14,7 @@ export * from './reducers/domainData/country';
 export * from './reducers/domainData/indicator';
 export * from './reducers/domainData/mapLayer';
 export * from './reducers/domainData/glossary';
+export * from './reducers/domainData/explore';
 
 // Silo Domain Data Reducers
 export * from './reducers/siloDomainData/dashboard';

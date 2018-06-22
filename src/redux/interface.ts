@@ -36,6 +36,7 @@ export interface Auth {
 export interface DomainData {
     landingOverviewData: LandingOverviewData;
     glossaryData: GlossaryData[];
+    exploreData: ExploreData[];
     provinces: Province[];
     provincesData: ProvinceData[];
     provincesInfo: ProvinceInfo[];
@@ -353,6 +354,19 @@ export interface GlossaryData {
 export interface SetGlossaryDataAction {
     glossaryData: GlossaryData[];
 }
+
+// Explore
+export interface ExploreData {
+    id: number;
+    title?: string;
+    pdf?: string;
+
+}
+
+export interface SetExploreDataAction {
+    exploreData: ExploreData[];
+}
+
 
 // Municipality
 
