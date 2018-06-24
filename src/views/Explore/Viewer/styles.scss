@@ -1,12 +1,12 @@
 @import '../../../stylesheets/base';
 
 .viewer {
-    height: calc(100vh - 4 * #{$spacing-medium} - 300px - #{$height-navbar} - 22px);
+    height: 100%;
 
     .container {
         display: flex;
         width: 100%;
-        height: calc(100vh - 4 * #{$spacing-medium} - 300px - #{$height-navbar} - 22px);
+        height: 100%;
     }
 
 
@@ -15,6 +15,5 @@
 .message {
     border: $width-separator-thin solid $color-separator;
     background-color: $color-foreground-alt;
-    height: calc(100vh - 4 * #{$spacing-medium} - 300px - #{$height-navbar} - 22px);
 }
 

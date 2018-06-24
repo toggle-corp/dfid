@@ -135,9 +135,11 @@ export class Explore extends React.PureComponent<Props, State> {
                          onBodyClick={this.handleTableClick}
                          highlightRowKey={activeRowKey}
                     />
+                    </div>
                 </div>
-                <Viewer />
-            </div>
+                <div className={styles.viewer}>
+                    <Viewer />
+                </div>
             </div>
         );
     }

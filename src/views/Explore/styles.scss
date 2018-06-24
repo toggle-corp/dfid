@@ -1,17 +1,17 @@
 @import '../../stylesheets/base';
 
 .explore {
+    display: flex;
     padding: $spacing-medium;
     height: 100%;
 
     .content {
+        flex-basis: 40%;
         background-color: $color-foreground;
         padding: $spacing-medium;
-        width: 100%;
         height: calc(100vh - #{$height-navbar} - 2 * #{$spacing-medium});
 
         .table {
-            height: 300px;
             overflow-y: auto;
 
             .link {
@@ -38,6 +38,10 @@
 
         }
 
+    }
+
+    .viewer {
+        flex-basis: 60%;
     }
 
 }
