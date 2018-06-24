@@ -19,3 +19,4 @@ export * from './reducers/domainData/explore';
 // Silo Domain Data Reducers
 export * from './reducers/siloDomainData/dashboard';
 export * from './reducers/siloDomainData/geoJson';
+export * from './reducers/siloDomainData/explore';

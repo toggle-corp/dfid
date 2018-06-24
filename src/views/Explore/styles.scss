@@ -8,9 +8,34 @@
         background-color: $color-foreground;
         padding: $spacing-medium;
         width: 100%;
+        height: calc(100vh - #{$height-navbar} - 2 * #{$spacing-medium});
 
         .table {
-            padding: $spacing-small;
+            height: 300px;
+            overflow-y: auto;
+
+            .link {
+                text-transform: lowercase;
+                color: $color-primary;
+            }
+
+            :global {
+                .row {
+                    &.highlighted {
+                        @include background-color($color-accent);
+
+                        .link {
+                            color: inherit;
+                        }
+                    }
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+
+            }
+
         }
 
     }

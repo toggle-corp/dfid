@@ -54,6 +54,7 @@ export interface DomainData {
 export interface SiloDomainData {
     dashboard: Dashboard;
     geoJsons: GeoJSONS;
+    explore: Explore;
 }
 
 export interface Notify {
@@ -363,10 +364,17 @@ export interface ExploreData {
 
 }
 
+export interface Explore {
+    selectedExplore?: number;
+}
+
 export interface SetExploreDataAction {
     exploreData: ExploreData[];
 }
 
+export interface SetSelectedExploreAction {
+    exploreId: number | string;
+}
 
 // Municipality
 

@@ -52,7 +52,7 @@ export const glossaryDataSelector = ({ domainData }: RootState): GlossaryData[] 
 );
 
 export const exploreDataSelector = ({ domainData }: RootState): ExploreData[] => (
-    domainData.exploreData
+    domainData.exploreData || emptyArray
 );
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (
