@@ -28,7 +28,7 @@ export class Viewer extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = { loadingIframe: false };
+        this.state = { loadingIframe: true };
     }
 
     componentWillReceiveProps(nextProps: Props) {

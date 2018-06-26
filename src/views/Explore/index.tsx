@@ -16,6 +16,7 @@ import {
 
 import {
     exploreDataSelector,
+    selectedExploreDataSelector,
     setExploreDataAction,
     setSelectedExploreAction,
 } from '../../redux';
@@ -30,6 +31,7 @@ interface OwnProps {
 }
 interface PropsFromState {
     exploreData: ExploreData[];
+    selectedExploreData?: ExploreData;
 }
 
 interface PropsFromDispatch {
@@ -40,7 +42,6 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State {
     loadingExploreData: boolean;
-    activeRowKey?: number | string; 
 }
 
 export class Explore extends React.PureComponent<Props, State> {
@@ -52,7 +53,6 @@ export class Explore extends React.PureComponent<Props, State> {
 
         this.state = {
             loadingExploreData: true,
-            activeRowKey: undefined,
         };
         this.headers = [
             {
@@ -111,16 +111,19 @@ export class Explore extends React.PureComponent<Props, State> {
         this.props.setSelectedExplore({
             exploreId: rowKey,
         });
-        this.setState({ activeRowKey: rowKey });
     }
 
     keyExtractor = (item: ExploreData) => item.id;
 
     render() {
-
         const { loadingExploreData } = this.state;
-        const { exploreData } = this.props;
-        const { activeRowKey } = this.state;
+        const {
+            exploreData,
+            selectedExploreData,
+        } = this.props;
+
+        const activeExploreId = selectedExploreData ?
+            selectedExploreData.id : undefined;
 
         return (
             <div className={styles.explore}>
@@ -133,7 +136,7 @@ export class Explore extends React.PureComponent<Props, State> {
                          headers={this.headers}
                          keyExtractor={this.keyExtractor}
                          onBodyClick={this.handleTableClick}
-                         highlightRowKey={activeRowKey}
+                         highlightRowKey={activeExploreId}
                     />
                     </div>
                 </div>
@@ -147,6 +150,7 @@ export class Explore extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => ({
     exploreData: exploreDataSelector(state),
+    selectedExploreData: selectedExploreDataSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
