@@ -12,8 +12,11 @@ import {
     pathNames,
     validLinks,
     hideNavbar,
+    extendedNavbar,
 } from '../../constants';
 import { CloakSettings } from '../../constants/routes/interface';
+
+import logo from '../../resources/img/logo.png';
 
 import NavMenu from './NavMenu';
 // import NavDrop from './NavDrop';
@@ -111,25 +114,41 @@ class Navbar extends React.PureComponent<Props, State> {
         const {
             className,
         } = this.props;
+        const navClassNames = [className];
+        const menuClassNames = [styles.mainMenu];
+        const extended = extendedNavbar[this.currentPath];
 
         // Hide navbar
         if (hideNavbar[this.currentPath]) {
             return <span className="no-nav" />;
         }
 
+        if (extended) {
+            navClassNames.push(styles.extended);
+            menuClassNames.push(styles.extendedMenu);
+        }
+
         return (
-            <nav className={`${styles.navbar} ${className}`}>
+            <nav className={`${styles.navbar} ${navClassNames.join(' ')}`}>
                 <Link
                     to={reverseRoute(pathNames.landing, {})}
                     className={styles.brand}
                 >
-                    <div className={styles.brand}>
-                        DFID Nepal
-                    </div>
+                    {
+                    extended ?
+                            <img
+                                className={styles.logo}
+                                src={logo}
+                            />
+                        :
+                            <div className={styles.brand}>
+                                DFID Nepal
+                            </div>
+                    }
                 </Link>
                 <NavMenu
                     links={this.validNavLinks}
-                    className={styles.mainMenu}
+                    className={menuClassNames.join(' ')}
                 />
                 {/*
                 <NavDrop

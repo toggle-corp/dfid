@@ -4,61 +4,6 @@ $width-body-max: 1200px;
 $height-logo: 96px;
 
 .landing {
-    .header {
-        border-bottom: $width-separator-thin solid $color-separator;
-        background-color: $color-foreground;
-
-        .content {
-            display: flex;
-            position: relative;
-            justify-content: space-between;
-            margin: auto;
-            max-width: $width-body-max;
-        }
-
-        .logo {
-            display: block;
-            padding: $spacing-medium;
-            height: $height-logo;
-            object-fit: contain;
-            object-position: left center;
-        }
-
-        %abs {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .background {
-            @extend %abs;
-            z-index: -2;
-            object-fit: cover;
-            object-position: center center;
-        }
-
-        .backdrop {
-            @extend %abs;
-            opacity: .8;
-            z-index: -1;
-            background-color: $color-foreground;
-        }
-
-        .menu {
-            align-self: flex-end;
-
-            .link {
-                display: inline-block;
-                padding: $spacing-medium;
-                color: $color-primary;
-                font-weight: $font-weight-bold;
-            }
-        }
-    }
-
     .body {
         margin: auto;
         max-width: $width-body-max;

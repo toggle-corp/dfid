@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
@@ -11,7 +11,6 @@ import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import { pathNames } from '../../constants';
 import { colorScheme } from '../../config/theme';
-import logo from '../../resources/img/logo.png';
 // import backgroundImage from '../../resources/img/background2.png';
 
 import {
@@ -49,18 +48,6 @@ interface State {
     redirectTo?: string;
     loadingProvincesInfo: boolean;
 }
-
-export const routeToDashboard = {
-    pathname: reverseRoute(pathNames.dashboard),
-};
-
-export const routeToExplore = {
-    pathname: reverseRoute(pathNames.dashboard),
-};
-
-export const routeToGlossary = {
-    pathname: reverseRoute(pathNames.glossary),
-};
 
 const provinceDataLabelAccessor = (d: ProvinceInfo) => d.name;
 
@@ -143,34 +130,6 @@ export class Landing extends React.PureComponent<Props, State> {
 
         return (
             <div className={styles.landing}>
-                <div className={styles.header}>
-                    <div className={styles.content}>
-                        <img
-                            className={styles.logo}
-                            src={logo}
-                        />
-                        <div className={styles.menu}>
-                            <Link
-                                className={styles.link}
-                                to={routeToDashboard}
-                            >
-                                Dashboard
-                            </Link>
-                            <Link
-                                className={styles.link}
-                                to={routeToExplore}
-                            >
-                                Explore
-                            </Link>
-                            <Link
-                                className={styles.link}
-                                to={routeToGlossary}
-                            >
-                                  Glossary
-                            </Link>
-                        </div>
-                    </div>
-                </div>
                 <div className={styles.body}>
                     <div className={styles.mapSection}>
                         <ProvinceMap
