@@ -11,6 +11,7 @@ import country from './country';
 import indicator from './indicator';
 import glossary from './glossary';
 import mapLayer from './mapLayer';
+import explore from './explore';
 
 import initialDomainData from '../../initial-state/domainData';
 
@@ -22,6 +23,7 @@ const domainDataReducer: ReducerGroup<DomainData> = {
     ...indicator,
     ...mapLayer,
     ...glossary,
+    ...explore,
 };
 
 export default createReducerWithMap(domainDataReducer, initialDomainData);

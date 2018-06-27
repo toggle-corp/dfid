@@ -36,6 +36,7 @@ export interface Auth {
 export interface DomainData {
     landingOverviewData: LandingOverviewData;
     glossaryData: GlossaryData[];
+    exploreData: ExploreData[];
     provinces: Province[];
     provincesData: ProvinceData[];
     provincesInfo: ProvinceInfo[];
@@ -53,6 +54,7 @@ export interface DomainData {
 export interface SiloDomainData {
     dashboard: Dashboard;
     geoJsons: GeoJSONS;
+    explore: Explore;
 }
 
 export interface Notify {
@@ -352,6 +354,26 @@ export interface GlossaryData {
 
 export interface SetGlossaryDataAction {
     glossaryData: GlossaryData[];
+}
+
+// Explore
+export interface ExploreData {
+    id: number;
+    title?: string;
+    pdf?: string;
+
+}
+
+export interface Explore {
+    selectedExplore?: number;
+}
+
+export interface SetExploreDataAction {
+    exploreData: ExploreData[];
+}
+
+export interface SetSelectedExploreAction {
+    exploreId: number | string;
 }
 
 // Municipality

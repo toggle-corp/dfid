@@ -37,6 +37,11 @@ const initialSiloDomainData: SiloDomainData = {
         },
     },
     geoJsons: {},
+    explore: {
+        /*
+         selectedExplore: 1,
+         */
+    },
 };
 
 export default initialSiloDomainData;

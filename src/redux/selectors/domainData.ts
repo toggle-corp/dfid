@@ -6,6 +6,7 @@ import {
     IndicatorData,
     LandingOverviewData,
     GlossaryData,
+    ExploreData,
     MapLayer,
     Municipality,
     Programme,
@@ -48,6 +49,10 @@ export const landingOverviewDataSelector = ({ domainData }: RootState): LandingO
 
 export const glossaryDataSelector = ({ domainData }: RootState): GlossaryData[] => (
     domainData.glossaryData
+);
+
+export const exploreDataSelector = ({ domainData }: RootState): ExploreData[] => (
+    domainData.exploreData || emptyArray
 );
 
 export const provincesSelector = ({ domainData }: RootState): Province[] => (

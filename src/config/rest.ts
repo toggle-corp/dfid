@@ -3,7 +3,7 @@ import { RestHeader, RestAuthorizationHeader } from '../rest/interface';
 
 // Just an alias for prepareQueryParams
 export interface UrlParams {
-    [key: string]: (string | number | (string | number)[]);
+    [key: string]: (boolean | string | number | (string | number | boolean)[]);
 }
 
 export const p: {

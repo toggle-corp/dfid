@@ -2,16 +2,46 @@
 
 .explore {
     display: flex;
-    width: 100%;
+    padding: $spacing-medium;
     height: 100%;
 
-    .map {
-        flex-basis: 70%;
-        height: 100%;
+    .content {
+        flex-basis: 40%;
+        background-color: $color-foreground;
+        padding: $spacing-medium;
+        height: calc(100vh - #{$height-navbar} - 2 * #{$spacing-medium});
+
+        .table {
+            overflow-y: auto;
+
+            .link {
+                text-transform: lowercase;
+                color: $color-primary;
+            }
+
+            :global {
+                .row {
+                    &.highlighted {
+                        @include background-color($color-accent);
+
+                        .link {
+                            color: inherit;
+                        }
+                    }
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+
+            }
+
+        }
+
     }
 
-    .stats {
-        display: flex;
+    .viewer {
+        flex-basis: 60%;
     }
 
 }

@@ -13,6 +13,7 @@ import {
     ProvinceData,
     RootState,
     Sector,
+    Explore,
 } from '../interface';
 
 import {
@@ -24,7 +25,8 @@ import {
     indicatorsDataSelector,
     mapLayersSelector,
     municipalitiesSelector,
-} from './domainData';
+    exploreDataSelector,
+} from '../../redux';
 
 // NOTE: Use these to make sure reference don't change
 const emptyArray: any[] = [];
@@ -41,6 +43,10 @@ export const dashboardSelector = ({ siloDomainData }: RootState): Dashboard => (
 
 export const geoJsonsSelector = ({ siloDomainData }: RootState): GeoJSONS => (
     siloDomainData.geoJsons || emptyObject
+);
+
+export const exploreSelector = ({ siloDomainData }: RootState): Explore => (
+    siloDomainData.explore || emptyObject
 );
 
 // Dashboard
@@ -202,3 +208,12 @@ export const dashboardRequestManagerLoadingSelector = createSelector(
     dashboard => dashboard.loadings || emptyObject as DashboardRequestManagerLoadings,
 );
 
+// Explore
+
+export const selectedExploreDataSelector = createSelector(
+    exploreDataSelector,
+    exploreSelector,
+    (exploreData, { selectedExplore }) => exploreData.find(
+        explore => explore.id === selectedExplore,
+    ),
+);
