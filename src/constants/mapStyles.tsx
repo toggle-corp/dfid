@@ -21,6 +21,11 @@ const mapStyles = {
         stroke: '#795548',
         strokeOpacity: 0.3,
         strokeWidget: 0.1,
+
+        color: '#7fcdbb',
+        opacity: 0.6,
+        hoverColor: '#d9f0a3',
+        hoverOpacity: 0.8,
     },
 
     indicator: {

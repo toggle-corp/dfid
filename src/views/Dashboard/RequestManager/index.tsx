@@ -83,7 +83,8 @@ import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 
 interface OwnProps {
     layersInfo: Dictionary<MapLayerProps>;
-    handleMapClick(key: string): void;
+    handleProvinceClick(key: string): void;
+    handleMunicipalityClick(key: string, name: string): void;
     setLayersInfo(settings: object): void;
     loading: boolean;
 }
@@ -498,6 +499,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadProvince = (props: Props) => {
+        const { selectedProvinces } = props;
+        const provinceIds = selectedProvinces.map(p => p.id);
+
         const selections = [{
             style: this.getProvincesStyle(props),
             types: ['Polygon'],
@@ -515,7 +519,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
             idKey: 'Province',
             integerId: true,
             labelKey: 'Province',
-            onClick: this.props.handleMapClick,
+            onClick: { fill: props.handleProvinceClick },
+            visibleCondition: {
+                fill: ['!in', 'Province', ...provinceIds],
+            },
         }];
 
         this.reloadSelectionToLayers({
@@ -525,12 +532,30 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadMunicipalities = (props: Props) => {
+        const { selectedProvinces } = props;
+        const provinceIds = selectedProvinces.map(p => String(p.id));
+
         const selections = [{
             id: 'municipalities',
             file: urlForMunicipalitiesGeoJson,
             order: 3,
-            types: ['Line'],
+            types: ['Line', 'Polygon'],
             style: mapStyles.municipalities,
+            handleHover: true,
+            idKey: 'HLCIT_CODE',
+            labelKey: 'LU_Name',
+
+            onClick: { fill: props.handleMunicipalityClick },
+
+            visibleCondition: {
+                fill: ['in', 'STATE', ...provinceIds],
+            },
+
+            tooltipSelector: (properties: any) => {
+                const label = properties.LU_Name;
+                // TODO: create HTML with other info necessary such as spend data
+                return label;
+            },
         }];
 
         this.reloadSelectionToLayers({
@@ -560,7 +585,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             overrides: {
                 idKey: 'id',
                 style: { color: getHexFromString('ipssj') },
-                visibleCondition: ['!=', 'Act_level', ''],
+                visibleCondition: {
+                    fill: ['!=', 'Act_level', ''],
+                },
                 url: urlForIpssjGeoJson,
                 order: 9,
             },

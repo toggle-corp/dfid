@@ -110,9 +110,14 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
     }
 
-    handleMapClick = (key: string) => {
+    handleProvinceClick = (key: string) => {
         const { toggleDashboardProvince } = this.props;
         toggleDashboardProvince(parseInt(key, 10));
+    }
+
+    handleMunicipalityClick = (key: string, name: string) => {
+        // TODO: Select municipality
+        console.warn(key, name);
     }
 
     renderMapChildren = () => {
@@ -174,7 +179,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return (
             <div className={styles.dashboard}>
                 <RequestManager
-                    handleMapClick={this.handleMapClick}
+                    handleProvinceClick={this.handleProvinceClick}
+                    handleMunicipalityClick={this.handleMunicipalityClick}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
                     loading={!!loading}
