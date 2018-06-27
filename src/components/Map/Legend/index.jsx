@@ -82,9 +82,8 @@ export default class Legend extends React.PureComponent {
     }
 
     renderLegendItem = item => (
-        <div>
+        <div key={item.label}>
             <button
-                key={item.label}
                 className={this.getItemClassName(item)}
                 onClick={() => this.toggleItem(item)}
             >

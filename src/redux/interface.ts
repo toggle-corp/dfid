@@ -394,7 +394,7 @@ export interface MunicipalityProgramme {
     programId: number;
     program: string;
     partners: MunicipalityPartner[];
-    programBudge: number;
+    programBudget: number;
     totalNoOfPartner: number;
 }
 

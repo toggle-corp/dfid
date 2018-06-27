@@ -3,8 +3,8 @@ const mapStyles = {
         stroke: '#444',
         strokeWidth: 1,
 
-        color: '#7fcdbb',
-        opacity: 0.6,
+        color: '#fff',
+        opacity: 0,
 
         hoverColor: '#d9f0a3',
         hoverOpacity: 0.8,
@@ -24,6 +24,11 @@ const mapStyles = {
 
         color: '#7fcdbb',
         opacity: 0.6,
+    },
+
+    municipalitiesHover: {
+        color: '#fff',
+        opacity: 0,
         hoverColor: '#d9f0a3',
         hoverOpacity: 0.8,
     },

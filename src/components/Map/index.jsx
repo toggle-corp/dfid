@@ -185,10 +185,12 @@ export default class Map extends React.PureComponent {
             >
                 <MapLayers />
                 <div className={styles.panels}>
-                    <Legend
-                        className={styles.legend}
-                        legendItems={this.legendItems}
-                    />
+                    {this.legendItems.length > 0 && (
+                        <Legend
+                            className={styles.legend}
+                            legendItems={this.legendItems}
+                        />
+                    )}
                     { children }
                 </div>
             </div>

@@ -40,6 +40,7 @@ import {
     geoJsonsSelector,
     dashboardIndicatorSelector,
     provincesSelector,
+    municipalitiesSelector,
     setMunicipalitiesAction,
 } from '../../../redux';
 
@@ -57,7 +58,9 @@ import {
     SetRequestManagerLoadingAction,
     DashboardFilter,
     Province,
+    Municipality,
     Programme,
+    MunicipalityProgramme,
     Sector,
     MapLayer,
     GeoJSON,
@@ -98,6 +101,7 @@ interface PropsFromState {
     geoJsons: GeoJSONS;
     selectedIndicator?: IndicatorData;
     provinces: Province[];
+    municipalities: Municipality[];
 }
 interface PropsFromDispatch {
     setCountriesData(params: SetCountriesDataAction): void;
@@ -118,6 +122,8 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State { }
+
+const emptyList: any[] = [];
 
 export class RequestManager extends React.PureComponent<Props, State>{
     geoJsonRequestCoordinator: Coordinator;
@@ -186,11 +192,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 this.reloadRasterMapLayer(nextProps);
             }
             if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
-                this.props.selectedIndicator !== nextProps.selectedIndicator) {
+                this.props.selectedIndicator !== nextProps.selectedIndicator ||
+                this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
                 this.reloadProvince(nextProps);
                 this.reloadMunicipalities(nextProps);
-            }
-            if (this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
                 this.reloadProgramLayer(nextProps);
             }
             if (this.props.selectedMapLayers !== nextProps.selectedMapLayers) {
@@ -251,6 +256,46 @@ export class RequestManager extends React.PureComponent<Props, State>{
             });
         }
 
+        return styles;
+    }
+
+    getMunicipalityStyle = (props: Props) => {
+        const {
+            selectedProgrammes,
+            municipalities,
+        } = props;
+        const styles = {};
+
+        if (selectedProgrammes.length === 0) {
+            municipalities.forEach((municipality) => {
+                styles[municipality.hlcitCode] = mapStyles.municipalities;
+            });
+            return styles;
+        }
+
+        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
+
+        const budgets = {};
+        municipalities.forEach((municipality) => {
+            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
+                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
+            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
+        });
+
+        const budgetList: number[] = Object.values(budgets);
+        const minValue = Math.min(...budgetList);
+        const maxValue = Math.max(...budgetList);
+
+        municipalities.forEach((municipality) => {
+            const value = budgets[municipality.hlcitCode];
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            const fractionWithOffset = fraction * (0.85 - offset) + offset;
+            styles[municipality.hlcitCode] = {
+                ...mapStyles.municipalities,
+                opacity: fractionWithOffset,
+            };
+        });
         return styles;
     }
 
@@ -535,28 +580,40 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const { selectedProvinces } = props;
         const provinceIds = selectedProvinces.map(p => String(p.id));
 
-        const selections = [{
-            id: 'municipalities',
-            file: urlForMunicipalitiesGeoJson,
-            order: 3,
-            types: ['Line', 'Polygon'],
-            style: mapStyles.municipalities,
-            handleHover: true,
-            idKey: 'HLCIT_CODE',
-            labelKey: 'LU_Name',
-
-            onClick: { fill: props.handleMunicipalityClick },
-
-            visibleCondition: {
-                fill: ['in', 'STATE', ...provinceIds],
+        const selections = [
+            {
+                id: 'municipalities',
+                file: urlForMunicipalitiesGeoJson,
+                order: 0,
+                types: ['Line', 'Polygon'],
+                style: this.getMunicipalityStyle(props),
+                idKey: 'HLCIT_CODE',
+                labelKey: 'LU_Name',
+                stylePerElement: true,
             },
+            {
+                id: 'municipalities-hover',
+                file: urlForMunicipalitiesGeoJson,
+                order: 3,
+                types: ['Polygon'],
+                style: mapStyles.municipalitiesHover,
+                handleHover: true,
+                idKey: 'HLCIT_CODE',
+                labelKey: 'LU_Name',
 
-            tooltipSelector: (properties: any) => {
-                const label = properties.LU_Name;
-                // TODO: create HTML with other info necessary such as spend data
-                return label;
+                onClick: { fill: props.handleMunicipalityClick },
+
+                visibleCondition: {
+                    fill: ['in', 'STATE', ...provinceIds],
+                },
+
+                tooltipSelector: (properties: any) => {
+                    const label = properties.LU_Name;
+                    // TODO: create HTML with other info necessary such as spend data
+                    return label;
+                },
             },
-        }];
+        ];
 
         this.reloadSelectionToLayers({
             keyPrefix: 'municipality',
@@ -660,6 +717,7 @@ const mapStateToProps = (state: RootState) => ({
     geoJsons: geoJsonsSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
     provinces: provincesSelector(state),
+    municipalities: municipalitiesSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({

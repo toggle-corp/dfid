@@ -5,6 +5,7 @@ import styles from './styles.scss';
 const propTypes = {
     className: PropTypes.string,
     title: PropTypes.string.isRequired,
+    subTitle: PropTypes.string,
     minValue: PropTypes.string.isRequired,
     maxValue: PropTypes.string.isRequired,
     minColor: PropTypes.string.isRequired,
@@ -13,6 +14,7 @@ const propTypes = {
 
 const defaultProps = {
     className: '',
+    subTitle: '',
 };
 
 export default class Legend extends React.PureComponent {
@@ -45,17 +47,18 @@ export default class Legend extends React.PureComponent {
         const className = this.getClassName();
         const {
             title,
+            subTitle,
             minValue,
             maxValue,
         } = this.props;
 
         return (
             <div className={className}>
-                <div className={styles.header}>Indicator</div>
+                <div className={styles.header}>{ title }</div>
                 <div className={styles.scale} style={this.getScaleStyle()}/>
                 <div className={styles.scaleValues}>
                     <span className={styles.value}>{ minValue }</span>
-                    <span className={styles.title}>{ title }</span>
+                    <span className={styles.title}>{ subTitle }</span>
                     <span className={styles.value}>{ maxValue }</span>
                 </div>
             </div>

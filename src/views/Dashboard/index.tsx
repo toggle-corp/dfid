@@ -25,6 +25,7 @@ import {
     dashboardMapLayersSelector,
     dashboardIndicatorSelector,
     dashboardRequestManagerLoadingSelector,
+    municipalitiesSelector,
     geoJsonsSelector,
     setRequestManagerLoadingAction,
 } from '../../redux';
@@ -36,6 +37,8 @@ import {
     MapLayer,
     IndicatorData,
     MapLayerProps,
+    Municipality,
+    MunicipalityProgramme,
     Programme,
     Province,
     RootState,
@@ -68,6 +71,7 @@ interface PropsFromState {
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
     selectedIndicator?: IndicatorData;
+    municipalities: Municipality[];
     requestManagerLoadings: DashboardRequestManagerLoadings;
     geoJsons: GeoJSONS;
 }
@@ -90,6 +94,8 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps
 interface State {
     layersInfo: Dictionary<MapLayerProps>;
 }
+
+const emptyList: any[] = [];
 
 export class Dashboard extends React.PureComponent<Props, State>{
 
@@ -120,7 +126,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         console.warn(key, name);
     }
 
-    renderMapChildren = () => {
+    renderIndicatorLegend = () => {
         const { selectedIndicator } = this.props;
         if (!selectedIndicator) {
             return null;
@@ -145,10 +151,60 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 maxValue={String(maxValue)}
                 minColor={minColor}
                 maxColor={maxColor}
-                title={selectedIndicator.name}
+                title="Indicator"
+                subTitle={selectedIndicator.name}
             />
         );
     }
+
+    renderProgramLegend = () => {
+        const { selectedProgrammes, municipalities } = this.props;
+        if (selectedProgrammes.length === 0) {
+            return null;
+        }
+
+        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
+        const budgets = {};
+        municipalities.forEach((municipality) => {
+            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
+                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
+            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
+        });
+
+        const budgetList: number[] = Object.values(budgets);
+        const minValue = Math.min(...budgetList);
+        const maxValue = Math.max(...budgetList);
+
+        const calcOpacity = (value: number) => {
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            return fraction * (0.85 - offset) + offset;
+        };
+
+        const { r, g, b } = getRgbFromHex(mapStyles.indicator.color);
+        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
+        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
+
+        console.warn(minColor, maxColor);
+
+        return (
+            <ScaleLegend
+                className={styles.scaleLegend}
+                minValue={String(minValue)}
+                maxValue={String(maxValue)}
+                minColor={minColor}
+                maxColor={maxColor}
+                title="Total budget (for selected programmes)"
+            />
+        );
+    }
+
+    renderMapChildren = () => (
+        <React.Fragment>
+            {this.renderIndicatorLegend()}
+            {this.renderProgramLegend()}
+        </React.Fragment>
+    )
 
     render() {
         const { layersInfo } = this.state;
@@ -223,6 +279,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
+    municipalities: municipalitiesSelector(state),
     requestManagerLoadings: dashboardRequestManagerLoadingSelector(state),
     geoJsons: geoJsonsSelector(state),
 });
