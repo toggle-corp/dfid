@@ -33,6 +33,7 @@ import {
     resetRequestManagerLoadingAction,
     dashboardFilterPaneSelector,
     dashboardProvincesSelector,
+    dashboardMunicipalitiesSelector,
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
@@ -87,13 +88,14 @@ import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 interface OwnProps {
     layersInfo: Dictionary<MapLayerProps>;
     handleProvinceClick(key: string): void;
-    handleMunicipalityClick(key: string, name: string): void;
+    handleMunicipalityClick(key: string): void;
     setLayersInfo(settings: object): void;
     loading: boolean;
 }
 interface PropsFromState {
     faramState: DashboardFilter;
     selectedProvinces: Province[];
+    selectedMunicipalities: Municipality[];
     selectedProgrammes: Programme[];
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
@@ -124,6 +126,7 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 interface State { }
 
 const emptyList: any[] = [];
+const emptyObject: any = {};
 
 export class RequestManager extends React.PureComponent<Props, State>{
     geoJsonRequestCoordinator: Coordinator;
@@ -262,13 +265,22 @@ export class RequestManager extends React.PureComponent<Props, State>{
     getMunicipalityStyle = (props: Props) => {
         const {
             selectedProgrammes,
+            selectedMunicipalities,
             municipalities,
         } = props;
         const styles = {};
+        const selectedStyles = {};
+
+        selectedMunicipalities.forEach((municipality) => {
+            selectedStyles[municipality.hlcitCode] = mapStyles.municipalitiesSelected;
+        });
 
         if (selectedProgrammes.length === 0) {
             municipalities.forEach((municipality) => {
-                styles[municipality.hlcitCode] = mapStyles.municipalities;
+                styles[municipality.hlcitCode] = {
+                    ...mapStyles.municipalities,
+                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
+                };
             });
             return styles;
         }
@@ -291,8 +303,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
             const fraction = (value - minValue) / (maxValue - minValue);
             const offset = 0.25;
             const fractionWithOffset = fraction * (0.85 - offset) + offset;
+
             styles[municipality.hlcitCode] = {
                 ...mapStyles.municipalities,
+                ...(selectedStyles[municipality.hlcitCode] || emptyObject),
                 opacity: fractionWithOffset,
             };
         });
@@ -710,6 +724,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
 const mapStateToProps = (state: RootState) => ({
     faramState: dashboardFilterPaneSelector(state),
     selectedProvinces: dashboardProvincesSelector(state),
+    selectedMunicipalities: dashboardMunicipalitiesSelector(state),
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),

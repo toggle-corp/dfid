@@ -121,9 +121,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
         toggleDashboardProvince(parseInt(key, 10));
     }
 
-    handleMunicipalityClick = (key: string, name: string) => {
-        // TODO: Select municipality
-        console.warn(key, name);
+    handleMunicipalityClick = (key: string) => {
+        console.warn(key);
     }
 
     renderIndicatorLegend = () => {

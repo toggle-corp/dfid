@@ -20,7 +20,6 @@ const mapStyles = {
     municipalities: {
         stroke: '#795548',
         strokeOpacity: 0.3,
-        strokeWidget: 0.1,
 
         color: '#7fcdbb',
         opacity: 0.6,
@@ -31,6 +30,12 @@ const mapStyles = {
         opacity: 0,
         hoverColor: '#d9f0a3',
         hoverOpacity: 0.8,
+    },
+
+    municipalitiesSelected: {
+        stroke: '#225ea8',
+        strokeWidth: 1.5,
+        strokeOpacity: 1,
     },
 
     indicator: {
