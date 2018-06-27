@@ -1,11 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import {
-    routeToDashboard,
-    routeToGlossary,
-    routeToExplore,
-} from '../index';
+import { reverseRoute } from '../../../vendor/react-store/utils/common';
+import { pathNames } from '../../../constants';
+
+export const routeToDashboard = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
+export const routeToExplore = {
+    pathname: reverseRoute(pathNames.dashboard),
+};
+
+export const routeToGlossary = {
+    pathname: reverseRoute(pathNames.glossary),
+};
 
 import * as styles from '../styles.scss';
 

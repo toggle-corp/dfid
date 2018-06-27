@@ -14,6 +14,7 @@ export interface RouteSetting {
     path: string | undefined;
     links: Map<CloakSettings>;
     hideNavbar?: boolean;
+    extendedNavbar?: boolean;
 }
 
 export interface CloakSettings {

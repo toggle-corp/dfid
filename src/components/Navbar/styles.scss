@@ -2,6 +2,7 @@
 
 $color-text-on-navbar: $color-primary;
 $color-text-on-primary: get-text-color($color-primary);
+$height-logo: 96px;
 
 .navbar {
     @include background-color($color-navbar);
@@ -10,6 +11,10 @@ $color-text-on-primary: get-text-color($color-primary);
     justify-content: space-between;
     box-shadow: 0 $spacing-extra-small $spacing-small (-$spacing-extra-small) $color-shadow-medium;
     padding: 0 $spacing-medium;
+
+    &.extended {
+        height: $height-logo;
+    }
 
     .dropdown-title {
         align-self: stretch;
@@ -22,6 +27,14 @@ $color-text-on-primary: get-text-color($color-primary);
         align-self: stretch;
         color: $color-text-on-navbar;
         font-size: $font-size-super-large;
+
+        .logo {
+            display: block;
+            padding: $spacing-medium;
+            height: $height-logo;
+            object-fit: contain;
+            object-position: left center;
+        }
 
         .icon-wrapper {
             margin-right: $spacing-small;
@@ -44,6 +57,17 @@ $color-text-on-primary: get-text-color($color-primary);
         align-self: stretch;
         flex-grow: 1;
         justify-content: center;
+
+        &.extended-menu {
+            align-self: flex-end;
+
+            .link {
+                display: inline-block;
+                padding: $spacing-medium;
+                color: $color-primary;
+                font-weight: $font-weight-bold;
+            }
+        }
 
         >button {
             padding: $spacing-small;

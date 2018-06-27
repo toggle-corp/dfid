@@ -12,7 +12,7 @@ export const routes: Map<RouteSetting> = {
         path: '/',
         loader: () => import('../../views/Landing'),
         links: allLinks,
-        hideNavbar: true,
+        extendedNavbar: true,
     },
 
     dashboard: {
@@ -82,4 +82,9 @@ export const validLinks = mapObjectToObject<RouteSetting, CloakSettings>(
 export const hideNavbar = mapObjectToObject<RouteSetting, boolean>(
     routes,
     route => !!route.hideNavbar,
+);
+
+export const extendedNavbar = mapObjectToObject<RouteSetting, boolean>(
+    routes,
+    route => !!route.extendedNavbar,
 );
