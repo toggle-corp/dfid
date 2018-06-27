@@ -111,6 +111,19 @@ const renderLayerEmpty = () => (
     </div>
 );
 
+const programmeHaveSectors = (programme: Programme, sectorsId?: number[]) => {
+    if (!sectorsId || !sectorsId.length) {
+        return false;
+    }
+    const { sectors } = programme;
+
+    return sectors.findIndex(
+        sector => sectorsId.findIndex(
+            sectorId => sectorId === sector.sectorId,
+        ) !== -1,
+    ) !== -1;
+};
+
 export class FilterPane extends React.PureComponent<Props, State>{
     schema: Schema;
 
@@ -143,6 +156,22 @@ export class FilterPane extends React.PureComponent<Props, State>{
     handleFaramChange = (
         faramValues: DashboardFilterParams, faramErrors: FaramErrors,
     ) => {
+        const { programmes, faramState } = this.props;
+        const { sectorsId: oldSectorsId } = faramState.faramValues;
+        const { sectorsId } = faramValues;
+
+        if (sectorsId !== oldSectorsId) {
+            faramValues.programmesId = programmes.reduce(
+                (acc, programme) => {
+                    if (programmeHaveSectors(programme, sectorsId)) {
+                        acc.push(programme.id);
+                    }
+                    return acc;
+                },
+                [] as number[],
+            );
+        }
+
         this.props.setDashboardFilters({
             faramValues,
             faramErrors,

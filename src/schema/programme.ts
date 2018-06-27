@@ -3,6 +3,18 @@ import { SchemaGroup } from './interface';
 const programmesSchema: SchemaGroup = [];
 
 {
+    const name = 'programmeSectorId';
+    const schema = {
+        doc: {
+            name: 'SectorId for Programme',
+        },
+        fields: {
+            sectorId: { type: 'uint', required: true },
+        },
+    };
+    programmesSchema.push({ name, schema });
+}
+{
     const name = 'programme';
     const schema = {
         doc: {
@@ -12,6 +24,7 @@ const programmesSchema: SchemaGroup = [];
             id: { type: 'uint', required: true },
             name: { type: 'string', required: true },
             description: { type: 'string' },
+            sectors: { type: 'array.programmeSectorId', required: true },
         },
     };
     programmesSchema.push({ name, schema });
