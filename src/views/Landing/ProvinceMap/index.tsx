@@ -132,9 +132,9 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
                         data: geoJson,
                     });
 
-                    const stops = colorScheme.map((val, i) => [(i + 1), val]);
+                    const stops = colorScheme.map((val, i) => [(colorScheme.length - i), val]);
                     const textStops = colorScheme.map(
-                        (val, i) => [(i + 1), getColorOnBgColor(val)],
+                        (val, i) => [(colorScheme.length - i), getColorOnBgColor(val)],
                     );
 
                     map.addLayer({

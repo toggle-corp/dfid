@@ -157,6 +157,8 @@ export interface SetProvincesInfoAction {
 export interface Programme {
     id: number;
     name: string;
+    description: string;
+    sectors: { sectorId: number }[];
 }
 
 export interface SetProgrammesAction {
