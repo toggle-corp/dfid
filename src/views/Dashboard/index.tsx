@@ -25,6 +25,7 @@ import {
     dashboardMapLayersSelector,
     dashboardIndicatorSelector,
     dashboardRequestManagerLoadingSelector,
+    municipalitiesSelector,
     geoJsonsSelector,
     setRequestManagerLoadingAction,
 } from '../../redux';
@@ -36,6 +37,8 @@ import {
     MapLayer,
     IndicatorData,
     MapLayerProps,
+    Municipality,
+    MunicipalityProgramme,
     Programme,
     Province,
     RootState,
@@ -54,6 +57,10 @@ import {
 
 import Map from '../../components/Map';
 import ScaleLegend from '../../components/Map/ScaleLegend';
+import {
+    renderPound,
+    renderNormalNumeral,
+} from '../../components/Renderer';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -68,6 +75,7 @@ interface PropsFromState {
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
     selectedIndicator?: IndicatorData;
+    municipalities: Municipality[];
     requestManagerLoadings: DashboardRequestManagerLoadings;
     geoJsons: GeoJSONS;
 }
@@ -91,6 +99,8 @@ interface State {
     layersInfo: Dictionary<MapLayerProps>;
 }
 
+const emptyList: any[] = [];
+
 export class Dashboard extends React.PureComponent<Props, State>{
 
     constructor(props: Props) {
@@ -110,12 +120,16 @@ export class Dashboard extends React.PureComponent<Props, State>{
         });
     }
 
-    handleMapClick = (key: string) => {
+    handleProvinceClick = (key: string) => {
         const { toggleDashboardProvince } = this.props;
         toggleDashboardProvince(parseInt(key, 10));
     }
 
-    renderMapChildren = () => {
+    handleMunicipalityClick = (key: string) => {
+        console.warn(key);
+    }
+
+    renderIndicatorLegend = () => {
         const { selectedIndicator } = this.props;
         if (!selectedIndicator) {
             return null;
@@ -136,14 +150,66 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return (
             <ScaleLegend
                 className={styles.scaleLegend}
-                minValue={String(minValue)}
-                maxValue={String(maxValue)}
+                minValue={minValue}
+                maxValue={maxValue}
+                minLabel={renderNormalNumeral(minValue)}
+                maxLabel={renderNormalNumeral(maxValue)}
                 minColor={minColor}
                 maxColor={maxColor}
-                title={selectedIndicator.name}
+                title="Indicator"
+                subTitle={selectedIndicator.name}
             />
         );
     }
+
+    renderProgramLegend = () => {
+        const { selectedProgrammes, municipalities } = this.props;
+        if (selectedProgrammes.length === 0) {
+            return null;
+        }
+
+        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
+        const budgets = {};
+        municipalities.forEach((municipality) => {
+            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
+                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
+            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
+        });
+
+        const budgetList: number[] = Object.values(budgets);
+        const minValue = Math.min(...budgetList);
+        const maxValue = Math.max(...budgetList);
+
+        const calcOpacity = (value: number) => {
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            return fraction * (0.85 - offset) + offset;
+        };
+
+        const { r, g, b } = getRgbFromHex(mapStyles.municipalities.color);
+        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
+        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
+
+        return (
+            <ScaleLegend
+                className={styles.scaleLegend}
+                minValue={minValue}
+                maxValue={maxValue}
+                minLabel={renderPound(minValue)}
+                maxLabel={renderPound(maxValue)}
+                minColor={minColor}
+                maxColor={maxColor}
+                title="Total budget (for selected programmes)"
+            />
+        );
+    }
+
+    renderMapChildren = () => (
+        <React.Fragment>
+            {this.renderIndicatorLegend()}
+            {this.renderProgramLegend()}
+        </React.Fragment>
+    )
 
     render() {
         const { layersInfo } = this.state;
@@ -174,7 +240,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return (
             <div className={styles.dashboard}>
                 <RequestManager
-                    handleMapClick={this.handleMapClick}
+                    handleProvinceClick={this.handleProvinceClick}
+                    handleMunicipalityClick={this.handleMunicipalityClick}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
                     loading={!!loading}
@@ -217,6 +284,7 @@ const mapStateToProps = (state: RootState) => ({
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
+    municipalities: municipalitiesSelector(state),
     requestManagerLoadings: dashboardRequestManagerLoadingSelector(state),
     geoJsons: geoJsonsSelector(state),
 });

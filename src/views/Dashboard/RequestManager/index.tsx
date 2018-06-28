@@ -33,6 +33,7 @@ import {
     resetRequestManagerLoadingAction,
     dashboardFilterPaneSelector,
     dashboardProvincesSelector,
+    dashboardMunicipalitiesSelector,
     dashboardProgrammesSelector,
     dashboardSectorsSelector,
     dashboardMapLayersSelector,
@@ -40,6 +41,7 @@ import {
     geoJsonsSelector,
     dashboardIndicatorSelector,
     provincesSelector,
+    municipalitiesSelector,
     setMunicipalitiesAction,
 } from '../../../redux';
 
@@ -57,7 +59,9 @@ import {
     SetRequestManagerLoadingAction,
     DashboardFilter,
     Province,
+    Municipality,
     Programme,
+    MunicipalityProgramme,
     Sector,
     MapLayer,
     GeoJSON,
@@ -83,13 +87,15 @@ import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 
 interface OwnProps {
     layersInfo: Dictionary<MapLayerProps>;
-    handleMapClick(key: string): void;
+    handleProvinceClick(key: string): void;
+    handleMunicipalityClick(key: string): void;
     setLayersInfo(settings: object): void;
     loading: boolean;
 }
 interface PropsFromState {
     faramState: DashboardFilter;
     selectedProvinces: Province[];
+    selectedMunicipalities: Municipality[];
     selectedProgrammes: Programme[];
     selectedSectors: Sector[];
     selectedMapLayers: MapLayer[];
@@ -97,6 +103,7 @@ interface PropsFromState {
     geoJsons: GeoJSONS;
     selectedIndicator?: IndicatorData;
     provinces: Province[];
+    municipalities: Municipality[];
 }
 interface PropsFromDispatch {
     setCountriesData(params: SetCountriesDataAction): void;
@@ -117,6 +124,9 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State { }
+
+const emptyList: any[] = [];
+const emptyObject: any = {};
 
 export class RequestManager extends React.PureComponent<Props, State>{
     geoJsonRequestCoordinator: Coordinator;
@@ -185,11 +195,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 this.reloadRasterMapLayer(nextProps);
             }
             if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
-                this.props.selectedIndicator !== nextProps.selectedIndicator) {
+                this.props.selectedIndicator !== nextProps.selectedIndicator ||
+                this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
                 this.reloadProvince(nextProps);
                 this.reloadMunicipalities(nextProps);
-            }
-            if (this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
                 this.reloadProgramLayer(nextProps);
             }
             if (this.props.selectedMapLayers !== nextProps.selectedMapLayers) {
@@ -250,6 +259,69 @@ export class RequestManager extends React.PureComponent<Props, State>{
             });
         }
 
+        return styles;
+    }
+
+    getMunicipalityStyle = (props: Props) => {
+        const {
+            selectedProgrammes,
+            selectedMunicipalities,
+            selectedIndicator,
+            municipalities,
+        } = props;
+        const styles = {};
+        const selectedStyles = {};
+
+        selectedMunicipalities.forEach((municipality) => {
+            selectedStyles[municipality.hlcitCode] = mapStyles.municipalitiesSelected;
+        });
+
+        if (selectedIndicator) {
+            municipalities.forEach((municipality) => {
+                styles[municipality.hlcitCode] = {
+                    ...mapStyles.municipalities,
+                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
+                    opacity: 0,
+                };
+            });
+            return styles;
+        }
+
+        if (selectedProgrammes.length === 0) {
+            municipalities.forEach((municipality) => {
+                styles[municipality.hlcitCode] = {
+                    ...mapStyles.municipalities,
+                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
+                };
+            });
+            return styles;
+        }
+
+        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
+
+        const budgets = {};
+        municipalities.forEach((municipality) => {
+            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
+                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
+            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
+        });
+
+        const budgetList: number[] = Object.values(budgets);
+        const minValue = Math.min(...budgetList);
+        const maxValue = Math.max(...budgetList);
+
+        municipalities.forEach((municipality) => {
+            const value = budgets[municipality.hlcitCode];
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            const fractionWithOffset = fraction * (0.85 - offset) + offset;
+
+            styles[municipality.hlcitCode] = {
+                ...mapStyles.municipalities,
+                ...(selectedStyles[municipality.hlcitCode] || emptyObject),
+                opacity: fractionWithOffset,
+            };
+        });
         return styles;
     }
 
@@ -498,6 +570,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadProvince = (props: Props) => {
+        const { selectedProvinces } = props;
+        const provinceIds = selectedProvinces.map(p => p.id);
+
         const selections = [{
             style: this.getProvincesStyle(props),
             types: ['Polygon'],
@@ -515,7 +590,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
             idKey: 'Province',
             integerId: true,
             labelKey: 'Province',
-            onClick: this.props.handleMapClick,
+            onClick: { fill: props.handleProvinceClick },
+            visibleCondition: {
+                fill: ['!in', 'Province', ...provinceIds],
+            },
         }];
 
         this.reloadSelectionToLayers({
@@ -525,13 +603,43 @@ export class RequestManager extends React.PureComponent<Props, State>{
     }
 
     reloadMunicipalities = (props: Props) => {
-        const selections = [{
-            id: 'municipalities',
-            file: urlForMunicipalitiesGeoJson,
-            order: 3,
-            types: ['Line'],
-            style: mapStyles.municipalities,
-        }];
+        const { selectedProvinces } = props;
+        const provinceIds = selectedProvinces.map(p => String(p.id));
+
+        const selections = [
+            {
+                id: 'municipalities',
+                file: urlForMunicipalitiesGeoJson,
+                order: 0,
+                types: ['Line', 'Polygon'],
+                style: this.getMunicipalityStyle(props),
+                idKey: 'HLCIT_CODE',
+                labelKey: 'LU_Name',
+                stylePerElement: true,
+            },
+            {
+                id: 'municipalities-hover',
+                file: urlForMunicipalitiesGeoJson,
+                order: 3,
+                types: ['Polygon'],
+                style: mapStyles.municipalitiesHover,
+                handleHover: true,
+                idKey: 'HLCIT_CODE',
+                labelKey: 'LU_Name',
+
+                onClick: { fill: props.handleMunicipalityClick },
+
+                visibleCondition: {
+                    fill: ['in', 'STATE', ...provinceIds],
+                },
+
+                tooltipSelector: (properties: any) => {
+                    const label = properties.LU_Name;
+                    // TODO: create HTML with other info necessary such as spend data
+                    return label;
+                },
+            },
+        ];
 
         this.reloadSelectionToLayers({
             keyPrefix: 'municipality',
@@ -560,7 +668,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
             overrides: {
                 idKey: 'id',
                 style: { color: getHexFromString('ipssj') },
-                visibleCondition: ['!=', 'Act_level', ''],
+                visibleCondition: {
+                    fill: ['!=', 'Act_level', ''],
+                },
                 url: urlForIpssjGeoJson,
                 order: 9,
             },
@@ -626,6 +736,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
 const mapStateToProps = (state: RootState) => ({
     faramState: dashboardFilterPaneSelector(state),
     selectedProvinces: dashboardProvincesSelector(state),
+    selectedMunicipalities: dashboardMunicipalitiesSelector(state),
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedSectors: dashboardSectorsSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
@@ -633,6 +744,7 @@ const mapStateToProps = (state: RootState) => ({
     geoJsons: geoJsonsSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
     provinces: provincesSelector(state),
+    municipalities: municipalitiesSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({

@@ -10,11 +10,11 @@ const initialSiloDomainData: SiloDomainData = {
         filterPane: {
             filters: {
                 // TODO: remove this
-                municipalitiesId: [1, 2],
+                municipalitiesId: [1, 2, 3, 4, 5, 6, 7, 8],
             },
             faramValues: {
                 // TODO: remove this
-                municipalitiesId: [1, 2],
+                municipalitiesId: [1, 2, 3, 4, 5, 6, 7, 8],
             },
             faramErrors: {},
             pristine: true,

@@ -25,13 +25,13 @@ const propTypes = {
             PropTypes.objectOf(stylePropType),
         ]),
         stylePerElement: PropTypes.bool,
-        visibleCondition: PropTypes.arrayOf(PropTypes.string),
+        visibleCondition: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.any)),
         idKey: PropTypes.string,
         integerId: PropTypes.bool,
         labelKey: PropTypes.string,
         handleHover: PropTypes.bool,
         zoomOnLoad: PropTypes.bool,
-        onClick: PropTypes.func,
+        onClick: PropTypes.objectOf(PropTypes.func),
     }),
 };
 
@@ -198,11 +198,11 @@ export default class MapLayer extends React.PureComponent {
             });
 
             this.layers.push(`${layerId}-hover`);
-            this.handleHover(map, layerId, labelKey);
+            this.handleHover(map, layerId, labelKey, layerType);
         }
 
-        if (visibleCondition) {
-            map.setFilter(layerId, visibleCondition);
+        if (visibleCondition && visibleCondition[layerType]) {
+            map.setFilter(layerId, visibleCondition[layerType]);
         }
     }
 
@@ -228,7 +228,7 @@ export default class MapLayer extends React.PureComponent {
         this.layers.push(`${layerKey}-layer`);
     }
 
-    handleHover = (map, layerId, labelKey) => {
+    handleHover = (map, layerId, labelKey, layerType) => {
         const hoverLayerId = `${layerId}-hover`;
         let popup;
 
@@ -249,16 +249,21 @@ export default class MapLayer extends React.PureComponent {
         });
 
         map.on('mouseenter', layerId, (e) => {
-            const { properties: { idKey = '', labelKey = '' } } = this.props;
+            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
             const feature = e.features[0];
             if (popup) {
-                popup.setHTML(feature.properties[labelKey]).addTo(map);
+                popup.setHTML(
+                    tooltipSelector ?
+                    tooltipSelector(feature.properties) :
+                    feature.properties[labelKey],
+                ).addTo(map);
             }
         });
 
         map.on('mousemove', layerId, (e) => {
-            const { properties: { idKey = '', labelKey = '' } } = this.props;
+            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
             const feature = e.features[0];
+
             map.setFilter(hoverLayerId, ['==', idKey, feature.properties[idKey]]);
             map.getCanvas().style.cursor = 'pointer';
 
@@ -266,7 +271,11 @@ export default class MapLayer extends React.PureComponent {
                 popup.setLngLat(map.unproject([
                     e.point.x,
                     e.point.y - 8,
-                ])).setHTML(feature.properties[labelKey]);
+                ])).setHTML(
+                    tooltipSelector ?
+                    tooltipSelector(feature.properties) :
+                    feature.properties[labelKey],
+                ).addTo(map);
             }
         });
 
@@ -281,10 +290,10 @@ export default class MapLayer extends React.PureComponent {
         });
 
         map.on('click', layerId, (e) => {
-            const { properties: { idKey, onClick } } = this.props;
-            if (onClick && idKey) {
-                const feature = e.features[0];
-                onClick(feature.properties[idKey]);
+            const { properties: { idKey, labelKey, onClick } } = this.props;
+            const feature = e.features[0];
+            if (onClick && onClick[layerType] && idKey) {
+                onClick[layerType](feature.properties[idKey], feature.properties[labelKey]);
             }
         });
     }

@@ -5,14 +5,18 @@ import styles from './styles.scss';
 const propTypes = {
     className: PropTypes.string,
     title: PropTypes.string.isRequired,
-    minValue: PropTypes.string.isRequired,
-    maxValue: PropTypes.string.isRequired,
+    subTitle: PropTypes.string,
+    minValue: PropTypes.number.isRequired,
+    maxValue: PropTypes.number.isRequired,
+    minLabel: PropTypes.node,
+    maxLabel: PropTypes.node,
     minColor: PropTypes.string.isRequired,
     maxColor: PropTypes.string.isRequired,
 };
 
 const defaultProps = {
     className: '',
+    subTitle: '',
 };
 
 export default class Legend extends React.PureComponent {
@@ -45,18 +49,21 @@ export default class Legend extends React.PureComponent {
         const className = this.getClassName();
         const {
             title,
+            subTitle,
             minValue,
             maxValue,
+            minLabel,
+            maxLabel,
         } = this.props;
 
         return (
             <div className={className}>
-                <div className={styles.header}>Indicator</div>
+                <div className={styles.header}>{ title }</div>
                 <div className={styles.scale} style={this.getScaleStyle()}/>
                 <div className={styles.scaleValues}>
-                    <span className={styles.value}>{ minValue }</span>
-                    <span className={styles.title}>{ title }</span>
-                    <span className={styles.value}>{ maxValue }</span>
+                    <span className={styles.value}>{ minLabel || minValue }</span>
+                    <span className={styles.title}>{ subTitle }</span>
+                    <span className={styles.value}>{ maxLabel || maxValue }</span>
                 </div>
             </div>
         );
