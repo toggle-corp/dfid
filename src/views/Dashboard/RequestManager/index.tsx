@@ -14,7 +14,6 @@ import { getHexFromString } from '../../../vendor/react-store/utils/common';
 import {
     urlForCountryGeoJson,
     urlForMunicipalitiesGeoJson,
-    urlForIpssjGeoJson,
     createUrlForTileLayer,
 } from '../../../rest';
 
@@ -180,7 +179,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
             this.reloadProvince(this.props);
             this.reloadMunicipalities(this.props);
             this.reloadMapLayer(this.props);
-            this.reloadProgramLayer(this.props);
         }
     }
 
@@ -189,17 +187,18 @@ export class RequestManager extends React.PureComponent<Props, State>{
             this.reloadProvince(nextProps);
             this.reloadMunicipalities(nextProps);
             this.reloadMapLayer(nextProps);
-            this.reloadProgramLayer(nextProps);
         } else {
             if (this.props.selectedRasterMapLayer !== nextProps.selectedRasterMapLayer) {
                 this.reloadRasterMapLayer(nextProps);
             }
-            if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
+            if (
+                this.props.selectedProvinces !== nextProps.selectedProvinces ||
                 this.props.selectedIndicator !== nextProps.selectedIndicator ||
-                this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
+                this.props.selectedProgrammes !== nextProps.selectedProgrammes ||
+                this.props.selectedMunicipalities !== nextProps.selectedMunicipalities
+            ) {
                 this.reloadProvince(nextProps);
                 this.reloadMunicipalities(nextProps);
-                this.reloadProgramLayer(nextProps);
             }
             if (this.props.selectedMapLayers !== nextProps.selectedMapLayers) {
                 this.reloadMapLayer(nextProps);
@@ -644,36 +643,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.reloadSelectionToLayers({
             keyPrefix: 'municipality',
             selectedList: selections,
-        });
-    }
-
-    reloadProgramLayer = (props: Props) => {
-        const { selectedProgrammes } = props;
-        const ipss = selectedProgrammes.find(p => (
-            p.name === 'Integrated Programme for Strengthening Security and Justice'
-        ));
-        const selectedList = [];
-        if (ipss) {
-            selectedList.push({
-                ...ipss,
-                types: ['Polygon'],
-                title: 'IPSSJ',
-                color: getHexFromString('ipssj'),
-            });
-        }
-
-        this.reloadSelectionToLayers({
-            selectedList,
-            keyPrefix: 'programmeLayer',
-            overrides: {
-                idKey: 'id',
-                style: { color: getHexFromString('ipssj') },
-                visibleCondition: {
-                    fill: ['!=', 'Act_level', ''],
-                },
-                url: urlForIpssjGeoJson,
-                order: 9,
-            },
         });
     }
 

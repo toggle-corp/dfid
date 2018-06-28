@@ -82,7 +82,7 @@
             @extend %content;
 
             :global {
-                .single-select-input {
+                .select-input {
                     .label {
                         color: $color-accent;
                         font-size: $font-size-medium;

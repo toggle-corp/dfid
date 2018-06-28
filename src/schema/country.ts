@@ -85,6 +85,7 @@ const countrySchema: SchemaGroup = [];
         },
         fields: {
             id: { type: 'uint', required: true },
+            provinceId: { type: 'uint', required: true },
             hlcitCode: { type: 'string' },
             type: { type: 'string' },
             localName: { type: 'string' },

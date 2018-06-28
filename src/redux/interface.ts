@@ -227,6 +227,11 @@ export interface DashboardFilter {
 
 export type SetDashboardFilterAction = Partial<DashboardFilter>;
 
+export interface SetDashboardProvinceAction {
+    provinceId: number;
+    municipalities: Municipality[];
+}
+
 // Indicator
 
 export interface Indicator {
@@ -385,6 +390,7 @@ export interface Municipality {
     hlcitCode: string;
     type: string;
     localName: string;
+    provinceId: number;
     programs: MunicipalityProgramme[];
     totalProgramBudget: number;
     totalNoOfProgrammes: number;

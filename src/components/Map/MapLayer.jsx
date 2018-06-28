@@ -54,6 +54,8 @@ export default class MapLayer extends React.PureComponent {
 
         this.sources = [];
         this.layers = [];
+        this.eventHandlers = {};
+        this.popups = {};
     }
 
     componentDidMount() {
@@ -76,9 +78,21 @@ export default class MapLayer extends React.PureComponent {
     destroy = () => {
         const { map } = this.props;
         if (map) {
+            Object.keys(this.eventHandlers).forEach((layerId) => {
+                const handlers = this.eventHandlers[layerId];
+                Object.keys(handlers).forEach((type) => {
+                    const listener = handlers[type];
+                    map.off(type, layerId, listener);
+                });
+            });
+            Object.values(this.popups).forEach((popup) => {
+                popup.remove();
+            });
             this.layers.forEach(layer => map.removeLayer(layer));
             this.sources.forEach(source => map.removeSource(source));
         }
+        this.eventHandlers = {};
+        this.popups = {};
         this.layers = [];
         this.sources = [];
     }
@@ -237,7 +251,13 @@ export default class MapLayer extends React.PureComponent {
                 closeButton: false,
                 closeOnClick: false,
             });
+            this.popups[layerId] = popup;
         }
+
+        if (!this.eventHandlers[layerId]) {
+            this.eventHandlers[layerId] = {};
+        }
+        const handlers = this.eventHandlers[layerId];
 
         map.on('zoom', (e) => {
             if (e.originalEvent && popup) {
@@ -248,7 +268,7 @@ export default class MapLayer extends React.PureComponent {
             }
         });
 
-        map.on('mouseenter', layerId, (e) => {
+        handlers.mouseenter = (e) => {
             const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
             const feature = e.features[0];
             if (popup) {
@@ -258,9 +278,9 @@ export default class MapLayer extends React.PureComponent {
                     feature.properties[labelKey],
                 ).addTo(map);
             }
-        });
+        };
 
-        map.on('mousemove', layerId, (e) => {
+        handlers.mousemove = (e) => {
             const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
             const feature = e.features[0];
 
@@ -277,9 +297,9 @@ export default class MapLayer extends React.PureComponent {
                     feature.properties[labelKey],
                 ).addTo(map);
             }
-        });
+        };
 
-        map.on('mouseleave', layerId, () => {
+        handlers.mouseleave = () => {
             const { properties: { idKey = '', labelKey = '' } } = this.props;
             map.setFilter(hoverLayerId, ['==', idKey, '']);
             map.getCanvas().style.cursor = '';
@@ -287,14 +307,19 @@ export default class MapLayer extends React.PureComponent {
             if (popup) {
                 popup.remove();
             }
-        });
+        };
 
-        map.on('click', layerId, (e) => {
+        handlers.click = (e) => {
             const { properties: { idKey, labelKey, onClick } } = this.props;
             const feature = e.features[0];
             if (onClick && onClick[layerType] && idKey) {
                 onClick[layerType](feature.properties[idKey], feature.properties[labelKey]);
             }
+        };
+
+        Object.keys(handlers).forEach((type) => {
+            const listener = handlers[type];
+            map.on(type, layerId, listener);
         });
     }
 

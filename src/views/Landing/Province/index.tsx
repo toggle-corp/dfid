@@ -13,18 +13,26 @@ import projectIcon from '../../../resources/img/project.png';
 import {
     RootState,
     ProvinceInfo,
+    Municipality,
+    SetDashboardProvinceAction,
 } from '../../../redux/interface';
-import { setDashboardProvinceAction } from '../../../redux';
+import {
+    setDashboardProvinceAction,
+    municipalitiesSelector,
+} from '../../../redux';
 import ProvinceDetailItem from '../ProvinceDetailItem';
 import styles from './styles.scss';
 
 interface OwnProps {
     datum: ProvinceInfo;
 }
-interface PropsFromDispatch {
-    setDashboardProvince(provinceId: number): void;
+interface PropsFromState {
+    municipalities: Municipality[];
 }
-type Props = OwnProps & PropsFromDispatch;
+interface PropsFromDispatch {
+    setDashboardProvince(params: SetDashboardProvinceAction): void;
+}
+type Props = OwnProps & PropsFromDispatch & PropsFromState;
 
 const routeToDashboard = {
     pathname: reverseRoute(pathNames.dashboard),
@@ -40,9 +48,12 @@ interface ProvinceDetail {
 class Province extends React.PureComponent<Props> {
     static keyExtractor = (province: ProvinceDetail) => province.label;
 
-    setDashboardProvince = (id: number) => () => {
-        const { setDashboardProvince } = this.props;
-        setDashboardProvince(id);
+    setDashboardProvince = (provinceId: number) => () => {
+        const { setDashboardProvince, municipalities } = this.props;
+        setDashboardProvince({
+            provinceId,
+            municipalities,
+        });
     }
 
     renderProvinceDetailItem = (key: string, datum: ProvinceDetail) => {
@@ -99,11 +110,15 @@ class Province extends React.PureComponent<Props> {
     }
 }
 
-const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
-    setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
+const mapStateToProps = (state: RootState) => ({
+    municipalities: municipalitiesSelector(state),
 });
 
-export default connect<undefined, PropsFromDispatch, OwnProps>(
-    undefined,
-    mapDispatchToProps,
+const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
+    setDashboardProvince: (params: SetDashboardProvinceAction) =>
+        dispatch(setDashboardProvinceAction(params)),
+});
+
+export default connect<PropsFromState, PropsFromDispatch, OwnProps>(
+    mapStateToProps, mapDispatchToProps,
 )(Province);
