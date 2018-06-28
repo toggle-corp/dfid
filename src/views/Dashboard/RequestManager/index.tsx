@@ -266,6 +266,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         const {
             selectedProgrammes,
             selectedMunicipalities,
+            selectedIndicator,
             municipalities,
         } = props;
         const styles = {};
@@ -274,6 +275,17 @@ export class RequestManager extends React.PureComponent<Props, State>{
         selectedMunicipalities.forEach((municipality) => {
             selectedStyles[municipality.hlcitCode] = mapStyles.municipalitiesSelected;
         });
+
+        if (selectedIndicator) {
+            municipalities.forEach((municipality) => {
+                styles[municipality.hlcitCode] = {
+                    ...mapStyles.municipalities,
+                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
+                    opacity: 0,
+                };
+            });
+            return styles;
+        }
 
         if (selectedProgrammes.length === 0) {
             municipalities.forEach((municipality) => {

@@ -57,6 +57,10 @@ import {
 
 import Map from '../../components/Map';
 import ScaleLegend from '../../components/Map/ScaleLegend';
+import {
+    renderPound,
+    renderNormalNumeral,
+} from '../../components/Renderer';
 
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -146,8 +150,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
         return (
             <ScaleLegend
                 className={styles.scaleLegend}
-                minValue={String(minValue)}
-                maxValue={String(maxValue)}
+                minValue={minValue}
+                maxValue={maxValue}
+                minLabel={renderNormalNumeral(minValue)}
+                maxLabel={renderNormalNumeral(maxValue)}
                 minColor={minColor}
                 maxColor={maxColor}
                 title="Indicator"
@@ -180,17 +186,17 @@ export class Dashboard extends React.PureComponent<Props, State>{
             return fraction * (0.85 - offset) + offset;
         };
 
-        const { r, g, b } = getRgbFromHex(mapStyles.indicator.color);
+        const { r, g, b } = getRgbFromHex(mapStyles.municipalities.color);
         const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
         const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
-
-        console.warn(minColor, maxColor);
 
         return (
             <ScaleLegend
                 className={styles.scaleLegend}
-                minValue={String(minValue)}
-                maxValue={String(maxValue)}
+                minValue={minValue}
+                maxValue={maxValue}
+                minLabel={renderPound(minValue)}
+                maxLabel={renderPound(maxValue)}
                 minColor={minColor}
                 maxColor={maxColor}
                 title="Total budget (for selected programmes)"

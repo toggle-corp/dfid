@@ -7,7 +7,7 @@ const initialDomainDataState: DomainData = {
         municipalitiesCovered:756,
         totalProjects: 12,
         totalSectors: 11,
-        totalBudget: 4900000,
+        totalBudget: 64400000,
     },
 
     glossaryData: [],
