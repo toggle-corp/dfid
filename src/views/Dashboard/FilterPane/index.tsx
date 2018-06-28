@@ -19,6 +19,7 @@ import {
     indicatorsSelector,
     validMapLayersSelector,
     validRasterMapLayersSelector,
+    municipalitiesSelector,
 } from '../../../redux';
 
 import {
@@ -28,10 +29,12 @@ import {
     Sector,
     Indicator,
     MapLayer,
+    Municipality,
     DashboardFilterParams,
     DashboardFilter,
     SetDashboardFilterAction,
 } from '../../../redux/interface';
+
 import {
     FaramErrors,
     Schema,
@@ -57,6 +60,7 @@ interface PropsFromState {
     provinces: Province[];
     sectors: Sector[];
     indicators: Indicator[];
+    municipalities: Municipality[];
     mapLayers: MapLayer[];
     rasterMapLayers: MapLayer[];
     faramState: DashboardFilter;
@@ -156,15 +160,39 @@ export class FilterPane extends React.PureComponent<Props, State>{
     handleFaramChange = (
         faramValues: DashboardFilterParams, faramErrors: FaramErrors,
     ) => {
-        const { programmes, faramState } = this.props;
-        const { sectorsId: oldSectorsId } = faramState.faramValues;
-        const { sectorsId } = faramValues;
+        const { municipalities, programmes, faramState } = this.props;
+        const {
+            sectorsId: oldSectorsId,
+            provincesId: oldProvincesId,
+        } = faramState.faramValues;
+        const {
+            sectorsId,
+            provincesId,
+            municipalitiesId,
+        } = faramValues;
 
         if (sectorsId !== oldSectorsId) {
             faramValues.programmesId = programmes.reduce(
                 (acc, programme) => {
                     if (programmeHaveSectors(programme, sectorsId)) {
                         acc.push(programme.id);
+                    }
+                    return acc;
+                },
+                [] as number[],
+            );
+        }
+
+        if (provincesId !== oldProvincesId && municipalitiesId) {
+            faramValues.municipalitiesId = municipalitiesId.reduce(
+                (acc, municipalityId) => {
+                    const municipality = municipalities.find(m => m.id === municipalityId);
+                    if (provincesId && municipality &&
+                        provincesId.findIndex(
+                            provinceId => provinceId === municipality.provinceId,
+                        ) !== -1
+                    ) {
+                        acc.push(municipalityId);
                     }
                     return acc;
                 },
@@ -380,6 +408,7 @@ const mapStateToProps = (state: RootState) => ({
     programmes: programmesSelector(state),
     provinces: provincesSelector(state),
     indicators: indicatorsSelector(state),
+    municipalities: municipalitiesSelector(state),
     mapLayers: validMapLayersSelector(state),
     rasterMapLayers: validRasterMapLayersSelector(state),
     faramState: dashboardFilterPaneSelector(state),

@@ -194,9 +194,12 @@ export class RequestManager extends React.PureComponent<Props, State>{
             if (this.props.selectedRasterMapLayer !== nextProps.selectedRasterMapLayer) {
                 this.reloadRasterMapLayer(nextProps);
             }
-            if (this.props.selectedProvinces !== nextProps.selectedProvinces ||
+            if (
+                this.props.selectedProvinces !== nextProps.selectedProvinces ||
                 this.props.selectedIndicator !== nextProps.selectedIndicator ||
-                this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
+                this.props.selectedProgrammes !== nextProps.selectedProgrammes ||
+                this.props.selectedMunicipalities !== nextProps.selectedMunicipalities
+            ) {
                 this.reloadProvince(nextProps);
                 this.reloadMunicipalities(nextProps);
                 this.reloadProgramLayer(nextProps);

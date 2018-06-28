@@ -16,15 +16,21 @@ import { colorScheme } from '../../config/theme';
 import {
     RootState,
     ProvinceInfo,
+    Municipality,
+    SetDashboardProvinceAction,
     SetProvincesInfoAction,
+    SetMunicipalitiesAction,
 } from '../../redux/interface';
 import {
     setDashboardProvinceAction,
     setProvincesInfoAction,
+    setMunicipalitiesAction,
     provincesInfoSelector,
+    municipalitiesSelector,
 } from '../../redux';
 
 import ProvinceInfoGetRequest from './requests/ProvinceInfoGetRequest';
+import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 
 import ProvinceMap from './ProvinceMap';
 import Overview from './Overview';
@@ -36,10 +42,12 @@ import styles from './styles.scss';
 interface OwnProps {}
 interface PropsFromState {
     provincesInfo: ProvinceInfo[];
+    municipalities: Municipality[];
 }
 interface PropsFromDispatch {
-    setDashboardProvince(provinceId: number): void;
+    setDashboardProvince(params: SetDashboardProvinceAction): void;
     setProvincesInfo(params: SetProvincesInfoAction): void;
+    setMunicipalities(params: SetMunicipalitiesAction): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
@@ -47,6 +55,7 @@ type Props = OwnProps & PropsFromState & PropsFromDispatch;
 interface State {
     redirectTo?: string;
     loadingProvincesInfo: boolean;
+    loadingMunicipalities: boolean;
 }
 
 const provinceDataLabelAccessor = (d: ProvinceInfo) => d.name;
@@ -70,6 +79,7 @@ const totalSpendValueLabelAccessor = (totalBudget: number) => {
 const activeProjectValueAccessor = (d: ProvinceInfo) => d.activeProgrammes;
 
 export class Landing extends React.PureComponent<Props, State> {
+    municipalitiesRequest: RestRequest;
     provinceInfoRequest: RestRequest;
 
     constructor(props: Props) {
@@ -78,17 +88,34 @@ export class Landing extends React.PureComponent<Props, State> {
         this.state = {
             redirectTo: undefined,
             loadingProvincesInfo: true,
+            loadingMunicipalities: true,
         };
     }
 
     componentWillMount() {
         this.startRequestForProvinceInfo();
+        this.startRequestForMunicipalities();
     }
 
     componentWillUnmount() {
         if (this.provinceInfoRequest) {
             this.provinceInfoRequest.stop();
         }
+        if (this.municipalitiesRequest) {
+            this.municipalitiesRequest.stop();
+        }
+    }
+
+    startRequestForMunicipalities = () => {
+        if (this.municipalitiesRequest) {
+            this.municipalitiesRequest.stop();
+        }
+        const municipalitiesRequest = new MunicipalitiesGetRequest({
+            setState: params => this.setState(params),
+            setMunicipalities: this.props.setMunicipalities,
+        });
+        this.municipalitiesRequest = municipalitiesRequest.create();
+        this.municipalitiesRequest.start();
     }
 
     startRequestForProvinceInfo = () => {
@@ -103,9 +130,12 @@ export class Landing extends React.PureComponent<Props, State> {
         this.provinceInfoRequest.start();
     }
 
-    handleMapClick = (province: number) => {
-        const { setDashboardProvince } = this.props;
-        setDashboardProvince(province);
+    handleMapClick = (provinceId: number) => {
+        const { setDashboardProvince, municipalities } = this.props;
+        setDashboardProvince({
+            provinceId,
+            municipalities,
+        });
         this.setState({ redirectTo: reverseRoute(pathNames.dashboard) });
     }
 
@@ -117,6 +147,7 @@ export class Landing extends React.PureComponent<Props, State> {
         const {
             redirectTo,
             loadingProvincesInfo,
+            loadingMunicipalities,
         } = this.state;
         const { provincesInfo } = this.props;
         if (redirectTo) {
@@ -141,7 +172,7 @@ export class Landing extends React.PureComponent<Props, State> {
                         <Overview />
                     </div>
                     <div className={styles.charts}>
-                        {loadingProvincesInfo && <LoadingAnimation />}
+                        {(loadingProvincesInfo || loadingMunicipalities) && <LoadingAnimation />}
                         <div className={styles.chartContainer}>
                             <h3 className={styles.heading}>
                                 Total Spend
@@ -178,11 +209,15 @@ export class Landing extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => ({
     provincesInfo: provincesInfoSelector(state),
+    municipalities: municipalitiesSelector(state),
 });
 
 const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
-    setDashboardProvince: (provinceId: number) => dispatch(setDashboardProvinceAction(provinceId)),
+    setDashboardProvince: (params: SetDashboardProvinceAction) =>
+        dispatch(setDashboardProvinceAction(params)),
     setProvincesInfo: (params: SetProvincesInfoAction) => dispatch(setProvincesInfoAction(params)),
+    setMunicipalities: (params: SetMunicipalitiesAction) =>
+        dispatch(setMunicipalitiesAction(params)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

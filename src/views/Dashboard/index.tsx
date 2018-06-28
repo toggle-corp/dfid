@@ -28,6 +28,7 @@ import {
     municipalitiesSelector,
     geoJsonsSelector,
     setRequestManagerLoadingAction,
+    toggleDashboardMunicipilityAction,
 } from '../../redux';
 
 import {
@@ -91,6 +92,7 @@ interface PropsFromDispatch {
     toggleDashboardProvince(provinceId: number): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
     setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
+    toggleDashboardMunicipility(municipalityId: number): void;
 }
 
 type Props = OwnProps & PropsFromState & PropsFromDispatch & RouteComponentProps<{}>;
@@ -126,7 +128,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleMunicipalityClick = (key: string) => {
-        console.warn(key);
+        console.warn('click:', key);
+        const { municipalities } = this.props;
+        const municipality = municipalities.find(municipality => municipality.hlcitCode === key);
+        if (municipality) {
+            this.props.toggleDashboardMunicipility(municipality.id);
+        }
     }
 
     renderIndicatorLegend = () => {
@@ -304,6 +311,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setGeoJsons: (params: SetGeoJsonsAction) => dispatch(setGeoJsonsAction(params)),
     setDashboardLoadings: (params: SetRequestManagerLoadingAction) =>
         dispatch(setRequestManagerLoadingAction(params)),
+    toggleDashboardMunicipility: (municipalityId: number) =>
+        dispatch(toggleDashboardMunicipilityAction(municipalityId)),
 });
 
 export default connect<PropsFromState, PropsFromDispatch, OwnProps>(

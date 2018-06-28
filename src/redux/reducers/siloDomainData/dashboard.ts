@@ -7,6 +7,7 @@ import {
 
     SetRequestManagerLoadingAction,
     SetDashboardFilterAction,
+    SetDashboardProvinceAction,
     SetInformationPaneStateAction,
 } from '../../interface';
 
@@ -20,6 +21,7 @@ export const enum DASHBOARD_ACTION {
     toggleProvince = 'siloDomainData/DASHBOARD/TOGGLE_PROVINCE',
     setInformationPaneState = 'siloDomainData/DASHBOARD/INFORMATION_PANE/STATE',
     setDashboardShowCompare = 'siloDomainData/DASHBOARD/SHOW_COMPARE',
+    toggleDashboardMunicipility = 'siloDomainData/DASHBOARD/TOGGLE_DASHBOARD_MUNICIPILITY',
 }
 
 // ACTION-CREATOR
@@ -36,10 +38,16 @@ export const setDashboardFiltersAction = (
 });
 
 export const setDashboardProvinceAction = (
-    provinceId: number,
+    { provinceId, municipalities }: SetDashboardProvinceAction,
 ) => ({
     provinceId,
+    municipalities,
     type: DASHBOARD_ACTION.setProvince,
+});
+
+export const toggleDashboardMunicipilityAction = (municipalityId: number) => ({
+    municipalityId,
+    type: DASHBOARD_ACTION.toggleDashboardMunicipility,
 });
 
 export const toggleDashboardProvinceAction = (
@@ -103,15 +111,28 @@ const setFilters = (state: SiloDomainData, action: SetDashboardFilterAction) => 
     return update(state, settings);
 };
 
-const setProvince = (state: SiloDomainData, { provinceId }: { provinceId: number }) => {
+const setProvince = (state: SiloDomainData, action: SetDashboardProvinceAction) => {
+    const { provinceId, municipalities } = action;
     const settings = {
         dashboard: { $auto: {
             filterPane: { $auto: {
                 faramValues: { $auto: {
                     provincesId: { $set: [provinceId] },
+                    municipalitiesId: { $autoArray: {
+                        $filter: (id: number) => {
+                            const municipality = municipalities.find(m => m.id === id);
+                            return municipality ? municipality.provinceId === provinceId : false;
+                        },
+                    } },
                 } },
                 filters: { $auto: {
                     provincesId: { $set: [provinceId] },
+                    municipalitiesId: { $autoArray: {
+                        $filter: (id: number) => {
+                            const municipality = municipalities.find(m => m.id === id);
+                            return municipality ? municipality.provinceId === provinceId : false;
+                        },
+                    } },
                 } },
             } },
         } },
@@ -119,6 +140,7 @@ const setProvince = (state: SiloDomainData, { provinceId }: { provinceId: number
     return update(state, settings);
 };
 
+// FIXME: Remove this
 const toggleProvince = (state: SiloDomainData, { provinceId }: { provinceId: number }) => {
     const settings = {
         dashboard: { $auto: {
@@ -209,6 +231,29 @@ const setInformationPaneState = (
     return update(state, settings);
 };
 
+const toggleDashboardMunicipility = (
+    state: SiloDomainData, { municipalityId }: { municipalityId: number },
+) => {
+    const settings = {
+        dashboard: { $auto: {
+            filterPane: { $auto: {
+                faramValues: { $auto: {
+                    municipalitiesId: { $autoArray: {
+                        $toggleElement: municipalityId,
+                    } },
+                } },
+                filters: { $auto: {
+                    municipalitiesId: { $autoArray: {
+                        $toggleElement: municipalityId,
+                    } },
+                } },
+            } },
+        } },
+    };
+    return update(state, settings);
+};
+
+
 const reducer: ReducerGroup<SiloDomainData> = {
     [DASHBOARD_ACTION.setFilters]: setFilters,
     [DASHBOARD_ACTION.setProvince]: setProvince,
@@ -217,6 +262,7 @@ const reducer: ReducerGroup<SiloDomainData> = {
     [DASHBOARD_ACTION.resetRequestManagerLoading]: resetRequestManagerLoading,
     [DASHBOARD_ACTION.setInformationPaneState]: setInformationPaneState,
     [DASHBOARD_ACTION.setDashboardShowCompare]: setDashboardShowCompare,
+    [DASHBOARD_ACTION.toggleDashboardMunicipility]: toggleDashboardMunicipility,
 };
 
 export default reducer;

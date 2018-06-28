@@ -8,14 +8,8 @@ const initialSiloDomainData: SiloDomainData = {
             activeTab: 'province',
         },
         filterPane: {
-            filters: {
-                // TODO: remove this
-                municipalitiesId: [1, 2, 3, 4, 5, 6, 7, 8],
-            },
-            faramValues: {
-                // TODO: remove this
-                municipalitiesId: [1, 2, 3, 4, 5, 6, 7, 8],
-            },
+            filters: {},
+            faramValues: {},
             faramErrors: {},
             pristine: true,
             isHidden: false,

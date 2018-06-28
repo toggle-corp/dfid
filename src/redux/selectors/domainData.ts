@@ -123,7 +123,6 @@ export const validRasterMapLayersSelector = createSelector(
     ),
 );
 
-
 // Dashboard
 export const provinceDataSelector = createSelector(
     provincesDataSelector,
