@@ -239,13 +239,12 @@ export interface Indicator {
     name: string;
     source: string;
     glossary: string;
-
 }
 
 export interface IndicatorData {
     id: number;
     name: string;
-    unit: number;
+    unit: string;
     provinces: Dictionary<{
         provinceId: number;
         value: number;

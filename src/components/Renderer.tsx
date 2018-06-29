@@ -20,18 +20,18 @@ export const renderDollar = (data: number) => (
     />
 );
 
-export const renderNumeral = (data: number) => (
+export const renderNumeral = (data: number, precision: number = 0) => (
     <Numeral
-        precision={0}
+        precision={precision}
         value={data}
     />
 );
 
-export const renderPercent = (data: number) => (
+export const renderPercent = (data: number, mul: number = 100) => (
     <Numeral
         precision={2}
         suffix=" %"
-        value={data ? data * 100 : undefined}
+        value={data ? data * mul : undefined}
     />
 );
 

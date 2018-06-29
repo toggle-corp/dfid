@@ -60,6 +60,7 @@ import Map from '../../components/Map';
 import ScaleLegend from '../../components/Map/ScaleLegend';
 import {
     renderPound,
+    renderNumeral,
     renderNormalNumeral,
 } from '../../components/Renderer';
 
@@ -103,6 +104,24 @@ interface State {
 
 const emptyList: any[] = [];
 
+const renderIndicatorSubTitle = (name: string, unit?: string) => {
+    let symbol = unit;
+    if (!unit || unit === '0' || unit.toLowerCase() === 'in number') {
+        return name;
+    }
+    if (unit.toLowerCase() === 'in percent') {
+        symbol = '%';
+    }
+    return `${name} (${symbol})`;
+};
+
+const renderIndicatorLabel = (value: number, unit?: string) => {
+    if (unit === '0') {
+        return renderNumeral(value, 3);
+    }
+    return renderNormalNumeral(value);
+};
+
 export class Dashboard extends React.PureComponent<Props, State>{
 
     constructor(props: Props) {
@@ -142,7 +161,8 @@ export class Dashboard extends React.PureComponent<Props, State>{
             return null;
         }
 
-        const { minValue, maxValue } = selectedIndicator;
+        console.warn(selectedIndicator);
+        const { minValue, maxValue, unit, name } = selectedIndicator;
 
         const calcOpacity = (value: number) => {
             const fraction = (value - minValue) / (maxValue - minValue);
@@ -159,12 +179,12 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 className={styles.scaleLegend}
                 minValue={minValue}
                 maxValue={maxValue}
-                minLabel={renderNormalNumeral(minValue)}
-                maxLabel={renderNormalNumeral(maxValue)}
+                minLabel={renderIndicatorLabel(minValue, unit)}
+                maxLabel={renderIndicatorLabel(maxValue, unit)}
                 minColor={minColor}
                 maxColor={maxColor}
                 title="Indicator"
-                subTitle={selectedIndicator.name}
+                subTitle={renderIndicatorSubTitle(name, unit)}
             />
         );
     }
