@@ -1,23 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import Message from '../../../../../vendor/react-store/components/View/Message';
+import Message from '../../../../../../vendor/react-store/components/View/Message';
 
-import { municipalityDataSelector } from '../../../../../redux';
+import { municipalityDataSelector } from '../../../../../../redux';
 
 import {
     RootState,
     Municipality,
     MunicipalityProgramme,
     MunicipalityDatum,
-} from '../../../../../redux/interface';
+} from '../../../../../../redux/interface';
 
-import ListItem from '../../../ListItem';
-import Item from '../../../../../components/Item';
+import ListItem from '../../../../ListItem';
+import Item from '../../../../../../components/Item';
 import {
     renderPound,
     renderNumeral,
-} from '../../../../../components/Renderer';
+} from '../../../../../../components/Renderer';
 
 import styles from './styles.scss';
 

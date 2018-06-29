@@ -48,6 +48,15 @@ export class CompareMunicipalityDetailInfo extends React.PureComponent<Props, St
         super(props);
 
         this.headers = [
+            /*
+            {
+                key: 'provinceId',
+                label: 'Province',
+                order: 0,
+                sortable: true,
+                comparator: (a, b) => compareNumber(a.provinceId, b.provinceId),
+            },
+             */
             {
                 key: 'localName',
                 label: 'Local Name',

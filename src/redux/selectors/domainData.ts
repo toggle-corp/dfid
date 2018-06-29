@@ -27,7 +27,7 @@ import {
 const emptyArray: any[] = [];
 const emptyObject: object = {};
 
-const provinceIdFromPropsSelector = (
+export const provinceIdFromPropsSelector = (
     state: RootState, props: { datum: ProvinceDatum },
 ) => (props.datum.id);
 
