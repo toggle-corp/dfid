@@ -8,6 +8,7 @@ import { dashboardMunicipalitiesSelector } from '../../../../redux';
 import {
     RootState,
     Municipality,
+    MunicipalityDatum,
 } from '../../../../redux/interface';
 
 import MunicipalityDetailInfo from './MunicipalityDetailInfo';
@@ -25,11 +26,12 @@ type Props = OwnProps & PropsFromState;
 
 interface State {}
 
+const keyExtractor = (item: Municipality) => String(item.id);
+
 export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, State>{
-    keyExtractor = (item: Municipality) => String(item.id);
 
     renderMunicipalityDetail = (
-        key: string, datum: Municipality, i: number, data: Municipality[],
+        key: string, datum: MunicipalityDatum, i: number, data: Municipality[],
     ) => {
         return (
             <MunicipalityDetailInfo
@@ -65,7 +67,7 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
             <ListView
                 className={styles.municipalityList}
                 data={selectedMunicipalites}
-                keyExtractor={this.keyExtractor}
+                keyExtractor={keyExtractor}
                 modifier={this.renderMunicipalityDetail}
             />
         );
