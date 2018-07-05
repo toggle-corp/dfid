@@ -3,14 +3,15 @@ import { connect } from 'react-redux';
 
 import Message from '../../../../vendor/react-store/components/View/Message';
 import ListView from '../../../../vendor/react-store/components/View/List/ListView';
-import { dashboardMunicipalitiesSelector } from '../../../../redux';
+import { dashboardProvincesSelector } from '../../../../redux';
 
 import {
     RootState,
-    Municipality,
+    Province,
+    ProvinceDatum,
 } from '../../../../redux/interface';
 
-import MunicipalityDetailInfo from './MunicipalityDetailInfo';
+import ProvinceGroup from './ProvinceGroup';
 
 import styles from './styles.scss';
 
@@ -18,21 +19,22 @@ interface OwnProps {
     loading?: boolean;
 }
 interface PropsFromState {
-    selectedMunicipalites: Municipality[];
+    selectedProvince: Province[];
 }
 
 type Props = OwnProps & PropsFromState;
 
 interface State {}
 
-export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, State>{
-    keyExtractor = (item: Municipality) => String(item.id);
+const keyExtractor = (item: Province) => String(item.id);
 
-    renderMunicipalityDetail = (
-        key: string, datum: Municipality, i: number, data: Municipality[],
+export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, State>{
+
+    renderProjectGroup = (
+        key: string, datum: ProvinceDatum, i: number, data: Province[],
     ) => {
         return (
-            <MunicipalityDetailInfo
+            <ProvinceGroup
                 key={key}
                 datum={datum}
             />
@@ -42,13 +44,13 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
     render() {
         const {
             loading,
-            selectedMunicipalites,
+            selectedProvince,
         } = this.props;
 
-        if (!selectedMunicipalites.length) {
+        if (!selectedProvince.length) {
             return (
                 <Message className={styles.message}>
-                    No municipality selected (Selected them from map)
+                    No municipalites selected (Selected them from map)
                 </Message>
             );
         }
@@ -56,7 +58,7 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
         if (loading) {
             return (
                 <Message>
-                    Loading municipality information...
+                    Loading province information...
                 </Message>
             );
         }
@@ -64,16 +66,16 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
         return (
             <ListView
                 className={styles.municipalityList}
-                data={selectedMunicipalites}
-                keyExtractor={this.keyExtractor}
-                modifier={this.renderMunicipalityDetail}
+                data={selectedProvince}
+                keyExtractor={keyExtractor}
+                modifier={this.renderProjectGroup}
             />
         );
     }
 }
 
 const mapStateToProps = (state: RootState) => ({
-    selectedMunicipalites: dashboardMunicipalitiesSelector(state),
+    selectedProvince: dashboardProvincesSelector(state),
 });
 
 export default connect<PropsFromState, OwnProps>(

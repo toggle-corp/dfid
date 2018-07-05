@@ -26,6 +26,7 @@ import {
     mapLayersSelector,
     municipalitiesSelector,
     exploreDataSelector,
+    provinceIdFromPropsSelector,
 } from '../../redux';
 
 // NOTE: Use these to make sure reference don't change
@@ -180,6 +181,15 @@ export const dashboardMunicipalitiesSelector = createSelector(
     (municipalities, municipalitiesId) =>
         municipalities.filter(municipality => (
             municipalitiesId.findIndex(id => id === municipality.id)) !== -1,
+        ) || emptyArray as Municipality[],
+);
+
+export const dashboardProvinceMunicipalitiesSelector = createSelector(
+    dashboardMunicipalitiesSelector,
+    provinceIdFromPropsSelector,
+    (municipalities, provinceId) =>
+        municipalities.filter(
+            municipality => municipality.provinceId === provinceId,
         ) || emptyArray as Municipality[],
 );
 

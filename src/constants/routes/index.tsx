@@ -10,6 +10,7 @@ export const routes: Map<RouteSetting> = {
         order: 3,
         type: ROUTE.public,
         path: '/',
+        title: 'DFID',
         loader: () => import('../../views/Landing'),
         links: allLinks,
         extendedNavbar: true,
@@ -19,6 +20,7 @@ export const routes: Map<RouteSetting> = {
         order: 4,
         type: ROUTE.public,
         path: '/dashboard',
+        title: 'Dashboard',
         loader: () => import('../../views/Dashboard'),
         links: allLinks,
     },
@@ -27,6 +29,7 @@ export const routes: Map<RouteSetting> = {
         order: 5,
         type: ROUTE.public,
         path: '/explore',
+        title: 'Explore',
         loader: () => import('../../views/Explore'),
         links: allLinks,
     },
@@ -35,6 +38,7 @@ export const routes: Map<RouteSetting> = {
         order: 6,
         type: ROUTE.public,
         path: '/glossary',
+        title: 'Glossary',
         loader: () => import('../../views/Glossary'),
         links: allLinks,
     },
@@ -45,11 +49,10 @@ export const routes: Map<RouteSetting> = {
         order: 7,
         type: ROUTE.public,
         path: undefined,
+        title: 'Page not found',
         loader: () => import('../../views/NotFound'),
         links: allLinks,
     },
-
-
 };
 
 export const routesOrder: string[] = mapObjectToArray<RouteSetting, { key: string, order: number }>(
@@ -61,10 +64,11 @@ export const routesOrder: string[] = mapObjectToArray<RouteSetting, { key: strin
 
 export const views = mapObjectToObject<RouteSetting, (props: object) => JSX.Element>(
     routes,
-    route => (props: object) => (
+    (route, name) => (props: object) => (
         <ViewManager
             {...props}
             load={route.loader}
+            name={name}
         />
     ),
 );

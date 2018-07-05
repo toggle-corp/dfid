@@ -22,7 +22,7 @@ import {
 
 import {
     renderPercentText,
-    renderDollarText,
+    renderPoundText,
 } from '../../../../components/Renderer';
 import { colorScheme } from '../../../../config/theme';
 
@@ -50,8 +50,8 @@ const provinceDataLabelAccessor = (d: ProvinceData) => d.province;
 const activeProjectValueAccessor = (d: ProvinceData) => d.activeProgrammes.length;
 const povertyRateValueAccessor = (d: ProvinceData) => d.povertyRate;
 const povertyRateValueLabelAccessor = (d: number) => renderPercentText(d);
-const perCapitaIncomeValueAccessor = (d: ProvinceData) => d.perCapitaIncome;
-const perCapitaIncomeValueLabelAccessor = (d: number) => renderDollarText(d);
+const totalBudgetValueAccessor = (d: ProvinceData) => d.totalBudget;
+const totalBudgetValueLabelAccessor = (d: number) => renderPoundText(d);
 
 export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>{
     headers: Header<ProvinceData>[];
@@ -309,15 +309,15 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                     </div>
                     <div className={styles.chartContainer}>
                         <h3 className={styles.heading}>
-                            Per Capita Income
+                            Total Budget
                         </h3>
                         <HorizontalBar
                             colorScheme={colorScheme}
                             className={styles.chart}
                             data={selectedProvincesData}
                             labelAccessor={provinceDataLabelAccessor}
-                            valueAccessor={perCapitaIncomeValueAccessor}
-                            valueLabelAccessor={perCapitaIncomeValueLabelAccessor}
+                            valueAccessor={totalBudgetValueAccessor}
+                            valueLabelAccessor={totalBudgetValueLabelAccessor}
                         />
                     </div>
                 </div>
