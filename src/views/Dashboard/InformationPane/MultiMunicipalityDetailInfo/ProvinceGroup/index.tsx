@@ -14,7 +14,8 @@ import {
 
 import MunicipalityDetailInfo from './MunicipalityDetailInfo';
 
-import styles from '.././styles.scss';
+import styles from './styles.scss';
+
 
 interface OwnProps {
     loading?: boolean;
@@ -46,6 +47,7 @@ export class ProvinceGroup extends React.PureComponent<Props, State>{
     render() {
         const {
             loading,
+            datum,
             selectedMunicipalites,
         } = this.props;
 
@@ -62,19 +64,22 @@ export class ProvinceGroup extends React.PureComponent<Props, State>{
 
         if (loading) {
             return (
-                <Message>
+                <Message className={styles.message}>
                     Loading municipality information...
                 </Message>
             );
         }
 
         return (
-            <ListView
-                className={styles.municipalityList}
-                data={selectedMunicipalites}
-                keyExtractor={keyExtractor}
-                modifier={this.renderMunicipalityDetail}
-            />
+            <div className={styles.provinceGroup}>
+                <h4 className={styles.heading}>{datum.name}</h4>
+                <ListView
+                    className={styles.municipalityList}
+                    data={selectedMunicipalites}
+                    keyExtractor={keyExtractor}
+                    modifier={this.renderMunicipalityDetail}
+                />
+            </div>
         );
     }
 }

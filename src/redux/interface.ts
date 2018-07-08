@@ -280,6 +280,8 @@ export interface SetMapLayersAction {
 
 export interface ProvinceDatum {
     id: number;
+    name: string;
+    description?: string;
 }
 
 export interface ProgrammeDatum {

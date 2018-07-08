@@ -1,0 +1,28 @@
+@import '../../../../../stylesheets/base';
+
+.message {
+    flex-grow: 1;
+    height: auto;
+}
+
+.province-group {
+    flex-grow: 1;
+
+    >.heading {
+        position: sticky;
+        top: 0;
+        border-bottom: $width-separator-thin solid $color-primary;
+        background-color: $color-foreground;
+        padding: $spacing-small $spacing-medium;
+        width: 100%;
+        text-transform: uppercase;
+        color: $color-primary;
+        font-weight: $font-weight-bold;
+    }
+
+    .municipality-list {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+}
