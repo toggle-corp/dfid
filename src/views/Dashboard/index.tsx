@@ -104,6 +104,11 @@ interface State {
 
 const emptyList: any[] = [];
 
+const nepalBounds = [
+    80.05858661752791, 26.3478369963687,
+    88.20166918432403, 30.447028670917916,
+];
+
 const renderIndicatorSubTitle = (name: string, unit?: string) => {
     let symbol = unit;
     if (!unit || unit === '0' || unit.toLowerCase() === 'in number') {
@@ -147,7 +152,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleMunicipalityClick = (key: string) => {
-        console.warn('click:', key);
         const { municipalities } = this.props;
         const municipality = municipalities.find(municipality => municipality.hlcitCode === key);
         if (municipality) {
@@ -288,6 +292,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                         className={styles.map}
                         layers={layersInfo}
                         hideLayers={loadingGeoJson}
+                        bounds={nepalBounds}
                     >
                         {this.renderMapChildren()}
                     </Map>

@@ -30,7 +30,6 @@ const propTypes = {
         integerId: PropTypes.bool,
         labelKey: PropTypes.string,
         handleHover: PropTypes.bool,
-        zoomOnLoad: PropTypes.bool,
         onClick: PropTypes.objectOf(PropTypes.func),
     }),
 };
@@ -38,7 +37,6 @@ const propTypes = {
 const defaultProps = {
     map: undefined,
     properties: {
-        zoomOnLoad: false,
         handleHover: false,
         stylePerElement: false,
     },
@@ -118,20 +116,6 @@ export default class MapLayer extends React.PureComponent {
 
         if (!geoJson) {
             return;
-        }
-
-        if (properties.zoomOnLoad) {
-            const bounds = turf.bbox(geoJson);
-            map.fitBounds(
-                [[
-                    bounds[0],
-                    bounds[1],
-                ], [
-                    bounds[2],
-                    bounds[3],
-                ]],
-                { padding: 128 },
-            );
         }
 
         map.addSource(properties.layerKey, {

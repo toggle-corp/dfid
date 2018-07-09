@@ -14,6 +14,7 @@ const propTypes = {
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node
     ]),
+    bounds: PropTypes.arrayOf(PropTypes.number),
 };
 
 const defaultProps = {
@@ -21,6 +22,7 @@ const defaultProps = {
     layers: {},
     hideLayers: false,
     children: undefined,
+    bounds: undefined,
 };
 
 export default class Map extends React.PureComponent {
@@ -107,6 +109,20 @@ export default class Map extends React.PureComponent {
             // we are still mounted before doing setState
             if (this.mounted) {
                 this.setState({ map });
+
+                const { bounds } = this.props;
+                if (bounds) {
+                    map.fitBounds(
+                        [[
+                            bounds[0],
+                            bounds[1],
+                        ], [
+                            bounds[2],
+                            bounds[3],
+                        ]],
+                        { padding: 128 },
+                    );
+                }
             }
         });
 
@@ -118,6 +134,23 @@ export default class Map extends React.PureComponent {
             this.layers = Map.createSortedLayers(nextProps.layers);
             this.legendItems = Map.createLegendItems(this.layers);
             this.reloadKey += 1;
+        }
+
+        if (this.props.bounds !== nextProps.bounds && this.state.map) {
+            const { bounds } = nextProps.props;
+            const { map } = this.state;
+            if (bounds) {
+                map.fitBounds(
+                    [[
+                        bounds[0],
+                        bounds[1],
+                    ], [
+                        bounds[2],
+                        bounds[3],
+                    ]],
+                    { padding: 128 },
+                );
+            }
         }
     }
 

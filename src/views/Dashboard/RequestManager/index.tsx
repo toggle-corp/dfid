@@ -583,7 +583,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
             file: urlForCountryGeoJson,
             order: 1,
             stylePerElement: true,
-            zoomOnLoad: true,
             handleHover: true,
             showPopUp: true,
             idKey: 'Province',
