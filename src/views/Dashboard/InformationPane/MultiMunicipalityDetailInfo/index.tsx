@@ -19,7 +19,7 @@ interface OwnProps {
     loading?: boolean;
 }
 interface PropsFromState {
-    selectedProvince: Province[];
+    selectedProvinces: Province[];
 }
 
 type Props = OwnProps & PropsFromState;
@@ -44,20 +44,20 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
     render() {
         const {
             loading,
-            selectedProvince,
+            selectedProvinces,
         } = this.props;
 
-        if (!selectedProvince.length) {
+        if (!selectedProvinces.length) {
             return (
                 <Message className={styles.message}>
-                    No municipalites selected (Selected them from map)
+                    No municipality selected
                 </Message>
             );
         }
 
         if (loading) {
             return (
-                <Message>
+                <Message className={styles.message}>
                     Loading province information...
                 </Message>
             );
@@ -66,7 +66,7 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
         return (
             <ListView
                 className={styles.municipalityList}
-                data={selectedProvince}
+                data={selectedProvinces}
                 keyExtractor={keyExtractor}
                 modifier={this.renderProjectGroup}
             />
@@ -75,7 +75,7 @@ export class MultiMunicipalityDetailInfo extends React.PureComponent<Props, Stat
 }
 
 const mapStateToProps = (state: RootState) => ({
-    selectedProvince: dashboardProvincesSelector(state),
+    selectedProvinces: dashboardProvincesSelector(state),
 });
 
 export default connect<PropsFromState, OwnProps>(
