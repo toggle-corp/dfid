@@ -248,9 +248,32 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     renderMunicipalityProgram = (key: string, datum: any) => {
         return (
-            <div key={key}>
-                {datum.program}: {datum.programBudget}
+            <div key={key} className={styles.program}>
+                <span>{datum.program}</span>
+                <span className={styles.number}>{renderPound(datum.programBudget)}</span>
+                <span className={styles.number}>{renderNumeral(datum.totalNoOfPartners, 0)}</span>
             </div>
+        );
+    }
+
+    renderMunicipalityProgramList = (municipality?: Municipality) => {
+        if (!municipality || !municipality.programs || municipality.programs.length === 0) {
+            return;
+        }
+
+        return (
+            <div className={styles.programs}>
+                <div className={styles.header}>
+                    <span>Program</span>
+                    <span>Budget</span>
+                    <span>Partners</span>
+                </div>
+                <List
+                    data={municipality.programs}
+                    keyExtractor={Dashboard.municipalityProgramKeyExtractor}
+                    modifier={this.renderMunicipalityProgram}
+                />
+        </div>
         );
     }
 
@@ -261,18 +284,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
         return (
             <div className={styles.municipalityTooltip}>
-                <div className={styles.title}>
+                <h4 className={styles.title}>
                     {label}
-                </div>
-                {municipality && municipality.programs.length > 0 && (
-                    <div className={styles.programs}>
-                        <List
-                            data={municipality.programs}
-                            keyExtractor={Dashboard.municipalityProgramKeyExtractor}
-                            modifier={this.renderMunicipalityProgram}
-                        />
-                    </div>
-                )}
+                </h4>
+                {this.renderMunicipalityProgramList(municipality)}
             </div>
         );
     }

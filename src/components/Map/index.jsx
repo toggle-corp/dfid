@@ -108,21 +108,24 @@ export default class Map extends React.PureComponent {
             // Since the map is loaded asynchronously, make sure
             // we are still mounted before doing setState
             if (this.mounted) {
-                this.setState({ map });
+                map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e6/Lol_circle.png', (error, circle) => {
+                    const { bounds } = this.props;
+                    if (bounds) {
+                        map.fitBounds(
+                            [[
+                                bounds[0],
+                                bounds[1],
+                            ], [
+                                bounds[2],
+                                bounds[3],
+                            ]],
+                            { padding: 128 },
+                        );
+                    }
+                    map.addImage('circle', circle);
 
-                const { bounds } = this.props;
-                if (bounds) {
-                    map.fitBounds(
-                        [[
-                            bounds[0],
-                            bounds[1],
-                        ], [
-                            bounds[2],
-                            bounds[3],
-                        ]],
-                        { padding: 128 },
-                    );
-                }
+                    this.setState({ map });
+                });
             }
         });
 

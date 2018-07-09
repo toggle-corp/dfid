@@ -166,27 +166,38 @@ export default class MapLayer extends React.PureComponent {
                 layerType: 'circle',
                 paint: {
                     'circle-color': this.getPaintData(properties, 'color'),
-                    'circle-opacity': this.getPaintData(properties, 'opacity', 0.65),
+                    'circle-opacity': this.getPaintData(properties, 'opacity', 1),
                 },
-                hoverPaint: properties.handleHover && ({
-                    'circle-color': this.getPaintData(properties, 'hoverColor'),
-                    'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 0.65),
-                }),
+                // hoverPaint: properties.handleHover && ({
+                //     'circle-color': this.getPaintData(properties, 'hoverColor'),
+                //     'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 1),
+                // }),
             });
         }
 
         if (properties.types.indexOf('Text') >= 0) {
+            const textFieldData = this.getPaintData(properties, 'textField');
+            const iconImageData = {
+                ...textFieldData,
+                stops: textFieldData.stops.map(d => [d[0], d[1] ? 'circle' : '']),
+            };
+
             this.createMapBoxLayer({
                 ...properties,
                 map,
                 layerType: 'symbol',
                 layout: {
-                    'text-field': this.getPaintData(properties, 'textField'),
+                    'text-field': textFieldData,
                     'text-size': {
-                        stops: [[7, 0], [7.2, 12]],
+                        stops: [[7, 0], [7.2, 11]],
+                    },
+                    'icon-image': iconImageData,
+                    'icon-size': {
+                        stops: [[7, 0], [7.2, 0.02]],
                     },
                 },
                 paint: {
+                    'icon-opacity': 0.75,
                     'text-color': '#2a2a2a',
                 },
             });
@@ -303,7 +314,7 @@ export default class MapLayer extends React.PureComponent {
                 popup.setLngLat(map.unproject([
                     e.point.x,
                     e.point.y - 8,
-                ])).addTo(map);
+                ]));
 
                 renderInto(tooltipContainer, this.renderTooltip(feature.properties));
                 popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
