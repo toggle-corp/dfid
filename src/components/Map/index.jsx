@@ -6,6 +6,9 @@ import MapLayer from './MapLayer';
 import Legend from './Legend';
 import styles from './styles.scss';
 
+import Button from '../../vendor/react-store/components/Action/Button';
+import { iconNames } from '../../vendor/react-store/constants';
+
 const propTypes = {
     className: PropTypes.string,
     layers: PropTypes.object,
@@ -100,6 +103,7 @@ export default class Map extends React.PureComponent {
             maxZoom: 10,
             logoPosition: 'top-left',
             doubleClickZoom: false,
+            preserveDrawingBuffer: true,
             // failIfMajorPerformanceCaveat: true,
             // maxBounds: [[76.477634, 25.361567], [92.338761, 31.891382]],
         });
@@ -180,6 +184,19 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
+    handleExportClick = () => {
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+
+        const canvas = map.getCanvas();
+        const link = document.createElement('a');
+        link.download = 'map-export.png';
+        link.href = canvas.toDataURL()
+        link.click();
+    }
+
     renderMapLayer = (layerInfo) => {
         let key = `${layerInfo.layerKey}-layer`;
         if (!layerInfo.donotReload) {
@@ -220,7 +237,7 @@ export default class Map extends React.PureComponent {
                 ref={this.mapContainer}
             >
                 <MapLayers />
-                <div className={styles.panels}>
+                <div className={styles.leftBottomPanels}>
                     {this.legendItems.length > 0 && (
                         <Legend
                             className={styles.legend}
@@ -228,6 +245,15 @@ export default class Map extends React.PureComponent {
                         />
                     )}
                     { children }
+                </div>
+                <div className={styles.rightBottomPanels}>
+                    <Button
+                        className={styles.exportButton}
+                        onClick={this.handleExportClick}
+                        iconName={iconNames.download}
+                    >
+                        Export
+                    </Button>
                 </div>
             </div>
         );
