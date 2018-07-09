@@ -277,6 +277,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
         );
     }
 
+    renderMaplayerTooltip = (properties: any) => {
+        return null;
+    }
+
     render() {
         const { layersInfo } = this.state;
         const {
@@ -309,6 +313,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     handleProvinceClick={this.handleProvinceClick}
                     handleMunicipalityClick={this.handleMunicipalityClick}
                     renderMunicipalityTooltip={this.renderMunicipalityTooltip}
+                    renderMaplayerTooltip={this.renderMaplayerTooltip}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
                     loading={!!loading}

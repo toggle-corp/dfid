@@ -19,7 +19,7 @@ const stylePropType = PropTypes.shape({
 const propTypes = {
     map: PropTypes.object,
     properties: PropTypes.shape({
-        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile'])),
+        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile', 'Text'])),
         layerKey: PropTypes.string,
         geoJson: PropTypes.object,
         style: PropTypes.oneOfType([
@@ -168,6 +168,27 @@ export default class MapLayer extends React.PureComponent {
                     'circle-color': this.getPaintData(properties, 'color'),
                     'circle-opacity': this.getPaintData(properties, 'opacity', 0.65),
                 },
+                hoverPaint: properties.handleHover && ({
+                    'circle-color': this.getPaintData(properties, 'hoverColor'),
+                    'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 0.65),
+                }),
+            });
+        }
+
+        if (properties.types.indexOf('Text') >= 0) {
+            this.createMapBoxLayer({
+                ...properties,
+                map,
+                layerType: 'symbol',
+                layout: {
+                    'text-field': this.getPaintData(properties, 'textField'),
+                    'text-size': {
+                        stops: [[7, 0], [7.2, 12]],
+                    },
+                },
+                paint: {
+                    'text-color': '#2a2a2a',
+                },
             });
         }
     }
@@ -180,6 +201,7 @@ export default class MapLayer extends React.PureComponent {
         labelKey,
         visibleCondition,
         paint,
+        layout = {},
         hoverPaint = undefined,
     }) => {
         const layerId = `${layerKey}-${layerType}`;
@@ -188,6 +210,7 @@ export default class MapLayer extends React.PureComponent {
             id: layerId,
             type: layerType,
             source: layerKey,
+            layout,
             paint,
         });
         this.layers.push(layerId);

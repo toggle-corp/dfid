@@ -90,6 +90,7 @@ interface OwnProps {
     handleMunicipalityClick(key: string): void;
     setLayersInfo(settings: object): void;
     renderMunicipalityTooltip(properties: object): void;
+    renderMaplayerTooltip(properties: object): void;
     loading: boolean;
 }
 interface PropsFromState {
@@ -276,9 +277,16 @@ export class RequestManager extends React.PureComponent<Props, State>{
             selectedStyles[municipality.hlcitCode] = mapStyles.municipalitiesSelected;
         });
 
+        municipalities.forEach((municipality) => {
+            styles[municipality.hlcitCode] = {
+                textField: String(municipality.totalNoOfProgrammes || ''),
+            };
+        });
+
         if (selectedIndicator) {
             municipalities.forEach((municipality) => {
                 styles[municipality.hlcitCode] = {
+                    ...styles[municipality.hlcitCode],
                     ...mapStyles.municipalities,
                     ...(selectedStyles[municipality.hlcitCode] || emptyObject),
                     opacity: 0,
@@ -290,6 +298,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         if (selectedProgrammes.length === 0) {
             municipalities.forEach((municipality) => {
                 styles[municipality.hlcitCode] = {
+                    ...styles[municipality.hlcitCode],
                     ...mapStyles.municipalities,
                     ...(selectedStyles[municipality.hlcitCode] || emptyObject),
                 };
@@ -317,6 +326,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
             const fractionWithOffset = fraction * (0.85 - offset) + offset;
 
             styles[municipality.hlcitCode] = {
+                ...styles[municipality.hlcitCode],
                 ...mapStyles.municipalities,
                 ...(selectedStyles[municipality.hlcitCode] || emptyObject),
                 opacity: fractionWithOffset,
@@ -610,7 +620,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 id: 'municipalities',
                 file: urlForMunicipalitiesGeoJson,
                 order: 0,
-                types: ['Line', 'Polygon'],
+                types: ['Line', 'Polygon', 'Text'],
                 style: this.getMunicipalityStyle(props),
                 idKey: 'HLCIT_CODE',
                 labelKey: 'LU_Name',
@@ -652,8 +662,14 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 types: [l.type],
                 style: {
                     color: getHexFromString(l.layerName),
+                    hoverColor: getHexFromString(l.layerName),
                 },
                 order: (l.type === 'Polygon') ? -1 : 10,
+
+                idKey: 'id',
+                handleHover: true,
+                showPopUp: true,
+                tooltipModifier: props.renderMaplayerTooltip,
             })),
         });
     }
