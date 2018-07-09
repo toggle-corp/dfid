@@ -41,3 +41,17 @@ $width-left-pane: 240px;
         }
     }
 }
+
+
+.municipality-tooltip {
+    background-color: $color-foreground;
+
+    .title {
+        padding: $spacing-small $spacing-medium;
+        font-weight: $font-weight-normal;
+    }
+
+    .programs {
+        padding: $spacing-small $spacing-medium;
+    }
+}

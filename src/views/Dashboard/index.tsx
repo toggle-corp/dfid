@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+import List from '../../vendor/react-store/components/View/List';
 import update from '../../vendor/react-store/utils/immutable-update';
 import { getRgbFromHex } from '../../vendor/react-store/utils/common';
 import mapStyles from '../../constants/mapStyles';
@@ -128,6 +129,9 @@ const renderIndicatorLabel = (value: number, unit?: string) => {
 };
 
 export class Dashboard extends React.PureComponent<Props, State>{
+    static municipalityProgramKeyExtractor = (programme: MunicipalityProgramme) => (
+        programme.program
+    )
 
     constructor(props: Props) {
         super(props);
@@ -242,6 +246,37 @@ export class Dashboard extends React.PureComponent<Props, State>{
         </React.Fragment>
     )
 
+    renderMunicipalityProgram = (key: string, datum: any) => {
+        return (
+            <div key={key}>
+                {datum.program}: {datum.programBudget}
+            </div>
+        );
+    }
+
+    renderMunicipalityTooltip = (properties: any) => {
+        const { municipalities } = this.props;
+        const label = properties.LU_Name;
+        const municipality = municipalities.find(m => m.hlcitCode === properties.HLCIT_CODE);
+
+        return (
+            <div className={styles.municipalityTooltip}>
+                <div className={styles.title}>
+                    {label}
+                </div>
+                {municipality && municipality.programs.length > 0 && (
+                    <div className={styles.programs}>
+                        <List
+                            data={municipality.programs}
+                            keyExtractor={Dashboard.municipalityProgramKeyExtractor}
+                            modifier={this.renderMunicipalityProgram}
+                        />
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     render() {
         const { layersInfo } = this.state;
         const {
@@ -273,6 +308,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <RequestManager
                     handleProvinceClick={this.handleProvinceClick}
                     handleMunicipalityClick={this.handleMunicipalityClick}
+                    renderMunicipalityTooltip={this.renderMunicipalityTooltip}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}
                     loading={!!loading}

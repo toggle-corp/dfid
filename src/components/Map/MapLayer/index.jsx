@@ -1,8 +1,10 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 import turf from 'turf';
-import { isTruthy, mapToList } from '../../vendor/react-store/utils/common';
+import { isTruthy, mapToList } from '../../../vendor/react-store/utils/common';
+import styles from './styles.scss';
 
 
 const stylePropType = PropTypes.shape({
@@ -42,6 +44,10 @@ const defaultProps = {
     },
 };
 
+
+const renderInto = (container, component) => (
+    ReactDOM.render(component, container)
+);
 
 export default class MapLayer extends React.PureComponent {
     static propTypes = propTypes;
@@ -229,12 +235,13 @@ export default class MapLayer extends React.PureComponent {
     handleHover = (map, layerId, labelKey, layerType) => {
         const hoverLayerId = `${layerId}-hover`;
         let popup;
+        let tooltipContainer;
 
         if (labelKey) {
-            popup = new mapboxgl.Popup({
-                closeButton: false,
-                closeOnClick: false,
-            });
+            tooltipContainer = document.createElement('div');
+            popup = new mapboxgl.Marker(tooltipContainer, {
+                offset: [0, -10],
+            }).setLngLat([0, 0]);
             this.popups[layerId] = popup;
         }
 
@@ -253,19 +260,17 @@ export default class MapLayer extends React.PureComponent {
         });
 
         handlers.mouseenter = (e) => {
-            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
+            const { properties: { idKey = '', labelKey = '' } } = this.props;
             const feature = e.features[0];
             if (popup) {
-                popup.setHTML(
-                    tooltipSelector ?
-                    tooltipSelector(feature.properties) :
-                    feature.properties[labelKey],
-                ).addTo(map);
+                popup.addTo(map);
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
             }
         };
 
         handlers.mousemove = (e) => {
-            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
+            const { properties: { idKey = '', labelKey = '' } } = this.props;
             const feature = e.features[0];
 
             map.setFilter(hoverLayerId, ['==', idKey, feature.properties[idKey]]);
@@ -275,11 +280,10 @@ export default class MapLayer extends React.PureComponent {
                 popup.setLngLat(map.unproject([
                     e.point.x,
                     e.point.y - 8,
-                ])).setHTML(
-                    tooltipSelector ?
-                    tooltipSelector(feature.properties) :
-                    feature.properties[labelKey],
-                ).addTo(map);
+                ])).addTo(map);
+
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
             }
         };
 
@@ -328,6 +332,20 @@ export default class MapLayer extends React.PureComponent {
             type: 'categorical',
             stops: mapToList(style, (v, k) => [k, val(v[key])]),
         };
+    }
+
+    renderTooltip = (properties) => {
+        const { properties: { labelKey, tooltipModifier } } = this.props;
+
+        if (tooltipModifier) {
+            return tooltipModifier(properties);
+        }
+
+        return (
+            <div className={styles.tooltip}>
+                { properties[labelKey] }
+            </div>
+        );
     }
 
     render() {

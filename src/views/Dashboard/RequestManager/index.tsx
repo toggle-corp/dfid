@@ -89,6 +89,7 @@ interface OwnProps {
     handleProvinceClick(key: string): void;
     handleMunicipalityClick(key: string): void;
     setLayersInfo(settings: object): void;
+    renderMunicipalityTooltip(properties: object): void;
     loading: boolean;
 }
 interface PropsFromState {
@@ -631,11 +632,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
                     fill: ['in', 'STATE', ...provinceIds],
                 },
 
-                tooltipSelector: (properties: any) => {
-                    const label = properties.LU_Name;
-                    // TODO: create HTML with other info necessary such as spend data
-                    return label;
-                },
+                tooltipModifier: props.renderMunicipalityTooltip,
             },
         ];
 
