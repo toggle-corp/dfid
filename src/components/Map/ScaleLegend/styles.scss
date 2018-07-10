@@ -3,9 +3,9 @@
 .scale-legend {
     display: flex;
     flex-direction: column;
-    border: $width-separator-thin solid $color-accent;
+    // border: $width-separator-thin solid $color-accent;
     background-color: $color-foreground;
-    width: 350px;
+    width: 340px;
 
     .scale {
         border-bottom: $width-separator-thin solid $color-accent;
@@ -18,7 +18,7 @@
         padding: $spacing-small $spacing-medium;
         color: $color-text-label;
         font-size: $font-size-small;
-        font-weight: 600;
+        font-weight: $font-weight-bold;
     }
 
 

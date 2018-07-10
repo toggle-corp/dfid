@@ -7,13 +7,15 @@ $height-logo: 96px;
 .navbar {
     @include background-color($color-navbar);
     display: flex;
+    position: relative;
     align-items: center;
-    justify-content: space-between;
+    // justify-content: space-between;
+    transition: $duration-transition-medium height ease-in-out;
     box-shadow: 0 $spacing-extra-small $spacing-small (-$spacing-extra-small) $color-shadow-medium;
     padding: 0 $spacing-medium;
 
     &.extended {
-        height: $height-logo;
+        height: $height-navbar-extended;
     }
 
     .dropdown-title {
@@ -54,12 +56,17 @@ $height-logo: 96px;
 
     .main-menu {
         display: flex;
+        position: absolute;
+        right: 50%;
         align-self: stretch;
-        flex-grow: 1;
-        justify-content: center;
+        transform: translateX(50%);
+        transition: $duration-transition-medium all ease-in-out;
+        height: 100%;
 
         &.extended-menu {
-            align-self: flex-end;
+            right: 0;
+            transform: translateX(0);
+            font-size: $font-size-large;
 
             .link {
                 display: inline-block;

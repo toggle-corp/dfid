@@ -27,6 +27,7 @@ $height-logo: 96px;
             .province-map {
                 flex-grow: 1;
                 margin-right: $spacing-medium;
+                background-color: $color-foreground-alt;
                 height: 480px;
             }
 
@@ -90,9 +91,8 @@ $height-logo: 96px;
 
         .about {
             @extend %section;
-            background-color: $color-foreground-alt;
             margin-bottom: $spacing-medium;
-            // padding: $spacing-large 0;
+            background-color: $color-foreground-alt;
 
             .content {
                 display: flex;
@@ -132,10 +132,10 @@ $height-logo: 96px;
         color: $color-text-on-dark;
 
         .content {
-            margin: auto;
-            max-width: $width-body-max;
             display: flex;
             align-items: baseline;
+            margin: auto;
+            max-width: $width-body-max;
         }
 
         .address {

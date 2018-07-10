@@ -76,6 +76,7 @@ export default class MapLayer extends React.PureComponent {
     }
 
     componentWillUnmount() {
+        clearTimeout(this.timeout);
         this.destroy();
     }
 
@@ -303,6 +304,7 @@ export default class MapLayer extends React.PureComponent {
             const { properties: { idKey = '', labelKey = '' } } = this.props;
             const feature = e.features[0];
             if (popup) {
+                clearTimeout(this.timeout);
                 popup.addTo(map);
                 renderInto(tooltipContainer, this.renderTooltip(feature.properties));
                 popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
@@ -317,13 +319,15 @@ export default class MapLayer extends React.PureComponent {
             map.getCanvas().style.cursor = 'pointer';
 
             if (popup) {
-                popup.setLngLat(map.unproject([
-                    e.point.x,
-                    e.point.y - 8,
-                ]));
+                this.timeout = setTimeout(() => {
+                    popup.setLngLat(map.unproject([
+                        e.point.x,
+                        e.point.y - 8,
+                    ]));
 
-                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
-                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
+                    renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                    popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
+                }, 200);
             }
         };
 
@@ -333,7 +337,9 @@ export default class MapLayer extends React.PureComponent {
             map.getCanvas().style.cursor = '';
 
             if (popup) {
-                popup.remove();
+                this.timeout = setTimeout(() => {
+                    popup.remove();
+                }, 200);
             }
         };
 

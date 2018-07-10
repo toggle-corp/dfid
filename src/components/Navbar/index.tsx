@@ -125,6 +125,7 @@ class Navbar extends React.PureComponent<Props, State> {
 
         if (extended) {
             navClassNames.push(styles.extended);
+            navClassNames.push('navbar-extended');
             menuClassNames.push(styles.extendedMenu);
         }
 

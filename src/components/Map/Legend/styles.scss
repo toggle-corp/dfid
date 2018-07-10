@@ -1,17 +1,17 @@
 @import '../../../stylesheets/base';
 
 .legend {
-    opacity: .9;
-    border: $width-separator-thin solid $color-accent;
+    // opacity: .9;
+    // border: $width-separator-thin solid $color-accent;
     background-color: $color-foreground;
-    padding: $spacing-small 0;
+    // padding: $spacing-small 0;
 
     .header {
         border-bottom: $width-separator-thin solid $color-accent;
-        padding: 0 $spacing-medium;
+        padding: $spacing-small $spacing-medium;
         color: $color-text-label;
         font-size: $font-size-small;
-        font-weight: 600;
+        font-weight: $font-weight-bold;
     }
 
     .legend-item {
@@ -30,7 +30,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 1em;
+            height: $font-size-medium;
             overflow-y: hidden;
 
             .icon {

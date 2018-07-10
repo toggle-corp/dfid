@@ -6,12 +6,12 @@
 }
 
 .municipality-details {
-    padding-bottom: $spacing-large;
+    border-bottom: $width-separator-thin solid $color-separator;
 
     >.heading {
-        border-bottom: $width-separator-thin solid $color-primary;
         padding: $spacing-small $spacing-medium;
-        color: $color-primary;
+        text-transform: none;
+        font-size: $font-size-large;
+        font-weight: $font-weight-bold;
     }
-
 }

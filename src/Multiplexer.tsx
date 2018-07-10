@@ -97,11 +97,11 @@ class Multiplexer extends React.PureComponent<Props, {}> {
 
         return (
             <Fragment>
-                <Navbar className="navbar" />
                 <Toast
                     notification={lastNotify}
                     onClose={this.handleToastClose}
                 />
+                <Navbar className="navbar" />
                 <div className="dfid-main-content">
                     <Switch>
                         {routesOrder.map(routeId => this.renderRoute(routeId))}

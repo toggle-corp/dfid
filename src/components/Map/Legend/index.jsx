@@ -111,7 +111,7 @@ export default class Legend extends React.PureComponent {
         return (
             <div className={className} >
                 {legendItems.length > 0 &&
-                    <div className={styles.header}>Layers</div>
+                    <h5 className={styles.header}>Layers</h5>
                 }
                 {legendItems.map(item => this.renderLegendItem(item))}
             </div>
