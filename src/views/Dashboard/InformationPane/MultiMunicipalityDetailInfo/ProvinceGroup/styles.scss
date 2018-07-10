@@ -11,12 +11,12 @@
     >.heading {
         position: sticky;
         top: 0;
-        border-bottom: $width-separator-thin solid $color-primary;
+        border-bottom: $width-separator-thin solid $color-accent;
         background-color: $color-foreground;
         padding: $spacing-small $spacing-medium;
         width: 100%;
         text-transform: uppercase;
-        color: $color-primary;
+        color: $color-accent;
         font-weight: $font-weight-bold;
     }
 

@@ -4,9 +4,10 @@ import ListView from '../../../vendor/react-store/components/View/List/ListView'
 import styles from './styles.scss';
 
 interface Props {
-    label: string;
+    label?: string;
     values: object[];
-    valueModifier(value?: object | string | number): string;
+    // FIXME: Check if ReactNode is supported
+    valueModifier(value?: object | string | number): string | React.ReactNode;
     keySelector(value?: object | string | number, index?: number): string | number;
 }
 
@@ -42,9 +43,11 @@ class ListItem extends React.PureComponent<Props> {
 
         return (
             <div className={styles.listItem} >
-                <div className={styles.label}>
-                    {label}
-                </div>
+                { label &&
+                    <div className={styles.label}>
+                        {label}
+                    </div>
+                }
                 <ListView
                     className={styles.list}
                     data={values}

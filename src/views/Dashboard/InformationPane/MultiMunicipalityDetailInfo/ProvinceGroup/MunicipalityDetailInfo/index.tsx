@@ -9,6 +9,7 @@ import {
     RootState,
     Municipality,
     MunicipalityProgramme,
+    MunicipalityPartner,
     MunicipalityDatum,
 } from '../../../../../../redux/interface';
 
@@ -31,10 +32,28 @@ type Props = OwnProps & PropsFromState ;
 
 interface State {}
 
-const renderProgramName = (data: MunicipalityProgramme) => data.program;
+const progammeKeySelector = (data: MunicipalityProgramme) => data.programId;
+
+const partnerKeySelector = (data: MunicipalityPartner) => data.name;
+
+const renderProgramPartnerName = (data: MunicipalityPartner) => (
+    <div>
+        {data.name}
+    </div>
+);
+
+const renderProgramName = (data: MunicipalityProgramme) => (
+    <div>
+        {data.program}
+        <ListItem
+            values={data.partners}
+            valueModifier={renderProgramPartnerName}
+            keySelector={progammeKeySelector}
+        />
+    </div>
+);
 
 export class MunicipalityDetailInfo extends React.PureComponent<Props, State>{
-    keySelector = (data: MunicipalityProgramme) => data.programId;
 
     render() {
         const {
@@ -85,7 +104,7 @@ export class MunicipalityDetailInfo extends React.PureComponent<Props, State>{
                     label="Program"
                     values={programs}
                     valueModifier={renderProgramName}
-                    keySelector={this.keySelector}
+                    keySelector={partnerKeySelector}
                 />
             </div>
         );
