@@ -236,6 +236,15 @@ export default class Map extends React.PureComponent {
                 className={className}
                 ref={this.mapContainer}
             >
+                <div className={styles.topRightPanels}>
+                    <Button
+                        className={styles.exportButton}
+                        onClick={this.handleExportClick}
+                        iconName={iconNames.download}
+                    >
+                        Export
+                    </Button>
+                </div>
                 <MapLayers />
                 <div className={styles.leftBottomPanels}>
                     {this.legendItems.length > 0 && (
@@ -246,16 +255,7 @@ export default class Map extends React.PureComponent {
                     )}
                     { children }
                 </div>
-                <div className={styles.rightBottomPanels}>
-                    <Button
-                        className={styles.exportButton}
-                        onClick={this.handleExportClick}
-                        iconName={iconNames.download}
-                    >
-                        Export
-                    </Button>
                 </div>
-            </div>
         );
     }
 }

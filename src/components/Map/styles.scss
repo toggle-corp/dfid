@@ -20,17 +20,25 @@
         }
     }
 
-    .right-bottom-panels {
+    .top-right-panels {
         display: flex;
         position: absolute;
-        right: 0;
-        bottom: $spacing-large;
+        top: 8px;
+        left: 7px;
         align-items: flex-end;
         z-index: 100;
 
         .export-button {
             margin-right: $spacing-small;
             margin-bottom: $spacing-small;
+            background-color: $color-accent;
+            padding: $spacing-small;
+            color: $color-foreground;
+            i {
+                padding: 0 $spacing-small;
+            }
+
+
         }
     }
 }
