@@ -258,7 +258,11 @@ export class Dashboard extends React.PureComponent<Props, State>{
 
     renderMunicipalityProgramList = (municipality?: Municipality) => {
         if (!municipality || !municipality.programs || municipality.programs.length === 0) {
-            return;
+            return (
+                <div className={styles.empty}>
+                    No information available
+                </div>
+            );
         }
 
         return (
@@ -273,7 +277,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                     keyExtractor={Dashboard.municipalityProgramKeyExtractor}
                     modifier={this.renderMunicipalityProgram}
                 />
-        </div>
+            </div>
         );
     }
 

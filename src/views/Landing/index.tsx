@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { reverseRoute } from '../../vendor/react-store/utils/common';
 import Numeral from '../../vendor/react-store/components/View/Numeral';
 import HorizontalBar from '../../vendor/react-store/components/Visualization/HorizontalBar';
-import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
+// import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import { RestRequest } from '../../vendor/react-store/utils/rest';
 
 import { pathNames } from '../../constants';
@@ -146,8 +146,8 @@ export class Landing extends React.PureComponent<Props, State> {
     render() {
         const {
             redirectTo,
-            loadingProvincesInfo,
-            loadingMunicipalities,
+            // loadingProvincesInfo,
+            // loadingMunicipalities,
         } = this.state;
         const { provincesInfo } = this.props;
         if (redirectTo) {
@@ -172,7 +172,9 @@ export class Landing extends React.PureComponent<Props, State> {
                         <Overview />
                     </div>
                     <div className={styles.charts}>
+                        {/* removed by fh
                         {(loadingProvincesInfo || loadingMunicipalities) && <LoadingAnimation />}
+                        */}
                         <div className={styles.chartContainer}>
                             <h3 className={styles.heading}>
                                 Total Spend
