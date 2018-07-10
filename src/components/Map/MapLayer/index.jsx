@@ -1,8 +1,10 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 import turf from 'turf';
-import { isTruthy, mapToList } from '../../vendor/react-store/utils/common';
+import { isTruthy, mapToList } from '../../../vendor/react-store/utils/common';
+import styles from './styles.scss';
 
 
 const stylePropType = PropTypes.shape({
@@ -17,7 +19,7 @@ const stylePropType = PropTypes.shape({
 const propTypes = {
     map: PropTypes.object,
     properties: PropTypes.shape({
-        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile'])),
+        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile', 'Text'])),
         layerKey: PropTypes.string,
         geoJson: PropTypes.object,
         style: PropTypes.oneOfType([
@@ -30,7 +32,6 @@ const propTypes = {
         integerId: PropTypes.bool,
         labelKey: PropTypes.string,
         handleHover: PropTypes.bool,
-        zoomOnLoad: PropTypes.bool,
         onClick: PropTypes.objectOf(PropTypes.func),
     }),
 };
@@ -38,12 +39,15 @@ const propTypes = {
 const defaultProps = {
     map: undefined,
     properties: {
-        zoomOnLoad: false,
         handleHover: false,
         stylePerElement: false,
     },
 };
 
+
+const renderInto = (container, component) => (
+    ReactDOM.render(component, container)
+);
 
 export default class MapLayer extends React.PureComponent {
     static propTypes = propTypes;
@@ -120,20 +124,6 @@ export default class MapLayer extends React.PureComponent {
             return;
         }
 
-        if (properties.zoomOnLoad) {
-            const bounds = turf.bbox(geoJson);
-            map.fitBounds(
-                [[
-                    bounds[0],
-                    bounds[1],
-                ], [
-                    bounds[2],
-                    bounds[3],
-                ]],
-                { padding: 128 },
-            );
-        }
-
         map.addSource(properties.layerKey, {
             type: 'geojson',
             data: geoJson,
@@ -176,7 +166,39 @@ export default class MapLayer extends React.PureComponent {
                 layerType: 'circle',
                 paint: {
                     'circle-color': this.getPaintData(properties, 'color'),
-                    'circle-opacity': this.getPaintData(properties, 'opacity', 0.65),
+                    'circle-opacity': this.getPaintData(properties, 'opacity', 1),
+                },
+                // hoverPaint: properties.handleHover && ({
+                //     'circle-color': this.getPaintData(properties, 'hoverColor'),
+                //     'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 1),
+                // }),
+            });
+        }
+
+        if (properties.types.indexOf('Text') >= 0) {
+            const textFieldData = this.getPaintData(properties, 'textField');
+            const iconImageData = {
+                ...textFieldData,
+                stops: textFieldData.stops.map(d => [d[0], d[1] ? 'circle' : '']),
+            };
+
+            this.createMapBoxLayer({
+                ...properties,
+                map,
+                layerType: 'symbol',
+                layout: {
+                    'text-field': textFieldData,
+                    'text-size': {
+                        stops: [[7, 0], [7.2, 11]],
+                    },
+                    'icon-image': iconImageData,
+                    'icon-size': {
+                        stops: [[7, 0], [7.2, 0.02]],
+                    },
+                },
+                paint: {
+                    'icon-opacity': 0.75,
+                    'text-color': '#2a2a2a',
                 },
             });
         }
@@ -190,6 +212,7 @@ export default class MapLayer extends React.PureComponent {
         labelKey,
         visibleCondition,
         paint,
+        layout = {},
         hoverPaint = undefined,
     }) => {
         const layerId = `${layerKey}-${layerType}`;
@@ -198,6 +221,7 @@ export default class MapLayer extends React.PureComponent {
             id: layerId,
             type: layerType,
             source: layerKey,
+            layout,
             paint,
         });
         this.layers.push(layerId);
@@ -245,12 +269,13 @@ export default class MapLayer extends React.PureComponent {
     handleHover = (map, layerId, labelKey, layerType) => {
         const hoverLayerId = `${layerId}-hover`;
         let popup;
+        let tooltipContainer;
 
         if (labelKey) {
-            popup = new mapboxgl.Popup({
-                closeButton: false,
-                closeOnClick: false,
-            });
+            tooltipContainer = document.createElement('div');
+            popup = new mapboxgl.Marker(tooltipContainer, {
+                offset: [0, -10],
+            }).setLngLat([0, 0]);
             this.popups[layerId] = popup;
         }
 
@@ -269,19 +294,17 @@ export default class MapLayer extends React.PureComponent {
         });
 
         handlers.mouseenter = (e) => {
-            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
+            const { properties: { idKey = '', labelKey = '' } } = this.props;
             const feature = e.features[0];
             if (popup) {
-                popup.setHTML(
-                    tooltipSelector ?
-                    tooltipSelector(feature.properties) :
-                    feature.properties[labelKey],
-                ).addTo(map);
+                popup.addTo(map);
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
             }
         };
 
         handlers.mousemove = (e) => {
-            const { properties: { idKey = '', labelKey = '', tooltipSelector } } = this.props;
+            const { properties: { idKey = '', labelKey = '' } } = this.props;
             const feature = e.features[0];
 
             map.setFilter(hoverLayerId, ['==', idKey, feature.properties[idKey]]);
@@ -291,11 +314,10 @@ export default class MapLayer extends React.PureComponent {
                 popup.setLngLat(map.unproject([
                     e.point.x,
                     e.point.y - 8,
-                ])).setHTML(
-                    tooltipSelector ?
-                    tooltipSelector(feature.properties) :
-                    feature.properties[labelKey],
-                ).addTo(map);
+                ]));
+
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
             }
         };
 
@@ -344,6 +366,20 @@ export default class MapLayer extends React.PureComponent {
             type: 'categorical',
             stops: mapToList(style, (v, k) => [k, val(v[key])]),
         };
+    }
+
+    renderTooltip = (properties) => {
+        const { properties: { labelKey, tooltipModifier } } = this.props;
+
+        if (tooltipModifier) {
+            return tooltipModifier(properties);
+        }
+
+        return (
+            <div className={styles.tooltip}>
+                { properties[labelKey] }
+            </div>
+        );
     }
 
     render() {

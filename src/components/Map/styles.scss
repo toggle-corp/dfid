@@ -3,7 +3,7 @@
 .map {
     position: relative;
 
-    .panels {
+    .left-bottom-panels {
         display: flex;
         position: absolute;
         bottom: 0;
@@ -17,6 +17,20 @@
             box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
             max-height: 480px;
             overflow-y: auto;
+        }
+    }
+
+    .right-bottom-panels {
+        display: flex;
+        position: absolute;
+        right: 0;
+        bottom: $spacing-large;
+        align-items: flex-end;
+        z-index: 100;
+
+        .export-button {
+            margin-right: $spacing-small;
+            margin-bottom: $spacing-small;
         }
     }
 }

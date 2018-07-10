@@ -6,6 +6,9 @@ import MapLayer from './MapLayer';
 import Legend from './Legend';
 import styles from './styles.scss';
 
+import Button from '../../vendor/react-store/components/Action/Button';
+import { iconNames } from '../../vendor/react-store/constants';
+
 const propTypes = {
     className: PropTypes.string,
     layers: PropTypes.object,
@@ -14,6 +17,7 @@ const propTypes = {
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node
     ]),
+    bounds: PropTypes.arrayOf(PropTypes.number),
 };
 
 const defaultProps = {
@@ -21,6 +25,7 @@ const defaultProps = {
     layers: {},
     hideLayers: false,
     children: undefined,
+    bounds: undefined,
 };
 
 export default class Map extends React.PureComponent {
@@ -98,6 +103,7 @@ export default class Map extends React.PureComponent {
             maxZoom: 10,
             logoPosition: 'top-left',
             doubleClickZoom: false,
+            preserveDrawingBuffer: true,
             // failIfMajorPerformanceCaveat: true,
             // maxBounds: [[76.477634, 25.361567], [92.338761, 31.891382]],
         });
@@ -106,7 +112,24 @@ export default class Map extends React.PureComponent {
             // Since the map is loaded asynchronously, make sure
             // we are still mounted before doing setState
             if (this.mounted) {
-                this.setState({ map });
+                map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e6/Lol_circle.png', (error, circle) => {
+                    const { bounds } = this.props;
+                    if (bounds) {
+                        map.fitBounds(
+                            [[
+                                bounds[0],
+                                bounds[1],
+                            ], [
+                                bounds[2],
+                                bounds[3],
+                            ]],
+                            { padding: 128 },
+                        );
+                    }
+                    map.addImage('circle', circle);
+
+                    this.setState({ map });
+                });
             }
         });
 
@@ -118,6 +141,23 @@ export default class Map extends React.PureComponent {
             this.layers = Map.createSortedLayers(nextProps.layers);
             this.legendItems = Map.createLegendItems(this.layers);
             this.reloadKey += 1;
+        }
+
+        if (this.props.bounds !== nextProps.bounds && this.state.map) {
+            const { bounds } = nextProps.props;
+            const { map } = this.state;
+            if (bounds) {
+                map.fitBounds(
+                    [[
+                        bounds[0],
+                        bounds[1],
+                    ], [
+                        bounds[2],
+                        bounds[3],
+                    ]],
+                    { padding: 128 },
+                );
+            }
         }
     }
 
@@ -142,6 +182,19 @@ export default class Map extends React.PureComponent {
         ];
 
         return classNames.join(' ');
+    }
+
+    handleExportClick = () => {
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+
+        const canvas = map.getCanvas();
+        const link = document.createElement('a');
+        link.download = 'map-export.png';
+        link.href = canvas.toDataURL()
+        link.click();
     }
 
     renderMapLayer = (layerInfo) => {
@@ -184,7 +237,7 @@ export default class Map extends React.PureComponent {
                 ref={this.mapContainer}
             >
                 <MapLayers />
-                <div className={styles.panels}>
+                <div className={styles.leftBottomPanels}>
                     {this.legendItems.length > 0 && (
                         <Legend
                             className={styles.legend}
@@ -192,6 +245,15 @@ export default class Map extends React.PureComponent {
                         />
                     )}
                     { children }
+                </div>
+                <div className={styles.rightBottomPanels}>
+                    <Button
+                        className={styles.exportButton}
+                        onClick={this.handleExportClick}
+                        iconName={iconNames.download}
+                    >
+                        Export
+                    </Button>
                 </div>
             </div>
         );

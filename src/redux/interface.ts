@@ -326,7 +326,6 @@ export interface MapLayerProps {
     style?: object;
     idKey?: string;
     labelKey?: string;
-    zoomOnLoad?: boolean;
     handleHover?: boolean;
     onClick?(key: String): void;
 }

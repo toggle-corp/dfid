@@ -41,3 +41,47 @@ $width-left-pane: 240px;
         }
     }
 }
+
+
+.municipality-tooltip {
+    @include shadow-small;
+    background-color: $color-foreground;
+    width: 350px;
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-medium;
+
+    .title {
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: $spacing-small $spacing-medium;
+        color: $color-accent;
+        font-weight: $font-weight-bold;
+    }
+
+    .programs {
+        display: table;
+
+        .header {
+            display: table-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+                color: $color-text-label;
+            }
+        }
+
+        .program {
+            display: table-row;
+            @extend %background-alternating-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+
+                &.number {
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
