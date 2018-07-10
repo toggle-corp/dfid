@@ -160,6 +160,11 @@ export default class MapLayer extends React.PureComponent {
         }
 
         if (properties.types.indexOf('Point') >= 0) {
+            const strokePaint = {
+                'circle-stroke-color': this.getPaintData(properties, 'stroke', '#fff'),
+                'circle-stroke-width': this.getPaintData(properties, 'strokeWidth', 0),
+            };
+
             this.createMapBoxLayer({
                 ...properties,
                 map,
@@ -167,11 +172,12 @@ export default class MapLayer extends React.PureComponent {
                 paint: {
                     'circle-color': this.getPaintData(properties, 'color'),
                     'circle-opacity': this.getPaintData(properties, 'opacity', 1),
+                    ...strokePaint,
                 },
-                // hoverPaint: properties.handleHover && ({
-                //     'circle-color': this.getPaintData(properties, 'hoverColor'),
-                //     'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 1),
-                // }),
+                hoverPaint: properties.handleHover && ({
+                    'circle-color': this.getPaintData(properties, 'hoverColor'),
+                    'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 1),
+                }),
             });
         }
 

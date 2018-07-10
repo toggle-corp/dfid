@@ -66,8 +66,8 @@ export default class Map extends React.PureComponent {
 
     // Create legend items from layers which have title and color
     // Perhaps use some defined variable like `showLegend` instead of title and color?
-    static createLegendItems = layers => layers
-        .filter(l => l.title && l.color)
+    static createLegendItems = (layers, zoom) => layers
+        .filter(l => l.title && l.color && (!l.minZoomLevelForLegend || l.minZoomLevelForLegend <= zoom))
         .map(layer => ({
             label: layer.title,
             color: layer.color,
@@ -76,14 +76,14 @@ export default class Map extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.state = {
-            map: undefined,
-        };
-
         this.mapContainer = React.createRef();
         this.layers = Map.createSortedLayers(this.props.layers);
-        this.legendItems = Map.createLegendItems(this.layers);
         this.reloadKey = 0;
+
+        this.state = {
+            map: undefined,
+            legendItems: Map.createLegendItems(this.layers, 3),
+        };
     }
 
     componentDidMount() {
@@ -128,9 +128,17 @@ export default class Map extends React.PureComponent {
                     }
                     map.addImage('circle', circle);
 
-                    this.setState({ map });
+                    if (this.mounted) {
+                        this.setState({ map });
+                    }
                 });
             }
+        });
+
+        map.on('zoom', () => {
+            this.setState({
+                legendItems: Map.createLegendItems(this.layers, map.getZoom()),
+            });
         });
 
         setTimeout(() => { map.resize(); }, 200);
@@ -139,7 +147,9 @@ export default class Map extends React.PureComponent {
     componentWillReceiveProps(nextProps) {
         if (this.props.layers !== nextProps.layers) {
             this.layers = Map.createSortedLayers(nextProps.layers);
-            this.legendItems = Map.createLegendItems(this.layers);
+            this.setState({
+                legendItems: Map.createLegendItems(this.layers, this.state.map ? this.state.map.getZoom() : 3),
+            });
             this.reloadKey += 1;
         }
 
@@ -246,10 +256,10 @@ export default class Map extends React.PureComponent {
                 </div>
                 <MapLayers />
                 <div className={styles.leftBottomPanels}>
-                    {this.legendItems.length > 0 && (
+                    {this.state.legendItems.length > 0 && (
                         <Legend
                             className={styles.legend}
-                            legendItems={this.legendItems}
+                            legendItems={this.state.legendItems}
                         />
                     )}
                     { children }

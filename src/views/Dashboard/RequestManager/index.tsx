@@ -643,6 +643,10 @@ export class RequestManager extends React.PureComponent<Props, State>{
                 },
 
                 tooltipModifier: props.renderMunicipalityTooltip,
+
+                title: 'Number of programs',
+                color: '#ffc000',
+                minZoomLevelForLegend: 7.2,
             },
         ];
 
@@ -655,22 +659,29 @@ export class RequestManager extends React.PureComponent<Props, State>{
     reloadMapLayer = (props: Props) => {
         this.reloadSelectionToLayers({
             keyPrefix: 'mapLayer',
-            selectedList: props.selectedMapLayers.map(l => ({
-                ...l,
-                title: l.layerName,
-                color: getHexFromString(l.layerName),
-                types: [l.type],
-                style: {
-                    color: getHexFromString(l.layerName),
-                    hoverColor: getHexFromString(l.layerName),
-                },
-                order: (l.type === 'Polygon') ? -1 : 10,
+            selectedList: props.selectedMapLayers.map((l) => {
+                const color = getHexFromString(l.layerName);
+                const stroke = '#404040';
 
-                idKey: 'id',
-                handleHover: true,
-                showPopUp: true,
-                tooltipModifier: props.renderMaplayerTooltip,
-            })),
+                return {
+                    ...l,
+                    color,
+                    title: l.layerName,
+                    types: [l.type],
+                    style: {
+                        color,
+                        stroke,
+                        strokeWidth: 1,
+                        hoverColor: color,
+                    },
+                    order: (l.type === 'Polygon') ? -1 : 10,
+
+                    // idKey: 'id',
+                    // handleHover: true,
+                    // showPopUp: true,
+                    // tooltipModifier: props.renderMaplayerTooltip,
+                };
+            }),
         });
     }
 
