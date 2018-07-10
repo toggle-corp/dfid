@@ -280,6 +280,14 @@ export class FilterPane extends React.PureComponent<Props, State>{
 
         const isFilterEmpty = isObjectEmpty(faramValues);
 
+        const inputClassNames = [
+            styles.input,
+        ];
+        if (disabled) {
+            inputClassNames.push(styles.disabled);
+        }
+        const inputClassName = inputClassNames.join(' ');
+
         return (
             <Faram
                 className={classNames.join(' ')}
@@ -326,7 +334,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingProvinces &&
                             <SelectInputWithList
                                 label="Provinces"
-                                className={styles.input}
+                                className={inputClassName}
                                 faramElementName="provincesId"
                                 options={provinces}
                                 keySelector={provinceKeyExtractor}
@@ -338,7 +346,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingSectors &&
                             <SelectInputWithList
                                 label="Sectors"
-                                className={styles.input}
+                                className={inputClassName}
                                 options={sectors}
                                 faramElementName="sectorsId"
                                 keySelector={sectorKeyExtractor}
@@ -350,7 +358,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingProgrammes &&
                             <SelectInputWithList
                                 label="Programmes"
-                                className={styles.input}
+                                className={inputClassName}
                                 options={programmes}
                                 faramElementName="programmesId"
                                 keySelector={programmeKeyExtractor}
@@ -362,31 +370,34 @@ export class FilterPane extends React.PureComponent<Props, State>{
                     </div>
                     <div className={styles.layers}>
                         { !loadingIndicators &&
-                            <SelectInput
-                                label="Indicators"
-                                className={styles.input}
-                                options={indicators}
-                                faramElementName="indicatorId"
-                                keySelector={indicatorKeyExtractor}
-                                labelSelector={indicatorLabelExtractor}
-                                showHintAndError={false}
-                                listProps={{ emptyComponent: renderIndicatorEmpty }}
-                            />
+                            <div className={inputClassName} >
+                                <SelectInput
+                                    label="Indicators"
+                                    options={indicators}
+                                    faramElementName="indicatorId"
+                                    keySelector={indicatorKeyExtractor}
+                                    labelSelector={indicatorLabelExtractor}
+                                    showHintAndError={false}
+                                    listProps={{ emptyComponent: renderIndicatorEmpty }}
+                                />
+                            </div>
                         }
                         { !loadingLayers &&
                             <Fragment>
-                                <SelectInput
-                                    label="Background Layers"
-                                    className={styles.input}
-                                    options={rasterMapLayers}
-                                    faramElementName="rasterMapLayerId"
-                                    keySelector={mapLayerKeyExtractor}
-                                    labelSelector={mapLayerLabelExtractor}
-                                    showHintAndError={false}
-                                />
+                                <div className={inputClassName} >
+                                    <SelectInput
+                                        label="Background Layers"
+                                        className={inputClassName}
+                                        options={rasterMapLayers}
+                                        faramElementName="rasterMapLayerId"
+                                        keySelector={mapLayerKeyExtractor}
+                                        labelSelector={mapLayerLabelExtractor}
+                                        showHintAndError={false}
+                                    />
+                                </div>
                                 <SelectInputWithList
                                     label="Layers"
-                                    className={styles.input}
+                                    className={inputClassName}
                                     options={mapLayers}
                                     faramElementName="mapLayersId"
                                     keySelector={mapLayerKeyExtractor}

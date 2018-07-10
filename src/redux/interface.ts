@@ -404,7 +404,10 @@ export interface MunicipalityProgramme {
     totalNoOfPartner: number;
 }
 
-export interface MunicipalityPartner { }
+export interface MunicipalityPartner {
+    name: string;
+    description: string;
+}
 
 export interface SetMunicipalitiesAction {
     municipalities: Municipality[];

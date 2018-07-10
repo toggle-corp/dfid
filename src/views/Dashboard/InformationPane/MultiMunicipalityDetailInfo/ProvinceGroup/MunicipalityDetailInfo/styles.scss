@@ -9,8 +9,9 @@
     padding-bottom: $spacing-large;
 
     >.heading {
+        border-bottom: $width-separator-thin solid $color-primary;
         padding: $spacing-small $spacing-medium;
-        color: $color-accent;
+        color: $color-primary;
     }
 
 }
