@@ -23,22 +23,9 @@
     .top-right-panels {
         display: flex;
         position: absolute;
-        top: 8px;
-        left: 7px;
+        top: $spacing-medium;
+        left: $spacing-medium;
         align-items: flex-end;
         z-index: 100;
-
-        .export-button {
-            margin-right: $spacing-small;
-            margin-bottom: $spacing-small;
-            background-color: $color-accent;
-            padding: $spacing-small;
-            color: $color-foreground;
-            i {
-                padding: 0 $spacing-small;
-            }
-
-
-        }
     }
 }

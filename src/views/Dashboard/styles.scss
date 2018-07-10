@@ -14,7 +14,6 @@ $width-left-pane: 240px;
         flex-grow: 0;
         flex-shrink: 0;
         z-index: 1;
-        box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
     }
 
     >.right {
@@ -37,7 +36,6 @@ $width-left-pane: 240px;
             top: $spacing-medium;
             right: $spacing-medium;
             z-index: 1111;
-            box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
         }
     }
 }

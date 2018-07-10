@@ -6,7 +6,7 @@ import MapLayer from './MapLayer';
 import Legend from './Legend';
 import styles from './styles.scss';
 
-import Button from '../../vendor/react-store/components/Action/Button';
+import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
 import { iconNames } from '../../vendor/react-store/constants';
 
 const propTypes = {
@@ -101,7 +101,7 @@ export default class Map extends React.PureComponent {
             zoom: 3,
             minZoom: 3,
             maxZoom: 10,
-            logoPosition: 'top-left',
+            logoPosition: 'bottom-right',
             doubleClickZoom: false,
             preserveDrawingBuffer: true,
             // failIfMajorPerformanceCaveat: true,
@@ -237,13 +237,12 @@ export default class Map extends React.PureComponent {
                 ref={this.mapContainer}
             >
                 <div className={styles.topRightPanels}>
-                    <Button
-                        className={styles.exportButton}
+                    <AccentButton
                         onClick={this.handleExportClick}
                         iconName={iconNames.download}
                     >
                         Export
-                    </Button>
+                    </AccentButton>
                 </div>
                 <MapLayers />
                 <div className={styles.leftBottomPanels}>
@@ -255,7 +254,7 @@ export default class Map extends React.PureComponent {
                     )}
                     { children }
                 </div>
-                </div>
+            </div>
         );
     }
 }

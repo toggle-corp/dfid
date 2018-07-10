@@ -7,9 +7,11 @@ $width-information-pane: 400px;
     display: flex;
     flex-direction: column;
     opacity: .96;
+    box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
     background-color: $color-background-row;
 
     &.collapsed {
+        box-shadow: none;
         background-color: transparent;
         width: 38px;
         height: 38px;
