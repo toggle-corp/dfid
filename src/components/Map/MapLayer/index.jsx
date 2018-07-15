@@ -2,396 +2,171 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
-import turf from 'turf';
-import { isTruthy, mapToList } from '../../../vendor/react-store/utils/common';
-import styles from './styles.scss';
-
-
-const stylePropType = PropTypes.shape({
-    color: PropTypes.string,
-    stroke: PropTypes.string,
-    strokeWeight: PropTypes.number,
-    opacity: PropTypes.number,
-    hoverColor: PropTypes.string,
-});
 
 
 const propTypes = {
     map: PropTypes.object,
-    properties: PropTypes.shape({
-        types: PropTypes.arrayOf(PropTypes.oneOf(['Polygon', 'Line', 'Point', 'Tile', 'Text'])),
-        layerKey: PropTypes.string,
-        geoJson: PropTypes.object,
-        style: PropTypes.oneOfType([
-            stylePropType,
-            PropTypes.objectOf(stylePropType),
-        ]),
-        stylePerElement: PropTypes.bool,
-        visibleCondition: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.any)),
-        idKey: PropTypes.string,
-        integerId: PropTypes.bool,
-        labelKey: PropTypes.string,
-        handleHover: PropTypes.bool,
-        onClick: PropTypes.objectOf(PropTypes.func),
+    type: PropTypes.string.isRequired,
+    paint: PropTypes.object.isRequired,
+    filter: PropTypes.array,
+
+    layerKey: PropTypes.string.isRequired,
+    sourceKey: PropTypes.string.isRequired,
+    property: PropTypes.string,
+
+    hoverInfo: PropTypes.shape({
+        paint: PropTypes.object.isRequired,
     }),
+
+    onClick: PropTypes.func,
 };
 
 const defaultProps = {
     map: undefined,
-    properties: {
-        handleHover: false,
-        stylePerElement: false,
-    },
+    property: undefined,
+    filter: undefined,
+    hoverInfo: undefined,
+    onClick: undefined,
 };
 
-
-const renderInto = (container, component) => (
-    ReactDOM.render(component, container)
-);
 
 export default class MapLayer extends React.PureComponent {
     static propTypes = propTypes;
     static defaultProps = defaultProps;
 
-    constructor(props) {
-        super(props);
-
-        this.sources = [];
-        this.layers = [];
-        this.eventHandlers = {};
-        this.popups = {};
-    }
+    eventHandlers = {};
 
     componentDidMount() {
-        this.load(this.props);
+        this.create(this.props);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.map !== this.props.map ||
-            nextProps.properties !== this.props.properties
-        ) {
+        if (this.props.map !== nextProps.map) {
             this.destroy();
-            this.load(nextProps);
+            this.create(nextProps);
+        } else if (this.props.paint !== nextProps.paint) {
+            this.reloadPaint(nextProps);
+        } else if (this.props.filter !== nextProps.filter) {
+            this.reloadFilter(nextProps);
         }
     }
 
     componentWillUnmount() {
-        clearTimeout(this.timeout);
         this.destroy();
     }
 
     destroy = () => {
-        const { map } = this.props;
+        const { map, layerKey } = this.props;
         if (map) {
-            Object.keys(this.eventHandlers).forEach((layerId) => {
-                const handlers = this.eventHandlers[layerId];
-                Object.keys(handlers).forEach((type) => {
-                    const listener = handlers[type];
-                    map.off(type, layerId, listener);
-                });
+            Object.keys(this.eventHandlers).forEach((type) => {
+                const listener = this.eventHandlers[type];
+                map.off(type, layerKey, listener);
             });
-            Object.values(this.popups).forEach((popup) => {
-                popup.remove();
-            });
-            this.layers.forEach(layer => map.removeLayer(layer));
-            this.sources.forEach(source => map.removeSource(source));
+            if (this.layer) {
+                map.removeLayer(this.layer);
+            }
+            if (this.hoverLayer) {
+                map.removeLayer(this.hoverLayer);
+            }
         }
-        this.eventHandlers = {};
-        this.popups = {};
-        this.layers = [];
-        this.sources = [];
+        this.layer = undefined;
+        this.hoverLayer = undefined;
     }
 
-    load = (props) => {
+    create = (props) => {
         const {
             map,
-            properties,
+            sourceKey,
+            layerKey,
+            type,
+            paint,
+            filter,
+            onClick,
+            property,
         } = props;
 
-        if (!map) {
-            return;
-        }
-
-        const { geoJson } = properties;
-
-        if (properties.types.indexOf('Tile') >= 0) {
-            this.createMapBoxTileLayer({
-                ...properties,
-                map,
-            });
-        }
-
-        if (!geoJson) {
-            return;
-        }
-
-        map.addSource(properties.layerKey, {
-            type: 'geojson',
-            data: geoJson,
-        });
-        this.sources.push(properties.layerKey);
-
-        if (properties.types.indexOf('Polygon') >= 0) {
-            this.createMapBoxLayer({
-                ...properties,
-                map,
-                layerType: 'fill',
-                paint: {
-                    'fill-color': this.getPaintData(properties, 'color'),
-                    'fill-opacity': this.getPaintData(properties, 'opacity', 0.65),
-                },
-                hoverPaint: properties.handleHover && ({
-                    'fill-color': this.getPaintData(properties, 'hoverColor'),
-                    'fill-opacity': this.getPaintData(properties, 'hoverOpacity'),
-                }),
-            });
-        }
-
-        if (properties.types.indexOf('Line') >= 0) {
-            this.createMapBoxLayer({
-                ...properties,
-                map,
-                layerType: 'line',
-                paint: {
-                    'line-color': this.getPaintData(properties, 'stroke'),
-                    'line-width': this.getPaintData(properties, 'strokeWidth', 1),
-                    'line-opacity': this.getPaintData(properties, 'strokeOpacity', 1),
-                },
-            });
-        }
-
-        if (properties.types.indexOf('Point') >= 0) {
-            const strokePaint = {
-                'circle-stroke-color': this.getPaintData(properties, 'stroke', '#fff'),
-                'circle-stroke-width': this.getPaintData(properties, 'strokeWidth', 0),
-            };
-
-            this.createMapBoxLayer({
-                ...properties,
-                map,
-                layerType: 'circle',
-                paint: {
-                    'circle-color': this.getPaintData(properties, 'color'),
-                    'circle-opacity': this.getPaintData(properties, 'opacity', 1),
-                    ...strokePaint,
-                },
-                hoverPaint: properties.handleHover && ({
-                    'circle-color': this.getPaintData(properties, 'hoverColor'),
-                    'circle-opacity': this.getPaintData(properties, 'hoverOpacity', 1),
-                }),
-            });
-        }
-
-        if (properties.types.indexOf('Text') >= 0) {
-            const textFieldData = this.getPaintData(properties, 'textField');
-            const iconImageData = {
-                ...textFieldData,
-                stops: textFieldData.stops.map(d => [d[0], d[1] ? 'circle' : '']),
-            };
-
-            this.createMapBoxLayer({
-                ...properties,
-                map,
-                layerType: 'symbol',
-                layout: {
-                    'text-field': textFieldData,
-                    'text-size': {
-                        stops: [[7, 0], [7.2, 11]],
-                    },
-                    'icon-image': iconImageData,
-                    'icon-size': {
-                        stops: [[7, 0], [7.2, 0.02]],
-                    },
-                },
-                paint: {
-                    'icon-opacity': 0.75,
-                    'text-color': '#2a2a2a',
-                },
-            });
-        }
-    }
-
-    createMapBoxLayer = ({
-        map,
-        layerKey,
-        layerType,
-        idKey,
-        labelKey,
-        visibleCondition,
-        paint,
-        layout = {},
-        hoverPaint = undefined,
-    }) => {
-        const layerId = `${layerKey}-${layerType}`;
-
         map.addLayer({
-            id: layerId,
-            type: layerType,
-            source: layerKey,
-            layout,
+            id: layerKey,
+            source: sourceKey,
+            type,
             paint,
         });
-        this.layers.push(layerId);
+        this.layer = layerKey;
 
-        if (hoverPaint) {
-            map.addLayer({
-                id: `${layerId}-hover`,
-                type: layerType,
-                source: layerKey,
-                paint: hoverPaint,
-                filter: ['==', idKey, ''],
-            });
-
-            this.layers.push(`${layerId}-hover`);
-            this.handleHover(map, layerId, labelKey, layerType);
+        if (filter) {
+            map.setFilter(layerKey, filter);
         }
 
-        if (visibleCondition && visibleCondition[layerType]) {
-            map.setFilter(layerId, visibleCondition[layerType]);
+        if (onClick) {
+            this.eventHandlers.click = (e) => {
+                const feature = e.features[0];
+                onClick(feature.properties[property]);
+            }
         }
+
+        this.createHoverLayer(props);
+
+        Object.keys(this.eventHandlers).forEach((type) => {
+            const listener = this.eventHandlers[type];
+            map.on(type, layerKey, listener);
+        });
     }
 
-    createMapBoxTileLayer = ({
-        map,
-        layerKey,
-        tiles,
-        tileSize,
-    }) => {
-        map.addSource(layerKey, {
-            type: 'raster',
-            tiles,
-            tileSize,
-        });
-        this.sources.push(layerKey);
+    createHoverLayer = ({ map, sourceKey, layerKey, property, type, hoverInfo }) => {
+        if (!hoverInfo) {
+            return;
+        }
+        const hoverLayerKey = `${layerKey}-hover`;
+
+        const {
+            paint,
+        } = hoverInfo;
 
         map.addLayer({
-            id: `${layerKey}-layer`,
-            type: 'raster',
-            source: layerKey,
-            paint: {}
-        });
-        this.layers.push(`${layerKey}-layer`);
-    }
-
-    handleHover = (map, layerId, labelKey, layerType) => {
-        const hoverLayerId = `${layerId}-hover`;
-        let popup;
-        let tooltipContainer;
-
-        if (labelKey) {
-            tooltipContainer = document.createElement('div');
-            popup = new mapboxgl.Marker(tooltipContainer, {
-                offset: [0, -10],
-            }).setLngLat([0, 0]);
-            this.popups[layerId] = popup;
-        }
-
-        if (!this.eventHandlers[layerId]) {
-            this.eventHandlers[layerId] = {};
-        }
-        const handlers = this.eventHandlers[layerId];
-
-        map.on('zoom', (e) => {
-            if (e.originalEvent && popup) {
-                popup.setLngLat(map.unproject([
-                    e.originalEvent.offsetX,
-                    e.originalEvent.offsetY - 8,
-                ]));
-            }
+            id: hoverLayerKey,
+            source: sourceKey,
+            type,
+            paint,
+            filter: ['==', property, ''],
         });
 
-        handlers.mouseenter = (e) => {
-            const { properties: { idKey = '', labelKey = '' } } = this.props;
-            const feature = e.features[0];
-            if (popup) {
-                clearTimeout(this.timeout);
-                popup.addTo(map);
-                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
-                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
-            }
-        };
+        this.hoverLayer = hoverLayerKey;
 
-        handlers.mousemove = (e) => {
-            const { properties: { idKey = '', labelKey = '' } } = this.props;
-            const feature = e.features[0];
+        // this.eventHandlers.mouseenter = (e) => {
+        //     const feature = e.features[0];
+        // }
 
-            map.setFilter(hoverLayerId, ['==', idKey, feature.properties[idKey]]);
+        this.eventHandlers.mousemove = (e) => {
+            const feature = e.features[0];
+            map.setFilter(hoverLayerKey, ['==', property, feature.properties[property]]);
             map.getCanvas().style.cursor = 'pointer';
+        }
 
-            if (popup) {
-                this.timeout = setTimeout(() => {
-                    popup.setLngLat(map.unproject([
-                        e.point.x,
-                        e.point.y - 8,
-                    ]));
-
-                    renderInto(tooltipContainer, this.renderTooltip(feature.properties));
-                    popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
-                }, 200);
-            }
-        };
-
-        handlers.mouseleave = () => {
-            const { properties: { idKey = '', labelKey = '' } } = this.props;
-            map.setFilter(hoverLayerId, ['==', idKey, '']);
+        this.eventHandlers.mouseleave = () => {
+            map.setFilter(hoverLayerKey, ['==', property, '']);
             map.getCanvas().style.cursor = '';
+        }
+    }
 
-            if (popup) {
-                this.timeout = setTimeout(() => {
-                    popup.remove();
-                }, 200);
-            }
-        };
+    reloadPaint = (props) => {
+        const {
+            map,
+            layerKey,
+            paint,
+        } = props;
 
-        handlers.click = (e) => {
-            const { properties: { idKey, labelKey, onClick } } = this.props;
-            const feature = e.features[0];
-            if (onClick && onClick[layerType] && idKey) {
-                onClick[layerType](feature.properties[idKey], feature.properties[labelKey]);
-            }
-        };
-
-        Object.keys(handlers).forEach((type) => {
-            const listener = handlers[type];
-            map.on(type, layerId, listener);
+        Object.entries(paint).forEach((paintData) => {
+            map.setPaintProperty(layerKey, paintData[0], paintData[1]);
         });
     }
 
-    getPaintData = (properties, key, defaultValue) => {
-        const val = v => isTruthy(v) ? v : defaultValue;
-
-        const style = properties.style;
-        if (!properties.stylePerElement) {
-            return val(style[key]);
-        }
-
-        if (properties.integerId) {
-            return {
-                property: properties.idKey,
-                type: 'categorical',
-                stops: mapToList(style, (v, k) => [parseInt(k, 10), val(v[key])]),
-            };
-        }
-
-        return {
-            property: properties.idKey,
-            type: 'categorical',
-            stops: mapToList(style, (v, k) => [k, val(v[key])]),
-        };
-    }
-
-    renderTooltip = (properties) => {
-        const { properties: { labelKey, tooltipModifier } } = this.props;
-
-        if (tooltipModifier) {
-            return tooltipModifier(properties);
-        }
-
-        return (
-            <div className={styles.tooltip}>
-                { properties[labelKey] }
-            </div>
-        );
+    reloadFilter = (props) => {
+        const {
+            map,
+            layerKey,
+            filter,
+        } = props;
+        map.setFilter(layerKey, filter);
     }
 
     render() {

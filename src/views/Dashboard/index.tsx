@@ -6,8 +6,6 @@ import { RouteComponentProps } from 'react-router-dom';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
 import List from '../../vendor/react-store/components/View/List';
 import update from '../../vendor/react-store/utils/immutable-update';
-import { getRgbFromHex } from '../../vendor/react-store/utils/common';
-import mapStyles from '../../constants/mapStyles';
 
 import {
     setCountriesDataAction,
@@ -56,15 +54,12 @@ import {
     SetSectorsAction,
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
-
-import Map from '../../components/Map';
-import ScaleLegend from '../../components/Map/ScaleLegend';
 import {
     renderPound,
     renderNumeral,
-    renderNormalNumeral,
 } from '../../components/Renderer';
 
+import MapView from './MapView';
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
 import RequestManager from './RequestManager';
@@ -103,31 +98,6 @@ interface State {
     layersInfo: Dictionary<MapLayerProps>;
 }
 
-const emptyList: any[] = [];
-
-const nepalBounds = [
-    80.05858661752791, 26.3478369963687,
-    88.20166918432403, 30.447028670917916,
-];
-
-const renderIndicatorSubTitle = (name: string, unit?: string) => {
-    let symbol = unit;
-    if (!unit || unit === '0' || unit.toLowerCase() === 'in number') {
-        return name;
-    }
-    if (unit.toLowerCase() === 'in percent') {
-        symbol = '%';
-    }
-    return `${name} (${symbol})`;
-};
-
-const renderIndicatorLabel = (value: number, unit?: string) => {
-    if (unit === '0') {
-        return renderNumeral(value, 3);
-    }
-    return renderNormalNumeral(value);
-};
-
 export class Dashboard extends React.PureComponent<Props, State>{
     static municipalityProgramKeyExtractor = (programme: MunicipalityProgramme) => (
         programme.program
@@ -162,89 +132,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
             this.props.toggleDashboardMunicipility(municipality.id);
         }
     }
-
-    renderIndicatorLegend = () => {
-        const { selectedIndicator } = this.props;
-        if (!selectedIndicator) {
-            return null;
-        }
-
-        console.warn(selectedIndicator);
-        const { minValue, maxValue, unit, name } = selectedIndicator;
-
-        const calcOpacity = (value: number) => {
-            const fraction = (value - minValue) / (maxValue - minValue);
-            const offset = 0.25;
-            return fraction * (0.85 - offset) + offset;
-        };
-
-        const { r, g, b } = getRgbFromHex(mapStyles.indicator.color);
-        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
-        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
-
-        return (
-            <ScaleLegend
-                className={styles.scaleLegend}
-                minValue={minValue}
-                maxValue={maxValue}
-                minLabel={renderIndicatorLabel(minValue, unit)}
-                maxLabel={renderIndicatorLabel(maxValue, unit)}
-                minColor={minColor}
-                maxColor={maxColor}
-                title="Indicator"
-                subTitle={renderIndicatorSubTitle(name, unit)}
-            />
-        );
-    }
-
-    renderProgramLegend = () => {
-        const { selectedProgrammes, municipalities } = this.props;
-        if (selectedProgrammes.length === 0) {
-            return null;
-        }
-
-        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
-        const budgets = {};
-        municipalities.forEach((municipality) => {
-            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
-                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
-            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
-        });
-
-        const budgetList: number[] = Object.values(budgets);
-        const minValue = Math.min(...budgetList);
-        const maxValue = Math.max(...budgetList);
-
-        const calcOpacity = (value: number) => {
-            const fraction = (value - minValue) / (maxValue - minValue);
-            const offset = 0.25;
-            return fraction * (0.85 - offset) + offset;
-        };
-
-        const { r, g, b } = getRgbFromHex(mapStyles.municipalities.color);
-        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
-        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
-
-        return (
-            <ScaleLegend
-                className={styles.scaleLegend}
-                minValue={minValue}
-                maxValue={maxValue}
-                minLabel={renderPound(minValue)}
-                maxLabel={renderPound(maxValue)}
-                minColor={minColor}
-                maxColor={maxColor}
-                title="Total budget (for selected programmes)"
-            />
-        );
-    }
-
-    renderMapChildren = () => (
-        <React.Fragment>
-            {this.renderIndicatorLegend()}
-            {this.renderProgramLegend()}
-        </React.Fragment>
-    )
 
     renderMunicipalityProgram = (key: string, datum: any) => {
         return (
@@ -348,14 +235,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 />
                 <div className={styles.right}>
                     {loadingGeoJson && <LoadingAnimation />}
-                    <Map
-                        className={styles.map}
-                        layers={layersInfo}
-                        hideLayers={loadingGeoJson}
-                        bounds={nepalBounds}
-                    >
-                        {this.renderMapChildren()}
-                    </Map>
+                    <MapView />
                     <InformationPane
                         className={styles.informationPane}
                         loadingProvinceData={loadingProvinceData}

@@ -20,17 +20,6 @@ $width-left-pane: 240px;
         position: relative;
         flex-grow: 1;
 
-        .map {
-            width: 100%;
-            height: 100%;
-
-            .scale-legend {
-                margin-bottom: $spacing-small;
-                margin-left: $spacing-small;
-                box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
-            }
-        }
-
         .information-pane {
             position: absolute;
             top: $spacing-medium;

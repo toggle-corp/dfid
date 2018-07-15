@@ -2,87 +2,32 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 
-import MapLayer from './MapLayer';
-import Legend from './Legend';
 import styles from './styles.scss';
 
-import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
-import { iconNames } from '../../vendor/react-store/constants';
+const nullComponent = () => null;
 
 const propTypes = {
     className: PropTypes.string,
-    layers: PropTypes.object,
-    hideLayers: PropTypes.bool,
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ]),
     bounds: PropTypes.arrayOf(PropTypes.number),
+    childRenderer: PropTypes.node,
 };
 
 const defaultProps = {
     className: '',
-    layers: {},
-    hideLayers: false,
-    children: undefined,
     bounds: undefined,
+    childRenderer: nullComponent,
 };
 
-export default class Map extends React.PureComponent {
+export default class Map extends React.Component {
     static propTypes = propTypes;
     static defaultProps = defaultProps;
-
-    static createSortedLayers = (layersObj) => {
-        const layers = Object.values(layersObj);
-
-        // Sort the layers
-        const sortedLayers = layers.sort((l1, l2) => l1.order - l2.order);
-
-        // Create the separate stroke layers
-        const separatedStrokeLayers = sortedLayers
-            .filter(l => l.separateStroke)
-            .map(l => ({
-                ...l,
-                layerKey: `${l.layerKey}-separate-stroke`,
-                types: ['Line'],
-            }));
-
-        // Create the layers with seprate style
-        const separateStyleLayers = sortedLayers
-            .filter(l => l.separateStyle)
-            .map(l => ({
-                ...l,
-                layerKey: `${l.layerKey}-separate-style`,
-                types: [l.separateStyleType],
-                style: l.separateStyle,
-            }));
-
-        return [
-            ...sortedLayers,
-            ...separatedStrokeLayers,
-            ...separateStyleLayers,
-        ];
-    }
-
-    // Create legend items from layers which have title and color
-    // Perhaps use some defined variable like `showLegend` instead of title and color?
-    static createLegendItems = (layers, zoom) => layers
-        .filter(l => l.title && l.color && (!l.minZoomLevelForLegend || l.minZoomLevelForLegend <= zoom))
-        .map(layer => ({
-            label: layer.title,
-            color: layer.color,
-        }));
 
     constructor(props) {
         super(props);
 
         this.mapContainer = React.createRef();
-        this.layers = Map.createSortedLayers(this.props.layers);
-        this.reloadKey = 0;
-
         this.state = {
             map: undefined,
-            legendItems: Map.createLegendItems(this.layers, 3),
         };
     }
 
@@ -135,24 +80,10 @@ export default class Map extends React.PureComponent {
             }
         });
 
-        map.on('zoom', () => {
-            this.setState({
-                legendItems: Map.createLegendItems(this.layers, map.getZoom()),
-            });
-        });
-
         setTimeout(() => { map.resize(); }, 200);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.layers !== nextProps.layers) {
-            this.layers = Map.createSortedLayers(nextProps.layers);
-            this.setState({
-                legendItems: Map.createLegendItems(this.layers, this.state.map ? this.state.map.getZoom() : 3),
-            });
-            this.reloadKey += 1;
-        }
-
         if (this.props.bounds !== nextProps.bounds && this.state.map) {
             const { bounds } = nextProps.props;
             const { map } = this.state;
@@ -194,76 +125,19 @@ export default class Map extends React.PureComponent {
         return classNames.join(' ');
     }
 
-    handleExportClick = () => {
-        const { map } = this.state;
-        if (!map) {
-            return;
-        }
-
-        const canvas = map.getCanvas();
-        const link = document.createElement('a');
-        link.download = 'map-export.png';
-        link.href = canvas.toDataURL()
-        link.click();
-    }
-
-    renderMapLayer = (layerInfo) => {
-        let key = `${layerInfo.layerKey}-layer`;
-        if (!layerInfo.donotReload) {
-            key = `${key}-${this.reloadKey}`;
-        }
-
-        return (
-            <MapLayer
-                key={key}
-                map={this.state.map}
-                properties={layerInfo}
-            />
-        );
-    }
-
-    renderMapLayers = () => {
-        const showMapLayers = this.state.map && !this.props.hideLayers;
-        if (!showMapLayers) {
-            return null;
-        }
-
-        // TODO: Use List
-        return (
-            <React.Fragment>
-                {this.layers.map(layerInfo => this.renderMapLayer(layerInfo))}
-            </React.Fragment>
-        );
-    }
-
     render() {
-        const { children } =  this.props;
+        const { childRenderer } = this.props;
+        const { map } = this.state;
+
         const className = this.getClassName();
-        const MapLayers = this.renderMapLayers;
+        const Child = childRenderer;
 
         return (
              <div
                 className={className}
                 ref={this.mapContainer}
             >
-                <div className={styles.topRightPanels}>
-                    <AccentButton
-                        onClick={this.handleExportClick}
-                        iconName={iconNames.download}
-                    >
-                        Export
-                    </AccentButton>
-                </div>
-                <MapLayers />
-                <div className={styles.leftBottomPanels}>
-                    {this.state.legendItems.length > 0 && (
-                        <Legend
-                            className={styles.legend}
-                            legendItems={this.state.legendItems}
-                        />
-                    )}
-                    { children }
-                </div>
+                {map && <Child map={map} />}
             </div>
         );
     }
