@@ -14,6 +14,7 @@ import ProvinceBorder from './ProvinceBorder';
 import Municipality from './Municipality';
 import MunicipalityBorder from './MunicipalityBorder';
 import Layers from './Layers';
+import Raster from './Raster';
 
 import styles from './styles.scss';
 
@@ -40,6 +41,7 @@ export default class MapView extends React.PureComponent {
     renderMapChildren = ({ map }) => {
         return (
             <React.Fragment>
+                <Raster map={map} />
                 <GenericSource
                     map={map}
                     setContext={this.setContext}
