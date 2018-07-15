@@ -2,8 +2,6 @@ import React from 'react';
 import Redux from 'redux';
 import { connect } from 'react-redux';
 
-import mapStyles from '../../../constants/mapStyles';
-
 import { RestRequest } from '../../../vendor/react-store/utils/rest';
 import {
     CoordinatorBuilder,
@@ -60,7 +58,6 @@ import {
     Province,
     Municipality,
     Programme,
-    MunicipalityProgramme,
     Sector,
     MapLayer,
     GeoJSON,
@@ -89,7 +86,6 @@ interface OwnProps {
     handleProvinceClick(key: string): void;
     handleMunicipalityClick(key: string): void;
     setLayersInfo(settings: object): void;
-    renderMunicipalityTooltip(properties: object): void;
     renderMaplayerTooltip(properties: object): void;
     loading: boolean;
 }
@@ -125,9 +121,6 @@ interface PropsFromDispatch {
 type Props = OwnProps & PropsFromState & PropsFromDispatch;
 
 interface State { }
-
-const emptyList: any[] = [];
-const emptyObject: any = {};
 
 export class RequestManager extends React.PureComponent<Props, State>{
     geoJsonRequestCoordinator: Coordinator;
@@ -212,141 +205,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
             this.municipalitiesRequest.stop();
         }
         this.geoJsonRequestCoordinator.stop();
-    }
-
-    getSelectedProvincesStyle = (props: Props) => {
-        const {
-            selectedProvinces,
-            provinces,
-        } = props;
-        const styles = {};
-
-        provinces.forEach((province) => {
-            // everything except the selected province is transparent
-            styles[province.id] = mapStyles.transparent;
-        });
-
-        if (selectedProvinces) {
-            selectedProvinces.forEach((province) => {
-                styles[province.id] = mapStyles.selectedProvinces;
-            });
-        }
-
-        return styles;
-    }
-
-    getMunicipalityStyle = (props: Props) => {
-        const {
-            selectedProgrammes,
-            selectedMunicipalities,
-            selectedIndicator,
-            municipalities,
-        } = props;
-        const styles = {};
-        const selectedStyles = {};
-
-        selectedMunicipalities.forEach((municipality) => {
-            selectedStyles[municipality.hlcitCode] = mapStyles.municipalitiesSelected;
-        });
-
-        municipalities.forEach((municipality) => {
-            styles[municipality.hlcitCode] = {
-                textField: String(municipality.totalNoOfProgrammes || ''),
-            };
-        });
-
-        if (selectedIndicator) {
-            municipalities.forEach((municipality) => {
-                styles[municipality.hlcitCode] = {
-                    ...styles[municipality.hlcitCode],
-                    ...mapStyles.municipalities,
-                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
-                    opacity: 0,
-                };
-            });
-            return styles;
-        }
-
-        if (selectedProgrammes.length === 0) {
-            municipalities.forEach((municipality) => {
-                styles[municipality.hlcitCode] = {
-                    ...styles[municipality.hlcitCode],
-                    ...mapStyles.municipalities,
-                    ...(selectedStyles[municipality.hlcitCode] || emptyObject),
-                };
-            });
-            return styles;
-        }
-
-        const selectedProgrammeIds = selectedProgrammes.map(p => p.id);
-
-        const budgets = {};
-        municipalities.forEach((municipality) => {
-            budgets[municipality.hlcitCode] = (municipality.programs || emptyList).filter(
-                (p: MunicipalityProgramme) => selectedProgrammeIds.indexOf(p.programId) >= 0,
-            ).map(p => p.programBudget).reduce((acc, b) => acc + b, 0);
-        });
-
-        const budgetList: number[] = Object.values(budgets);
-        const minValue = Math.min(...budgetList);
-        const maxValue = Math.max(...budgetList);
-
-        municipalities.forEach((municipality) => {
-            const value = budgets[municipality.hlcitCode];
-            const fraction = (value - minValue) / (maxValue - minValue);
-            const offset = 0.25;
-            const fractionWithOffset = fraction * (0.85 - offset) + offset;
-
-            styles[municipality.hlcitCode] = {
-                ...styles[municipality.hlcitCode],
-                ...mapStyles.municipalities,
-                ...(selectedStyles[municipality.hlcitCode] || emptyObject),
-                opacity: fractionWithOffset,
-            };
-        });
-        return styles;
-    }
-
-    getProvincesStyle = (props: Props) => {
-        const {
-            selectedIndicator,
-            provinces,
-        } = props;
-        const styles = {};
-
-        provinces.forEach((province) => {
-            styles[province.id] = mapStyles.provinces;
-        });
-
-        if (!selectedIndicator) {
-            return styles;
-        }
-
-        const minValue = selectedIndicator.minValue;
-        const maxValue = selectedIndicator.maxValue;
-
-        Object.keys(selectedIndicator.provinces).forEach((provinceId) => {
-            if (maxValue === minValue) {
-                return;
-            }
-
-            const value = selectedIndicator.provinces[provinceId].value;
-            if (!value) {
-                return;
-            }
-
-            const fraction = (value - minValue) / (maxValue - minValue);
-            const offset = 0.25;
-            const fractionWithOffset = fraction * (0.85 - offset) + offset;
-
-            styles[provinceId] = {
-                ...styles[provinceId],
-                ...mapStyles.indicator,
-                opacity: fractionWithOffset,
-            };
-        });
-
-        return styles;
     }
 
     startRequestForCountriesData = () => {

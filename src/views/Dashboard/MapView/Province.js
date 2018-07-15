@@ -7,6 +7,7 @@ import {
 } from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
+import mapStyles from '../../../constants/mapStyles';
 import { getCategoricalPaint } from './utils';
 
 const mapStateToProps = state => ({
@@ -15,12 +16,7 @@ const mapStateToProps = state => ({
 });
 
 class Province extends React.PureComponent {
-    paint = {
-        'fill-color': '#e06030',
-        'fill-opacity': 0.4,
-    }
-
-    componentDidMount() {
+    componentWillMount() {
         this.calculatePaint(this.props);
     }
 
@@ -32,14 +28,18 @@ class Province extends React.PureComponent {
 
     calculatePaint = ({ selectedIndicator, provinces }) => {
         if (!selectedIndicator) {
-            return this.paint;
+            this.paint = {
+                'fill-color': mapStyles.provinces.color,
+                'fill-opacity': mapStyles.provinces.opacity,
+            };
+            return;
         }
 
         const style = {};
         provinces.forEach((province) => {
             style[province.id] = {
-                'color': '#e06030',
-                'opacity': 0.4,
+                'color': mapStyles.provinces.indicatorColor,
+                'opacity': 0.85,
             };
         });
 

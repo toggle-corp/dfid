@@ -7,6 +7,7 @@ import {
 } from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
+import mapStyles from '../../../constants/mapStyles';
 import { getCategoricalPaint } from './utils';
 
 const mapStateToProps = state => ({
@@ -15,12 +16,7 @@ const mapStateToProps = state => ({
 });
 
 class Province extends React.PureComponent {
-    paint = {
-        'line-color': '#fff',
-        'line-width': 2,
-    }
-
-    componentDidMount() {
+    componentWillMount() {
         this.calculatePaint(this.props);
     }
 
@@ -34,19 +30,21 @@ class Province extends React.PureComponent {
         const style = {};
         provinces.forEach((province) => {
             style[province.id] = {
-                color: '#fff',
+                color: mapStyles.provinces.stroke,
+                strokeWidth: mapStyles.provinces.strokeWidth,
             };
         });
 
         selectedProvinces.forEach((province) => {
             style[province.id] = {
-                color: '#00f',
+                color: mapStyles.provinces.selectedStroke,
+                strokeWidth: mapStyles.provinces.selectedStrokeWidth,
             };
         });
 
         this.paint = {
             'line-color': getCategoricalPaint('Province', style, 'color', true),
-            'line-width': 2,
+            'line-width': getCategoricalPaint('Province', style, 'strokeWidth', true),
         };
     }
 

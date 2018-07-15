@@ -7,6 +7,7 @@ import {
 } from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
+import mapStyles from '../../../constants/mapStyles';
 
 const mapStateToProps = state => ({
     selectedProvinces: dashboardProvincesSelector(state),
@@ -19,15 +20,17 @@ const mapDispatchToProps = dispatch => ({
 
 class Province extends React.PureComponent {
     paint = {
-        'fill-color': '#e06030',
+        'fill-color': '#fff',
         'fill-opacity': 0,
     }
 
     hoverInfo = {
         paint: {
-            'fill-color': '#fff',
-            'fill-opacity': 0.4,
+            'fill-color': mapStyles.provinces.hoverColor,
+            'fill-opacity': mapStyles.provinces.hoverOpacity,
         },
+        showTooltip: true,
+        tooltipProperty: 'Province',
     }
 
     handleClick = (key) => {

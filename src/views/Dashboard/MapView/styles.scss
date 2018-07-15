@@ -10,3 +10,70 @@
         box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
     }
 }
+
+
+// Note: height 'auto' cannot be transitioned
+.municipality-tooltip {
+    @include shadow-small;
+    transition: $duration-transition-medium all ease-in-out;
+    background-color: $color-foreground;
+    width: 340px;
+    animation: fade-in $duration-transition-medium forwards ease-in;
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-medium;
+    pointer-events: none;
+
+    .title {
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: $spacing-small $spacing-medium;
+        color: $color-accent;
+        font-weight: $font-weight-bold;
+    }
+
+    .empty {
+        padding: $spacing-medium;
+        text-align: center;
+        color: $color-text-placeholder;
+    }
+
+    .programs {
+        display: table;
+
+        .header {
+            display: table-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+                text-transform: uppercase;
+                color: $color-text-label;
+                font-size: $font-size-small;
+                font-weight: $font-weight-bold;
+            }
+        }
+
+        .program {
+            display: table-row;
+            @extend %background-alternating-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+
+                &.number {
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

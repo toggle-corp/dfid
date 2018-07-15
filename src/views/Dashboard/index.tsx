@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
-import List from '../../vendor/react-store/components/View/List';
 import update from '../../vendor/react-store/utils/immutable-update';
 
 import {
@@ -54,10 +53,6 @@ import {
     SetSectorsAction,
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
-import {
-    renderPound,
-    renderNumeral,
-} from '../../components/Renderer';
 
 import MapView from './MapView';
 import FilterPane from './FilterPane';
@@ -133,56 +128,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
         }
     }
 
-    renderMunicipalityProgram = (key: string, datum: any) => {
-        return (
-            <div key={key} className={styles.program}>
-                <span>{datum.program}</span>
-                <span className={styles.number}>{renderPound(datum.programBudget)}</span>
-                <span className={styles.number}>{renderNumeral(datum.totalNoOfPartners, 0)}</span>
-            </div>
-        );
-    }
-
-    renderMunicipalityProgramList = (municipality?: Municipality) => {
-        if (!municipality || !municipality.programs || municipality.programs.length === 0) {
-            return (
-                <div className={styles.empty}>
-                    No information available
-                </div>
-            );
-        }
-
-        return (
-            <div className={styles.programs}>
-                <div className={styles.header}>
-                    <span>Program</span>
-                    <span>Budget</span>
-                    <span>Partners</span>
-                </div>
-                <List
-                    data={municipality.programs}
-                    keyExtractor={Dashboard.municipalityProgramKeyExtractor}
-                    modifier={this.renderMunicipalityProgram}
-                />
-            </div>
-        );
-    }
-
-    renderMunicipalityTooltip = (properties: any) => {
-        const { municipalities } = this.props;
-        const label = properties.LU_Name;
-        const municipality = municipalities.find(m => m.hlcitCode === properties.HLCIT_CODE);
-
-        return (
-            <div className={styles.municipalityTooltip}>
-                <h4 className={styles.title}>
-                    {label}
-                </h4>
-                {this.renderMunicipalityProgramList(municipality)}
-            </div>
-        );
-    }
-
     renderMaplayerTooltip = (properties: any) => {
         return null;
     }
@@ -218,7 +163,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <RequestManager
                     handleProvinceClick={this.handleProvinceClick}
                     handleMunicipalityClick={this.handleMunicipalityClick}
-                    renderMunicipalityTooltip={this.renderMunicipalityTooltip}
                     renderMaplayerTooltip={this.renderMaplayerTooltip}
                     layersInfo={layersInfo}
                     setLayersInfo={this.setLayersInfo}

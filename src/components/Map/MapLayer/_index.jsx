@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
-import turf from 'turf';
 import { isTruthy, mapToList } from '../../../vendor/react-store/utils/common';
 import styles from './styles.scss';
 

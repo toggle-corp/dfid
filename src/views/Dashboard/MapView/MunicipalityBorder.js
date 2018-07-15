@@ -7,6 +7,7 @@ import {
 } from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
+import mapStyles from '../../../constants/mapStyles';
 import { getCategoricalPaint } from './utils';
 
 const mapStateToProps = state => ({
@@ -16,11 +17,7 @@ const mapStateToProps = state => ({
 
 
 class Municipality extends React.PureComponent {
-    paint = {
-        'line-color': '#fff',
-    }
-
-    componentDidMount() {
+    componentWillMount() {
         this.calculatePaint(this.props);
     }
 
@@ -34,22 +31,24 @@ class Municipality extends React.PureComponent {
         const style = {};
         municipalities.forEach((municipality) => {
             style[municipality.hlcitCode] = {
-                color: '#000',
-                strokeWidth: 1,
+                color: mapStyles.municipalities.stroke,
+                strokeWidth: mapStyles.municipalities.strokeWidth,
+                strokeOpacity: mapStyles.municipalities.strokeOpacity,
             };
         });
 
         selectedMunicipalities.forEach((municipality) => {
             style[municipality.hlcitCode] = {
-                color: '#00f',
-                strokeWidth: 2,
+                color: mapStyles.municipalities.selectedStroke,
+                strokeWidth: mapStyles.municipalities.selectedStrokeWidth,
+                strokeOpacity: mapStyles.municipalities.selectedStrokeOpacity,
             };
         });
 
         this.paint = {
             'line-color': getCategoricalPaint('HLCIT_CODE', style, 'color'),
             'line-width': getCategoricalPaint('HLCIT_CODE', style, 'strokeWidth'),
-
+            'line-opacity': getCategoricalPaint('HLCIT_CODE', style, 'strokeOpacity'),
         };
     }
 

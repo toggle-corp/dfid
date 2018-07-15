@@ -2,6 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
+import styles from './styles.scss';
+
+const renderInto = (container, component) => (
+    ReactDOM.render(component, container)
+);
 
 
 const propTypes = {
@@ -16,6 +21,9 @@ const propTypes = {
 
     hoverInfo: PropTypes.shape({
         paint: PropTypes.object.isRequired,
+        showTooltip: PropTypes.bool,
+        tooltipProperty: PropTypes.string,
+        tooltipModifier: PropTypes.func,
     }),
 
     onClick: PropTypes.func,
@@ -68,9 +76,13 @@ export default class MapLayer extends React.PureComponent {
             if (this.hoverLayer) {
                 map.removeLayer(this.hoverLayer);
             }
+            if (this.popup) {
+                this.popup.remove();
+            }
         }
         this.layer = undefined;
         this.hoverLayer = undefined;
+        this.popup = undefined;
     }
 
     create = (props) => {
@@ -112,7 +124,14 @@ export default class MapLayer extends React.PureComponent {
         });
     }
 
-    createHoverLayer = ({ map, sourceKey, layerKey, property, type, hoverInfo }) => {
+    createHoverLayer = ({
+        map,
+        sourceKey,
+        layerKey,
+        property,
+        type,
+        hoverInfo,
+    }) => {
         if (!hoverInfo) {
             return;
         }
@@ -120,6 +139,7 @@ export default class MapLayer extends React.PureComponent {
 
         const {
             paint,
+            showTooltip,
         } = hoverInfo;
 
         map.addLayer({
@@ -132,19 +152,58 @@ export default class MapLayer extends React.PureComponent {
 
         this.hoverLayer = hoverLayerKey;
 
-        // this.eventHandlers.mouseenter = (e) => {
-        //     const feature = e.features[0];
-        // }
+        let popup;
+        let tooltipContainer;
+
+        if (showTooltip) {
+            tooltipContainer = document.createElement('div');
+            popup = new mapboxgl.Marker(tooltipContainer, {
+                offset: [0, -10],
+            }).setLngLat([0, 0]);
+            this.popup = popup;
+
+            map.on('zoom', (e) => {
+                if (e.originalEvent && this.popup) {
+                    this.popup.setLngLat(map.unproject([
+                        e.originalEvent.offsetX,
+                        e.originalEvent.offsetY - 8,
+                    ]));
+                }
+            });
+        }
+
+        this.eventHandlers.mouseenter = (e) => {
+            const feature = e.features[0];
+            if (popup) {
+                popup.addTo(map);
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
+            }
+        }
 
         this.eventHandlers.mousemove = (e) => {
             const feature = e.features[0];
             map.setFilter(hoverLayerKey, ['==', property, feature.properties[property]]);
             map.getCanvas().style.cursor = 'pointer';
+
+            if (popup) {
+                popup.setLngLat(map.unproject([
+                    e.point.x,
+                    e.point.y - 8,
+                ]));
+
+                renderInto(tooltipContainer, this.renderTooltip(feature.properties));
+                popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
+            }
         }
 
         this.eventHandlers.mouseleave = () => {
             map.setFilter(hoverLayerKey, ['==', property, '']);
             map.getCanvas().style.cursor = '';
+
+            if (popup) {
+                popup.remove();
+            }
         }
     }
 
@@ -167,6 +226,20 @@ export default class MapLayer extends React.PureComponent {
             filter,
         } = props;
         map.setFilter(layerKey, filter);
+    }
+
+    renderTooltip = (properties) => {
+        const { hoverInfo: { tooltipProperty, tooltipModifier } } = this.props;
+
+        if (tooltipModifier) {
+            return tooltipModifier(properties);
+        }
+
+        return (
+            <div className={styles.tooltip}>
+                { properties[tooltipProperty] }
+            </div>
+        );
     }
 
     render() {
