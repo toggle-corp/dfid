@@ -15,6 +15,8 @@ import {
 
 import MapLayer from '../../../components/Map/MapLayer';
 import mapStyles from '../../../constants/mapStyles';
+
+import { getCategoricalPaint } from './utils';
 import styles from './styles.scss';
 
 const mapStateToProps = state => ({
@@ -46,6 +48,40 @@ class Municipality extends React.PureComponent {
             showTooltip: true,
             tooltipModifier: this.renderTooltip,
         }
+
+        this.textPaint = {
+            'icon-opacity': 0.75,
+            'text-color': '#2a2a2a',
+        };
+
+        this.calculateTextLayout(props);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.municipalities !== nextProps.municipalities) {
+            this.calculateTextLayout(nextProps);
+        }
+    }
+
+    calculateTextLayout = ({ municipalities }) => {
+        const layout = {};
+        municipalities.forEach((municipality) => {
+            layout[municipality.hlcitCode] = {
+                textField: String(municipality.totalNoOfProgrammes || ''),
+                iconImage: municipality.totalNoOfProgrammes ? 'circle' : '',
+            };
+        });
+
+        this.textLayout = {
+            'text-field': getCategoricalPaint('HLCIT_CODE', layout, 'textField'),
+            'text-size': {
+                stops: [[7, 0], [7.2, 11]],
+            },
+            'icon-image': getCategoricalPaint('HLCIT_CODE', layout, 'iconImage'),
+            'icon-size': {
+                stops: [[7, 0], [7.2, 0.02]],
+            },
+        };
     }
 
     handleClick = (key) => {
@@ -121,17 +157,27 @@ class Municipality extends React.PureComponent {
         const filter = ['in', 'STATE', ...provinceIds];
 
         return (
-            <MapLayer
-                sourceKey="municipality"
-                layerKey="municipality"
-                property="HLCIT_CODE"
-                map={map}
-                type="fill"
-                paint={this.paint}
-                hoverInfo={this.hoverInfo}
-                filter={filter}
-                onClick={this.handleClick}
-            />
+            <React.Fragment>
+                <MapLayer
+                    sourceKey="municipality"
+                    layerKey="municipality"
+                    property="HLCIT_CODE"
+                    map={map}
+                    type="fill"
+                    paint={this.paint}
+                    hoverInfo={this.hoverInfo}
+                    filter={filter}
+                    onClick={this.handleClick}
+                />
+                <MapLayer
+                    map={map}
+                    sourceKey="municipality"
+                    layerKey="municipality-text"
+                    type="symbol"
+                    layout={this.textLayout}
+                    paint={this.textPaint}
+                />
+            </React.Fragment>
         );
     }
 }

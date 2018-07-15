@@ -20,6 +20,8 @@ class Layers extends React.PureComponent {
                 type: 'circle',
                 paint: {
                     'circle-color': color,
+                    'circle-stroke-color': '#404040',
+                    'circle-stroke-width': 1,
                 },
             };
         }

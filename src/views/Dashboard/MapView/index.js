@@ -66,6 +66,11 @@ export default class MapView extends React.PureComponent {
                     map={map}
                     context={this.state.context}
                 />
+                <Layers
+                    map={map}
+                    context={this.state.context}
+                    setContext={this.setContext}
+                />
                 <MunicipalityBorder
                     map={map}
                     context={this.state.context}
@@ -73,11 +78,6 @@ export default class MapView extends React.PureComponent {
                 <ProvinceBorder
                     map={map}
                     context={this.state.context}
-                />
-                <Layers
-                    map={map}
-                    context={this.state.context}
-                    setContext={this.setContext}
                 />
             </React.Fragment>
         );

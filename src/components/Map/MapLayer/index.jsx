@@ -10,9 +10,10 @@ const renderInto = (container, component) => (
 
 
 const propTypes = {
-    map: PropTypes.object,
+    map: PropTypes.object.isRequired,
     type: PropTypes.string.isRequired,
     paint: PropTypes.object.isRequired,
+    layout: PropTypes.object,
     filter: PropTypes.array,
 
     layerKey: PropTypes.string.isRequired,
@@ -30,9 +31,9 @@ const propTypes = {
 };
 
 const defaultProps = {
-    map: undefined,
-    property: undefined,
+    layout: undefined,
     filter: undefined,
+    property: undefined,
     hoverInfo: undefined,
     onClick: undefined,
 };
@@ -92,22 +93,28 @@ export default class MapLayer extends React.PureComponent {
             layerKey,
             type,
             paint,
+            layout,
             filter,
             onClick,
             property,
         } = props;
 
-        map.addLayer({
+        const layerInfo = {
             id: layerKey,
             source: sourceKey,
             type,
             paint,
-        });
-        this.layer = layerKey;
+        };
 
-        if (filter) {
-            map.setFilter(layerKey, filter);
+        if (layout) {
+            layerInfo.layout = layout;
         }
+        if (filter) {
+            layerInfo.filter = filter;
+        }
+
+        map.addLayer(layerInfo);
+        this.layer = layerKey;
 
         if (onClick) {
             this.eventHandlers.click = (e) => {
@@ -191,7 +198,6 @@ export default class MapLayer extends React.PureComponent {
                     e.point.x,
                     e.point.y - 8,
                 ]));
-
                 renderInto(tooltipContainer, this.renderTooltip(feature.properties));
                 popup.setOffset([0, -tooltipContainer.clientHeight / 2]);
             }
