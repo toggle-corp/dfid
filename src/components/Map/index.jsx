@@ -10,12 +10,14 @@ const propTypes = {
     className: PropTypes.string,
     bounds: PropTypes.arrayOf(PropTypes.number),
     childRenderer: PropTypes.func,
+    panelsRenderer: PropTypes.func,
 };
 
 const defaultProps = {
     className: '',
     bounds: undefined,
     childRenderer: nullComponent,
+    panelsRenderer: nullComponent,
 };
 
 export default class Map extends React.Component {
@@ -126,18 +128,26 @@ export default class Map extends React.Component {
     }
 
     render() {
-        const { childRenderer } = this.props;
+        const { childRenderer, panelsRenderer } = this.props;
         const { map } = this.state;
 
         const className = this.getClassName();
         const Child = childRenderer;
+        const Panels = panelsRenderer;
 
         return (
              <div
                 className={className}
                 ref={this.mapContainer}
             >
-                {map && <Child map={map} />}
+                {map && (
+                    <React.Fragment>
+                        <Child map={map} />
+                        <div className={styles.leftBottomPanels}>
+                            <Panels />
+                        </div>
+                    </React.Fragment>
+                )}
             </div>
         );
     }

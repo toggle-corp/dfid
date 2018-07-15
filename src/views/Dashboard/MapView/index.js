@@ -12,9 +12,11 @@ import Province from './Province';
 import ProvinceHover from './ProvinceHover';
 import ProvinceBorder from './ProvinceBorder';
 import Municipality from './Municipality';
+import MunicipalityHover from './MunicipalityHover';
 import MunicipalityBorder from './MunicipalityBorder';
 import Layers from './Layers';
 import Raster from './Raster';
+import Legends from './Legends';
 
 import styles from './styles.scss';
 
@@ -66,6 +68,10 @@ export default class MapView extends React.PureComponent {
                     map={map}
                     context={this.state.context}
                 />
+                <MunicipalityHover
+                    map={map}
+                    context={this.state.context}
+                />
                 <Layers
                     map={map}
                     context={this.state.context}
@@ -89,6 +95,7 @@ export default class MapView extends React.PureComponent {
                 className={styles.map}
                 bounds={nepalBounds}
                 childRenderer={this.renderMapChildren}
+                panelsRenderer={Legends}
             />
         );
     }
