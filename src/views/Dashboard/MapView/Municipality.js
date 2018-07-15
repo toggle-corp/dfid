@@ -1,12 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { dashboardProvincesSelector } from '../../../redux';
+import {
+    toggleDashboardMunicipilityAction,
+    dashboardProvincesSelector,
+    municipalitiesSelector,
+} from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
 
 const mapStateToProps = state => ({
     selectedProvinces: dashboardProvincesSelector(state),
+    municipalities: municipalitiesSelector(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+    toggleSelectedMunicipality: (provinceId) =>
+        dispatch(toggleDashboardMunicipilityAction(provinceId)),
 });
 
 class Municipality extends React.PureComponent {
@@ -20,6 +30,14 @@ class Municipality extends React.PureComponent {
             'fill-color': '#e06030',
             'fill-opacity': 0.8,
         },
+    }
+
+    handleClick = (key) => {
+        const { municipalities } = this.props;
+        const municipality = municipalities.find(municipality => municipality.hlcitCode === key);
+        if (municipality) {
+            this.props.toggleSelectedMunicipality(municipality.id);
+        }
     }
 
     render() {
@@ -46,9 +64,10 @@ class Municipality extends React.PureComponent {
                 paint={this.paint}
                 hoverInfo={this.hoverInfo}
                 filter={filter}
+                onClick={this.handleClick}
             />
         );
     }
 }
 
-export default connect(mapStateToProps)(Municipality);
+export default connect(mapStateToProps, mapDispatchToProps)(Municipality);

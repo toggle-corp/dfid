@@ -35,17 +35,21 @@ class Municipality extends React.PureComponent {
         municipalities.forEach((municipality) => {
             style[municipality.hlcitCode] = {
                 color: '#000',
+                strokeWidth: 1,
             };
         });
 
         selectedMunicipalities.forEach((municipality) => {
             style[municipality.hlcitCode] = {
                 color: '#00f',
+                strokeWidth: 2,
             };
         });
 
         this.paint = {
             'line-color': getCategoricalPaint('HLCIT_CODE', style, 'color'),
+            'line-width': getCategoricalPaint('HLCIT_CODE', style, 'strokeWidth'),
+
         };
     }
 

@@ -9,6 +9,7 @@ import Map from '../../../components/Map';
 
 import GenericSource from './GenericSource';
 import Province from './Province';
+import ProvinceHover from './ProvinceHover';
 import ProvinceBorder from './ProvinceBorder';
 import Municipality from './Municipality';
 import MunicipalityBorder from './MunicipalityBorder';
@@ -52,6 +53,10 @@ export default class MapView extends React.PureComponent {
                     sourceKey="municipality"
                 />
                 <Province
+                    map={map}
+                    context={this.state.context}
+                />
+                <ProvinceHover
                     map={map}
                     context={this.state.context}
                 />
