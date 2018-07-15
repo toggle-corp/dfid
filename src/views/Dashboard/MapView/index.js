@@ -12,6 +12,7 @@ import Province from './Province';
 import ProvinceBorder from './ProvinceBorder';
 import Municipality from './Municipality';
 import MunicipalityBorder from './MunicipalityBorder';
+import Layers from './Layers';
 
 import styles from './styles.scss';
 
@@ -25,15 +26,14 @@ const emptyList = [];
 export default class MapView extends React.PureComponent {
     constructor(props) {
         super(props);
-        this.state = {
-            context: {},
-        };
+
+        this.contextData = {};
+        this.state = { context: {} };
     }
 
     setContext = (value) => {
-        this.setState({
-            context: { ...this.state.context, ...value },
-        });
+        this.contextData = { ...this.contextData, ...value };
+        this.setState({ context: this.contextData });
     }
 
     renderMapChildren = ({ map }) => {
@@ -66,6 +66,11 @@ export default class MapView extends React.PureComponent {
                 <ProvinceBorder
                     map={map}
                     context={this.state.context}
+                />
+                <Layers
+                    map={map}
+                    context={this.state.context}
+                    setContext={this.setContext}
                 />
             </React.Fragment>
         );

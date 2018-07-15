@@ -10,6 +10,7 @@ const ProvinceSource = ({ sourceKey, geoJson, map, setContext }) => (
         map={map}
         geoJson={geoJson}
         onSourceAdded={() => { setContext({ [sourceKey]: true }); }}
+        onSourceRemoved={() => { setContext({ [sourceKey]: undefined }); }}
     />
 );
 

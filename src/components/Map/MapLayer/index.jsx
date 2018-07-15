@@ -44,7 +44,7 @@ export default class MapLayer extends React.PureComponent {
         if (this.props.map !== nextProps.map) {
             this.destroy();
             this.create(nextProps);
-        } else if (this.props.paint !== nextProps.paint) {
+        } else if (this.layer && this.props.paint !== nextProps.paint) {
             this.reloadPaint(nextProps);
         } else if (this.props.filter !== nextProps.filter) {
             this.reloadFilter(nextProps);

@@ -9,7 +9,7 @@ const nullComponent = () => null;
 const propTypes = {
     className: PropTypes.string,
     bounds: PropTypes.arrayOf(PropTypes.number),
-    childRenderer: PropTypes.node,
+    childRenderer: PropTypes.func,
 };
 
 const defaultProps = {

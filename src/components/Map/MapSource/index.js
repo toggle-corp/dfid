@@ -7,11 +7,13 @@ const propTypes = {
     map: PropTypes.object,
     sourceKey: PropTypes.string.isRequired,
     onSourceAdded: PropTypes.func,
+    onSourceRemoved: PropTypes.func,
 };
 
 const defaultProps = {
     map: undefined,
     onSourceAdded: undefined,
+    onSourceRemoved: undefined,
 };
 
 
@@ -35,9 +37,12 @@ export default class MapSource extends React.PureComponent {
     }
 
     destroy = () => {
-        const { map } = this.props;
+        const { map, onSourceRemoved } = this.props;
         if (map && this.source) {
             map.removeSource(this.source);
+        }
+        if (onSourceRemoved) {
+            onSourceRemoved();
         }
         this.source = undefined;
     }
