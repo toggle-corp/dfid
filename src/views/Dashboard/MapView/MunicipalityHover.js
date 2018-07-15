@@ -75,11 +75,11 @@ class Municipality extends React.PureComponent {
         this.textLayout = {
             'text-field': getCategoricalPaint('HLCIT_CODE', layout, 'textField'),
             'text-size': {
-                stops: [[7, 0], [7.2, 11]],
+                stops: [[7.199, 0], [7.2, 11]],
             },
             'icon-image': getCategoricalPaint('HLCIT_CODE', layout, 'iconImage'),
             'icon-size': {
-                stops: [[7, 0], [7.2, 0.02]],
+                stops: [[7.199, 0], [7.2, 0.02]],
             },
         };
     }

@@ -125,14 +125,22 @@ class Legends extends React.PureComponent {
     }
 
     renderMapLayersLegend = () => {
-        const { selectedMapLayers } = this.props;
-        if (selectedMapLayers.length === 0) {
+        const { selectedMapLayers, zoomLevel } = this.props;
+        if (selectedMapLayers.length === 0 && zoomLevel < 7.2) {
             return null;
         }
-        const legendItems = selectedMapLayers.map(l => ({
+
+        let legendItems = selectedMapLayers.map(l => ({
             label: l.layerName,
             color: getHexFromString(l.layerName),
         }));
+
+        if (zoomLevel >= 7.2) {
+            legendItems.push({
+                label: 'Number of programs',
+                color: '#ffc000',
+            });
+        }
 
         return (
             <Legend

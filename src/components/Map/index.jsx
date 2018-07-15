@@ -30,6 +30,7 @@ export default class Map extends React.Component {
         this.mapContainer = React.createRef();
         this.state = {
             map: undefined,
+            zoomLevel: 3,
         };
     }
 
@@ -80,6 +81,12 @@ export default class Map extends React.Component {
                     }
                 });
             }
+        });
+
+        map.on('zoom', () => {
+            this.setState({
+                zoomLevel: map.getZoom(),
+            });
         });
 
         setTimeout(() => { map.resize(); }, 200);
@@ -142,9 +149,9 @@ export default class Map extends React.Component {
             >
                 {map && (
                     <React.Fragment>
-                        <Child map={map} />
+                        <Child map={map} zoomLevel={this.state.zoomLevel} />
                         <div className={styles.leftBottomPanels}>
-                            <Panels />
+                            <Panels map={map} zoomLevel={this.state.zoomLevel} />
                         </div>
                     </React.Fragment>
                 )}
