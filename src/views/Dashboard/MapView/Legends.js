@@ -140,6 +140,7 @@ class Legends extends React.PureComponent {
                 label: 'Number of programs',
                 color: '#ffc000',
                 innerText: '#',
+                size: 14,
             });
         }
 

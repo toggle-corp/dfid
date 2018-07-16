@@ -8,6 +8,7 @@ const propTypes = {
         label: PropTypes.string,
         color: PropTypes.color,
         innerText: PropTypes.string,
+        size: PropTypes.number,
     })),
     onStateChange: PropTypes.func,
 };
@@ -93,6 +94,9 @@ export default class Legend extends React.PureComponent {
                         className={styles.icon}
                         style={{
                             backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
+                            width: item.size || 10,
+                            height: item.size || 10,
+                            fontSize: (item.size || 10) - 2,
                         }}
                     >
                         {item.innerText}
