@@ -159,7 +159,7 @@ class Municipality extends React.PureComponent {
         return (
             <React.Fragment>
                 <MapLayer
-                    sourceKey="municipality"
+                    sourceKey="municipality-hover"
                     layerKey="municipality-hover"
                     property="HLCIT_CODE"
                     map={map}

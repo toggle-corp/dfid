@@ -139,6 +139,7 @@ class Legends extends React.PureComponent {
             legendItems.push({
                 label: 'Number of programs',
                 color: '#ffc000',
+                innerText: '#',
             });
         }
 

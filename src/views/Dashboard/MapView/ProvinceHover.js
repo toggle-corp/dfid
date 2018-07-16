@@ -53,7 +53,7 @@ class Province extends React.PureComponent {
 
         return (
             <MapLayer
-                sourceKey="province"
+                sourceKey="province-hover"
                 layerKey="province-hover"
                 property="Province"
                 map={map}

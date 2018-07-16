@@ -8,12 +8,14 @@ const propTypes = {
     sourceKey: PropTypes.string.isRequired,
     onSourceAdded: PropTypes.func,
     onSourceRemoved: PropTypes.func,
+    supportHover: PropTypes.bool,
 };
 
 const defaultProps = {
     map: undefined,
     onSourceAdded: undefined,
     onSourceRemoved: undefined,
+    supportHover: false,
 };
 
 
@@ -38,13 +40,19 @@ export default class MapSource extends React.PureComponent {
 
     destroy = () => {
         const { map, onSourceRemoved } = this.props;
-        if (map && this.source) {
-            map.removeSource(this.source);
+        if (map) {
+            if (this.source) {
+                map.removeSource(this.source);
+            }
+            if (this.hoverSource) {
+                map.removeSource(this.hoverSource);
+            }
         }
         if (onSourceRemoved) {
             onSourceRemoved();
         }
         this.source = undefined;
+        this.hoverSource = undefined;
     }
 
     create = (props) => {
@@ -53,6 +61,7 @@ export default class MapSource extends React.PureComponent {
             sourceKey,
             geoJson,
             onSourceAdded,
+            supportHover,
         } = props;
 
         map.addSource(sourceKey, {
@@ -60,6 +69,14 @@ export default class MapSource extends React.PureComponent {
             data: geoJson,
         });
         this.source = sourceKey;
+
+        if (supportHover) {
+            map.addSource(`${sourceKey}-hover`, {
+                type: 'geojson',
+                data: geoJson,
+            });
+            this.hoverSource = `${sourceKey}-hover`;
+        }
 
         if (onSourceAdded) {
             onSourceAdded();

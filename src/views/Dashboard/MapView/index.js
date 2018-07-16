@@ -49,12 +49,14 @@ export default class MapView extends React.PureComponent {
                     setContext={this.setContext}
                     url={urlForCountryGeoJson}
                     sourceKey="province"
+                    supportHover
                 />
                 <GenericSource
                     map={map}
                     setContext={this.setContext}
                     url={urlForMunicipalitiesGeoJson}
                     sourceKey="municipality"
+                    supportHover
                 />
                 <Province
                     map={map}

@@ -7,6 +7,7 @@ const propTypes = {
     legendItems: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string,
         color: PropTypes.color,
+        innerText: PropTypes.string,
     })),
     onStateChange: PropTypes.func,
 };
@@ -92,10 +93,10 @@ export default class Legend extends React.PureComponent {
                         className={styles.icon}
                         style={{
                             backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
-                            width: 10,
-                            height: 10,
                         }}
-                    />
+                    >
+                        {item.innerText}
+                    </span>
                 </div>
                 <p className={`${styles.label} label`} >
                     {item.label}

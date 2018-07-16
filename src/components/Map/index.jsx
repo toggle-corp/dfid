@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 
+import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
+import { iconNames } from '../../vendor/react-store/constants';
+
 import styles from './styles.scss';
 
 const nullComponent = () => null;
@@ -134,6 +137,19 @@ export default class Map extends React.Component {
         return classNames.join(' ');
     }
 
+    handleExportClick = () => {
+        const { map } = this.state;
+        if (!map) {
+            return;
+        }
+
+        const canvas = map.getCanvas();
+        const link = document.createElement('a');
+        link.download = 'map-export.png';
+        link.href = canvas.toDataURL()
+        link.click();
+    }
+
     render() {
         const { childRenderer, panelsRenderer } = this.props;
         const { map } = this.state;
@@ -150,6 +166,14 @@ export default class Map extends React.Component {
                 {map && (
                     <React.Fragment>
                         <Child map={map} zoomLevel={this.state.zoomLevel} />
+                        <div className={styles.topLeftPanels}>
+                            <AccentButton
+                                onClick={this.handleExportClick}
+                                iconName={iconNames.download}
+                            >
+                                Export
+                            </AccentButton>
+                        </div>
                         <div className={styles.leftBottomPanels}>
                             <Panels map={map} zoomLevel={this.state.zoomLevel} />
                         </div>
