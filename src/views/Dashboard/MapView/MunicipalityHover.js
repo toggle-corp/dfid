@@ -58,17 +58,31 @@ class Municipality extends React.PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.municipalities !== nextProps.municipalities) {
+        if (this.props.municipalities !== nextProps.municipalities ||
+            this.props.textMarkers !== nextProps.textMarkers
+        ) {
             this.calculateTextLayout(nextProps);
         }
     }
 
-    calculateTextLayout = ({ municipalities }) => {
+    calculateTextMarkersText = (municipality, textMarkers) => {
+        if (textMarkers === 'programs') {
+            return municipality.totalNoOfProgrammes;
+        }
+
+        const partners = (municipality.programs || []).reduce((acc, p) => (
+            [...acc, ...p.partners.map(pt => pt.name)]
+        ), []);
+        return new Set(partners).size;
+    }
+
+    calculateTextLayout = ({ municipalities, textMarkers }) => {
         const layout = {};
         municipalities.forEach((municipality) => {
+            const number = this.calculateTextMarkersText(municipality, textMarkers);
             layout[municipality.hlcitCode] = {
-                textField: String(municipality.totalNoOfProgrammes || ''),
-                iconImage: municipality.totalNoOfProgrammes ? 'circle' : '',
+                textField: String(number || ''),
+                iconImage: number ? 'circle' : '',
             };
         });
 

@@ -53,10 +53,16 @@ export default class MapLayer extends React.PureComponent {
         if (this.props.map !== nextProps.map) {
             this.destroy();
             this.create(nextProps);
-        } else if (this.layer && this.props.paint !== nextProps.paint) {
-            this.reloadPaint(nextProps);
-        } else if (this.props.filter !== nextProps.filter) {
-            this.reloadFilter(nextProps);
+        } else if (this.layer) {
+            if (this.props.layout !== nextProps.layout) {
+                this.reloadLayout(nextProps);
+            }
+            if (this.props.paint !== nextProps.paint) {
+                this.reloadPaint(nextProps);
+            }
+            if (this.props.filter !== nextProps.filter) {
+                this.reloadFilter(nextProps);
+            }
         }
     }
 
@@ -211,6 +217,18 @@ export default class MapLayer extends React.PureComponent {
                 popup.remove();
             }
         }
+    }
+
+    reloadLayout = (props) => {
+        const {
+            map,
+            layerKey,
+            layout,
+        } = props;
+
+        Object.entries(layout).forEach((layoutData) => {
+            map.setLayoutProperty(layerKey, layoutData[0], layoutData[1]);
+        });
     }
 
     reloadPaint = (props) => {

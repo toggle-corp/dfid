@@ -32,7 +32,23 @@ export default class MapView extends React.PureComponent {
         super(props);
 
         this.contextData = {};
-        this.state = { context: {} };
+        this.state = {
+            context: {},
+            textMarkers: 'programs',
+        };
+    }
+
+    toggleTextMarkers = () => {
+        const { textMarkers } = this.state;
+        if (textMarkers === 'programs') {
+            this.setState({
+                textMarkers: 'partners',
+            });
+        } else {
+            this.setState({
+                textMarkers: 'programs',
+            });
+        }
     }
 
     setContext = (value) => {
@@ -59,6 +75,7 @@ export default class MapView extends React.PureComponent {
                 <MunicipalityHover
                     map={map}
                     context={this.state.context}
+                    textMarkers={this.state.textMarkers}
                 />
                 <Layers
                     map={map}
@@ -91,13 +108,21 @@ export default class MapView extends React.PureComponent {
         );
     }
 
+    renderLegends = (props) => (
+        <Legends
+            onToggleTextMarkers={this.toggleTextMarkers}
+            textMarkers={this.state.textMarkers}
+            {...props}
+        />
+    )
+
     render() {
         return (
             <Map
                 className={styles.map}
                 bounds={nepalBounds}
                 childRenderer={this.renderMapChildren}
-                panelsRenderer={Legends}
+                panelsRenderer={this.renderLegends}
             />
         );
     }

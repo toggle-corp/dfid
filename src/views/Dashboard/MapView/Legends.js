@@ -8,7 +8,10 @@ import {
     municipalitiesSelector,
 } from '../../../redux';
 
+import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
 import { getRgbFromHex, getHexFromString } from '../../../vendor/react-store/utils/common';
+import { iconNames } from '../../../vendor/react-store/constants';
+
 import Legend from '../../../components/Map/Legend';
 import ScaleLegend from '../../../components/Map/ScaleLegend';
 import mapStyles from '../../../constants/mapStyles';
@@ -81,7 +84,7 @@ class Legends extends React.PureComponent {
         );
     }
 
-    renderProgramLegend = () => {
+    renderProgramsLegend = () => {
         const { selectedProgrammes, municipalities } = this.props;
         if (selectedProgrammes.length === 0) {
             return null;
@@ -125,7 +128,7 @@ class Legends extends React.PureComponent {
     }
 
     renderMapLayersLegend = () => {
-        const { selectedMapLayers, zoomLevel } = this.props;
+        const { selectedMapLayers, zoomLevel, textMarkers } = this.props;
         if (selectedMapLayers.length === 0 && zoomLevel < 7.2) {
             return null;
         }
@@ -137,10 +140,11 @@ class Legends extends React.PureComponent {
 
         if (zoomLevel >= 7.2) {
             legendItems.push({
-                label: 'Number of programs',
+                label: `Number of ${textMarkers}`,
                 color: '#ffc000',
                 innerText: '#',
                 size: 14,
+                rightComponent: this.renderToggleTextMarkersButton,
             });
         }
 
@@ -152,12 +156,22 @@ class Legends extends React.PureComponent {
         );
     }
 
+    renderToggleTextMarkersButton = () => {
+        return (
+            <PrimaryButton
+                iconName={iconNames.panels}
+                onClick={this.props.onToggleTextMarkers}
+                transparent
+            />
+        );
+    }
+
     render() {
         return (
             <React.Fragment>
                 {this.renderMapLayersLegend()}
                 {this.renderIndicatorLegend()}
-                {this.renderProgramLegend()}
+                {this.renderProgramsLegend()}
             </React.Fragment>
         );
     }
