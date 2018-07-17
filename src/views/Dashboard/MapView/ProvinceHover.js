@@ -4,13 +4,18 @@ import { connect } from 'react-redux';
 import {
     toggleDashboardProvinceAction,
     dashboardProvincesSelector,
+    dashboardIndicatorSelector,
 } from '../../../redux';
 
 import MapLayer from '../../../components/Map/MapLayer';
+import { renderNormalNumeral } from '../../../components/Renderer';
+
 import mapStyles from '../../../constants/mapStyles';
+import styles from './styles.scss';
 
 const mapStateToProps = state => ({
     selectedProvinces: dashboardProvincesSelector(state),
+    selectedIndicator: dashboardIndicatorSelector(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -19,22 +24,57 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class Province extends React.PureComponent {
-    paint = {
-        'fill-color': '#fff',
-        'fill-opacity': 0,
-    }
+    constructor(props) {
+        super(props);
 
-    hoverInfo = {
-        paint: {
-            'fill-color': mapStyles.provinces.hoverColor,
-            'fill-opacity': mapStyles.provinces.hoverOpacity,
-        },
-        showTooltip: true,
-        tooltipProperty: 'Province',
+        this.paint = {
+            'fill-color': '#fff',
+            'fill-opacity': 0,
+        }
+
+        this.hoverInfo = {
+            paint: {
+                'fill-color': mapStyles.provinces.hoverColor,
+                'fill-opacity': mapStyles.provinces.hoverOpacity,
+            },
+            showTooltip: true,
+            tooltipModifier: this.renderTooltip,
+        }
     }
 
     handleClick = (key) => {
         this.props.toggleSelectedProvince(parseInt(key, 10));
+    }
+
+    renderIndicatorTooltip = (province) => {
+        const { selectedIndicator } = this.props;
+        if (!selectedIndicator) {
+            return null;
+        }
+
+        const value = selectedIndicator.provinces[province].value;
+        let unit = '';
+        if (selectedIndicator.unit.toLowerCase() === 'in percent') {
+            unit = '%';
+        }
+
+        return (
+            <span className={styles.attributes}>
+                {renderNormalNumeral(value)}{unit}
+            </span>
+        );
+    }
+
+    renderTooltip = (properties) => {
+        const { selectedIndicator } = this.props;
+        return (
+            <div className={styles.provinceTooltip}>
+                <span className={styles.label}>
+                    Province {properties.Province}
+                </span>
+                {this.renderIndicatorTooltip(properties.Province)}
+            </div>
+        );
     }
 
     render() {

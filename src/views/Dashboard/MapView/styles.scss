@@ -19,6 +19,33 @@
     overflow-y: auto;
 }
 
+
+.province-tooltip {
+    @include shadow-small;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $duration-transition-medium all ease-in-out;
+    background-color: $color-foreground;
+    padding: $spacing-extra-small $spacing-small;
+
+    .label {
+        font-family: $font-family-sans-serif;
+        font-size: $font-size-medium;
+    }
+
+    .attributes {
+        padding-left: $spacing-small;
+
+        &::before {
+            content: '(';
+        }
+        &::after {
+            content: ')';
+        }
+    }
+}
+
 // Note: height 'auto' cannot be transitioned
 .municipality-tooltip {
     @include shadow-small;

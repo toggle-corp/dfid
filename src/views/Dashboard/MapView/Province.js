@@ -32,14 +32,6 @@ class Province extends React.PureComponent {
 
     calculatePaint = ({ selectedIndicator, selectedProgrammes, provinces }) => {
         if (!selectedIndicator) {
-            if (selectedProgrammes.length > 0) {
-                this.paint = {
-                    'fill-color': '#fff',
-                    'fill-opacity': 0,
-                };
-                return;
-            }
-
             this.paint = {
                 'fill-color': mapStyles.provinces.color,
                 'fill-opacity': mapStyles.provinces.opacity,

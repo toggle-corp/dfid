@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 
 import {
     dashboardProgrammesSelector,
-    dashboardIndicatorSelector,
     municipalitiesSelector,
 } from '../../../redux';
 
@@ -16,7 +15,6 @@ import styles from './styles.scss';
 const emptyList = [];
 
 const mapStateToProps = state => ({
-    selectedIndicator: dashboardIndicatorSelector(state),
     selectedProgrammes: dashboardProgrammesSelector(state),
     municipalities: municipalitiesSelector(state),
 });
@@ -27,15 +25,13 @@ class Municipality extends React.PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.selectedProgrammes !== nextProps.selectedProgrammes ||
-            this.props.selectedIndicator !== nextProps.selectedIndicator
-        ) {
+        if (this.props.selectedProgrammes !== nextProps.selectedProgrammes) {
             this.calculatePaint(nextProps);
         }
     }
 
-    calculatePaint = ({ selectedProgrammes, selectedIndicator, municipalities }) => {
-        if (selectedProgrammes.length === 0 || selectedIndicator) {
+    calculatePaint = ({ selectedProgrammes, municipalities }) => {
+        if (selectedProgrammes.length === 0) {
             this.paint = {
                 'fill-color': '#fff',
                 'fill-opacity': 0,
