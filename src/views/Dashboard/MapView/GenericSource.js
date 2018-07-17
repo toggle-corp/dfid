@@ -1,7 +1,7 @@
 import React from 'react';
 
 import MapSource from '../../../components/Map/MapSource';
-import { RequestWrapper } from './GeoJsonRequest';
+import GeoJsonRequest from './GeoJsonRequest';
 
 
 const ProvinceSource = ({ sourceKey, geoJson, map, setContext, supportHover }) => (
@@ -15,8 +15,9 @@ const ProvinceSource = ({ sourceKey, geoJson, map, setContext, supportHover }) =
     />
 );
 
+// Could be an HOC instead
 export default (props) => (
-    <RequestWrapper
+    <GeoJsonRequest
         url={props.url}
         child={ProvinceSource}
         {...props}

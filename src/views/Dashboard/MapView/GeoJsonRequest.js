@@ -1,10 +1,9 @@
 import React from 'react';
 import * as topojson  from 'topojson-client';
 
-
-export default class GeoJsonRequest {
+// TODO: use RestRequest from 'react-store' instead of this class
+class Request {
     constructor(url) {
-        this.url = url;
         this.headers = {
             method: 'GET',
         };
@@ -36,14 +35,7 @@ export default class GeoJsonRequest {
             response = JSON.parse(responseText);
         }
 
-        let geoJson;
-        if (response.type && response.type === 'FeatureCollection') {
-            geoJson = response;
-        } else {
-            geoJson = topojson.feature(response, Object.values(response.objects)[0]);
-        }
-
-        this.onSuccess(geoJson);
+        this.onSuccess(response);
     }
 
     handleError = (error) => {
@@ -56,20 +48,22 @@ export default class GeoJsonRequest {
 }
 
 
-export class RequestWrapper extends React.PureComponent {
+// Can also be an HOC but let's see if this has other use cases
+// before finalizing.
+export default class GeoJsonRequest extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
             geoJson: undefined,
         };
 
-        this.request = new GeoJsonRequest();
+        this.request = new Request();
     }
 
     componentDidMount() {
         this.request.start({
             url: this.props.url,
-            onSuccess: geoJson => this.setState({ geoJson }),
+            onSuccess: this.handleSuccess,
         });
     }
 
@@ -78,13 +72,23 @@ export class RequestWrapper extends React.PureComponent {
             this.request.stop();
             this.request.start({
                 url: this.props.url,
-                onSuccess: geoJson => this.setState({ geoJson }),
+                onSuccess: this.handleSuccess,
             });
         }
     }
 
     componentWillUnmount() {
         this.request.stop();
+    }
+
+    handleSuccess = (response) => {
+        let geoJson;
+        if (response.type && response.type === 'FeatureCollection') {
+            geoJson = response;
+        } else {
+            geoJson = topojson.feature(response, Object.values(response.objects)[0]);
+        }
+        this.setState({ geoJson })
     }
 
     render() {
