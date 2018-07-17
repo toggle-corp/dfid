@@ -14,6 +14,7 @@ const iconNames: Readonly<{
     informationCircle: 'ion-information-circled',
     list: 'ion-android-list',
     grid: 'ion-android-apps',
+    panels: 'ion-ios-browsers',
 };
 
 export default iconNames;
