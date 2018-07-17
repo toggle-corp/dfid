@@ -44,20 +44,6 @@ export default class MapView extends React.PureComponent {
         return (
             <React.Fragment>
                 <Raster map={map} />
-                <GenericSource
-                    map={map}
-                    setContext={this.setContext}
-                    url={urlForCountryGeoJson}
-                    sourceKey="province"
-                    supportHover
-                />
-                <GenericSource
-                    map={map}
-                    setContext={this.setContext}
-                    url={urlForMunicipalitiesGeoJson}
-                    sourceKey="municipality"
-                    supportHover
-                />
                 <Province
                     map={map}
                     context={this.state.context}
@@ -86,6 +72,20 @@ export default class MapView extends React.PureComponent {
                 <ProvinceBorder
                     map={map}
                     context={this.state.context}
+                />
+                <GenericSource
+                    map={map}
+                    setContext={this.setContext}
+                    url={urlForCountryGeoJson}
+                    sourceKey="province"
+                    supportHover
+                />
+                <GenericSource
+                    map={map}
+                    setContext={this.setContext}
+                    url={urlForMunicipalitiesGeoJson}
+                    sourceKey="municipality"
+                    supportHover
                 />
             </React.Fragment>
         );

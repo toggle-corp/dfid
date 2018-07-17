@@ -60,7 +60,6 @@ import {
     Programme,
     Sector,
     MapLayer,
-    GeoJSON,
     GeoJSONS,
     Dictionary,
     SetGeoJsonsAction,
@@ -78,7 +77,6 @@ import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
 import ProvinceDataGetRequest from './requests/ProvinceDataGetRequest';
 import ProvincesGetRequest from './requests/ProvincesGetRequest';
 import SectorsGetRequest from './requests/SectorsGetRequest';
-import MapLayerGeoJsonGetRequest from './requests/MapLayerGeoJsonGetRequest';
 import MunicipalitiesGetRequest from './requests/MunicipalitiesGetRequest';
 
 interface OwnProps {
@@ -335,27 +333,6 @@ export class RequestManager extends React.PureComponent<Props, State>{
         });
         this.municipalitiesRequest = municipalitiesRequest.create();
         this.municipalitiesRequest.start();
-    }
-
-    addRequestForMapLayerGeoJson = (
-        key: string,
-        url: string,
-        responseHandler: (geoJson: GeoJSON) => void,
-    ) => {
-        if (!url) {
-            // NOTE: Ignore undefined/null urls
-            console.warn('invalid url for map layer geo json for', key);
-            return;
-        }
-
-        const mapLayerGeoJsonRequest = new MapLayerGeoJsonGetRequest({
-            setMapLayerGeoJson: responseHandler,
-            setGeoJsons: this.props.setGeoJsons,
-            getCoordinator: () => this.geoJsonRequestCoordinator,
-        }).create({ url, key });
-
-        this.geoJsonRequestCoordinator.add(key, mapLayerGeoJsonRequest);
-        this.geoJsonRequestCoordinator.start();
     }
 
     render() {
