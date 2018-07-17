@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl';
 
 import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
 import { iconNames } from '../../vendor/react-store/constants';
+import html2canvas from 'html2canvas';
 
 import styles from './styles.scss';
 
@@ -31,6 +32,7 @@ export default class Map extends React.Component {
         super(props);
 
         this.mapContainer = React.createRef();
+        this.leftBottomPanels = React.createRef();
         this.state = {
             map: undefined,
             zoomLevel: 3,
@@ -143,11 +145,34 @@ export default class Map extends React.Component {
             return;
         }
 
-        const canvas = map.getCanvas();
-        const link = document.createElement('a');
-        link.download = 'map-export.png';
-        link.href = canvas.toDataURL()
-        link.click();
+        const canvas1 = map.getCanvas();
+
+        const legends = this.leftBottomPanels.current.querySelectorAll('.legend, .scale-legend');
+        // query selector does not return a list and hence the array spreader used below.
+        const promises = Array.from(legends).map(l => html2canvas(l));
+
+        Promise.all(promises).then((canvases) => {
+            const canvas3 = document.createElement('canvas');
+            canvas3.width = canvas1.width;
+            canvas3.height = canvas1.height;
+
+            const context = canvas3.getContext('2d');
+            context.drawImage(canvas1, 0, 0);
+
+            let x = 6;
+            canvases.forEach((canvas2) => {
+                const y = canvas1.height - canvas2.height - 6;
+                context.shadowBlur = 4;
+                context.shadowColor = "black";
+                context.drawImage(canvas2, x, y);
+                x += canvas2.width + 6;
+            });
+
+            const link = document.createElement('a');
+            link.download = 'map-export.png';
+            link.href = canvas3.toDataURL()
+            link.click();
+        });
     }
 
     render() {
@@ -174,7 +199,7 @@ export default class Map extends React.Component {
                                 Export
                             </AccentButton>
                         </div>
-                        <div className={styles.leftBottomPanels}>
+                        <div className={styles.leftBottomPanels} ref={this.leftBottomPanels}>
                             <Panels map={map} zoomLevel={this.state.zoomLevel} />
                         </div>
                     </React.Fragment>

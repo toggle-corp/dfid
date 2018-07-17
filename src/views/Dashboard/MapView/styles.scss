@@ -28,6 +28,7 @@
     transition: $duration-transition-medium all ease-in-out;
     background-color: $color-foreground;
     padding: $spacing-extra-small $spacing-small;
+    pointer-events: none;
 
     .label {
         font-family: $font-family-sans-serif;

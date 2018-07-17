@@ -70,10 +70,11 @@ class Municipality extends React.PureComponent {
             return municipality.totalNoOfProgrammes;
         }
 
-        const partners = (municipality.programs || []).reduce((acc, p) => (
-            [...acc, ...p.partners.map(pt => pt.name)]
-        ), []);
-        return new Set(partners).size;
+        // const partners = (municipality.programs || []).reduce((acc, p) => (
+        //     [...acc, ...p.partners.map(pt => pt.name)]
+        // ), []);
+        // return new Set(partners).size;
+        return municipality.totalNoOfPartners;
     }
 
     calculateTextLayout = ({ municipalities, textMarkers }) => {
