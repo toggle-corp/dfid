@@ -2,87 +2,40 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 
-import MapLayer from './MapLayer';
-import Legend from './Legend';
-import styles from './styles.scss';
-
 import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
 import { iconNames } from '../../vendor/react-store/constants';
+import html2canvas from 'html2canvas';
+
+import styles from './styles.scss';
+
+const nullComponent = () => null;
 
 const propTypes = {
     className: PropTypes.string,
-    layers: PropTypes.object,
-    hideLayers: PropTypes.bool,
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ]),
     bounds: PropTypes.arrayOf(PropTypes.number),
+    childRenderer: PropTypes.func,
+    panelsRenderer: PropTypes.func,
 };
 
 const defaultProps = {
     className: '',
-    layers: {},
-    hideLayers: false,
-    children: undefined,
     bounds: undefined,
+    childRenderer: nullComponent,
+    panelsRenderer: nullComponent,
 };
 
-export default class Map extends React.PureComponent {
+export default class Map extends React.Component {
     static propTypes = propTypes;
     static defaultProps = defaultProps;
-
-    static createSortedLayers = (layersObj) => {
-        const layers = Object.values(layersObj);
-
-        // Sort the layers
-        const sortedLayers = layers.sort((l1, l2) => l1.order - l2.order);
-
-        // Create the separate stroke layers
-        const separatedStrokeLayers = sortedLayers
-            .filter(l => l.separateStroke)
-            .map(l => ({
-                ...l,
-                layerKey: `${l.layerKey}-separate-stroke`,
-                types: ['Line'],
-            }));
-
-        // Create the layers with seprate style
-        const separateStyleLayers = sortedLayers
-            .filter(l => l.separateStyle)
-            .map(l => ({
-                ...l,
-                layerKey: `${l.layerKey}-separate-style`,
-                types: [l.separateStyleType],
-                style: l.separateStyle,
-            }));
-
-        return [
-            ...sortedLayers,
-            ...separatedStrokeLayers,
-            ...separateStyleLayers,
-        ];
-    }
-
-    // Create legend items from layers which have title and color
-    // Perhaps use some defined variable like `showLegend` instead of title and color?
-    static createLegendItems = (layers, zoom) => layers
-        .filter(l => l.title && l.color && (!l.minZoomLevelForLegend || l.minZoomLevelForLegend <= zoom))
-        .map(layer => ({
-            label: layer.title,
-            color: layer.color,
-        }));
 
     constructor(props) {
         super(props);
 
         this.mapContainer = React.createRef();
-        this.layers = Map.createSortedLayers(this.props.layers);
-        this.reloadKey = 0;
-
+        this.leftBottomPanels = React.createRef();
         this.state = {
             map: undefined,
-            legendItems: Map.createLegendItems(this.layers, 3),
+            zoomLevel: 3,
         };
     }
 
@@ -137,7 +90,7 @@ export default class Map extends React.PureComponent {
 
         map.on('zoom', () => {
             this.setState({
-                legendItems: Map.createLegendItems(this.layers, map.getZoom()),
+                zoomLevel: map.getZoom(),
             });
         });
 
@@ -145,14 +98,6 @@ export default class Map extends React.PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.layers !== nextProps.layers) {
-            this.layers = Map.createSortedLayers(nextProps.layers);
-            this.setState({
-                legendItems: Map.createLegendItems(this.layers, this.state.map ? this.state.map.getZoom() : 3),
-            });
-            this.reloadKey += 1;
-        }
-
         if (this.props.bounds !== nextProps.bounds && this.state.map) {
             const { bounds } = nextProps.props;
             const { map } = this.state;
@@ -200,70 +145,65 @@ export default class Map extends React.PureComponent {
             return;
         }
 
-        const canvas = map.getCanvas();
-        const link = document.createElement('a');
-        link.download = 'map-export.png';
-        link.href = canvas.toDataURL()
-        link.click();
-    }
+        const canvas1 = map.getCanvas();
 
-    renderMapLayer = (layerInfo) => {
-        let key = `${layerInfo.layerKey}-layer`;
-        if (!layerInfo.donotReload) {
-            key = `${key}-${this.reloadKey}`;
-        }
+        const legends = this.leftBottomPanels.current.querySelectorAll('.legend, .scale-legend');
+        // query selector does not return a list and hence the array spreader used below.
+        const promises = Array.from(legends).map(l => html2canvas(l));
 
-        return (
-            <MapLayer
-                key={key}
-                map={this.state.map}
-                properties={layerInfo}
-            />
-        );
-    }
+        Promise.all(promises).then((canvases) => {
+            const canvas3 = document.createElement('canvas');
+            canvas3.width = canvas1.width;
+            canvas3.height = canvas1.height;
 
-    renderMapLayers = () => {
-        const showMapLayers = this.state.map && !this.props.hideLayers;
-        if (!showMapLayers) {
-            return null;
-        }
+            const context = canvas3.getContext('2d');
+            context.drawImage(canvas1, 0, 0);
 
-        // TODO: Use List
-        return (
-            <React.Fragment>
-                {this.layers.map(layerInfo => this.renderMapLayer(layerInfo))}
-            </React.Fragment>
-        );
+            let x = 6;
+            canvases.forEach((canvas2) => {
+                const y = canvas1.height - canvas2.height - 6;
+                context.shadowBlur = 4;
+                context.shadowColor = "black";
+                context.drawImage(canvas2, x, y);
+                x += canvas2.width + 6;
+            });
+
+            const link = document.createElement('a');
+            link.download = 'map-export.png';
+            link.href = canvas3.toDataURL()
+            link.click();
+        });
     }
 
     render() {
-        const { children } =  this.props;
+        const { childRenderer, panelsRenderer } = this.props;
+        const { map } = this.state;
+
         const className = this.getClassName();
-        const MapLayers = this.renderMapLayers;
+        const Child = childRenderer;
+        const Panels = panelsRenderer;
 
         return (
              <div
                 className={className}
                 ref={this.mapContainer}
             >
-                <div className={styles.topRightPanels}>
-                    <AccentButton
-                        onClick={this.handleExportClick}
-                        iconName={iconNames.download}
-                    >
-                        Export
-                    </AccentButton>
-                </div>
-                <MapLayers />
-                <div className={styles.leftBottomPanels}>
-                    {this.state.legendItems.length > 0 && (
-                        <Legend
-                            className={styles.legend}
-                            legendItems={this.state.legendItems}
-                        />
-                    )}
-                    { children }
-                </div>
+                {map && (
+                    <React.Fragment>
+                        <Child map={map} zoomLevel={this.state.zoomLevel} />
+                        <div className={styles.topLeftPanels}>
+                            <AccentButton
+                                onClick={this.handleExportClick}
+                                iconName={iconNames.download}
+                            >
+                                Export
+                            </AccentButton>
+                        </div>
+                        <div className={styles.leftBottomPanels} ref={this.leftBottomPanels}>
+                            <Panels map={map} zoomLevel={this.state.zoomLevel} />
+                        </div>
+                    </React.Fragment>
+                )}
             </div>
         );
     }

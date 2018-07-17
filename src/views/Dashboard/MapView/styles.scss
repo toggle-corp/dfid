@@ -1,0 +1,114 @@
+@import '../../../stylesheets/base';
+
+.map {
+    width: 100%;
+    height: 100%;
+}
+
+.scale-legend {
+    margin-bottom: $spacing-small;
+    margin-left: $spacing-small;
+    box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+}
+
+.legend {
+    margin-bottom: $spacing-small;
+    margin-left: $spacing-small;
+    box-shadow: 0 0 $radius-blur-large $radius-spread-medium $color-shadow-medium;
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+
+.province-tooltip {
+    @include shadow-small;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $duration-transition-medium all ease-in-out;
+    background-color: $color-foreground;
+    padding: $spacing-extra-small $spacing-small;
+    pointer-events: none;
+
+    .label {
+        font-family: $font-family-sans-serif;
+        font-size: $font-size-medium;
+    }
+
+    .attributes {
+        padding-left: $spacing-small;
+
+        &::before {
+            content: '(';
+        }
+        &::after {
+            content: ')';
+        }
+    }
+}
+
+// Note: height 'auto' cannot be transitioned
+.municipality-tooltip {
+    @include shadow-small;
+    transition: $duration-transition-medium all ease-in-out;
+    background-color: $color-foreground;
+    width: 340px;
+    animation: fade-in $duration-transition-medium forwards ease-in;
+    font-family: $font-family-sans-serif;
+    font-size: $font-size-medium;
+    pointer-events: none;
+
+    .title {
+        border-bottom: $width-separator-thin solid $color-accent;
+        padding: $spacing-small $spacing-medium;
+        color: $color-accent;
+        font-weight: $font-weight-bold;
+    }
+
+    .empty {
+        padding: $spacing-medium;
+        text-align: center;
+        color: $color-text-placeholder;
+    }
+
+    .programs {
+        display: table;
+
+        .header {
+            display: table-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+                text-transform: uppercase;
+                color: $color-text-label;
+                font-size: $font-size-small;
+                font-weight: $font-weight-bold;
+            }
+        }
+
+        .program {
+            display: table-row;
+            @extend %background-alternating-row;
+
+            > span {
+                display: table-cell;
+                padding: $spacing-extra-small $spacing-medium;
+
+                &.number {
+                    text-align: right;
+                }
+            }
+        }
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
