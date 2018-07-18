@@ -15,7 +15,9 @@ import {
 
 import MapLayer from '../../../components/Map/MapLayer';
 import mapStyles from '../../../constants/mapStyles';
+import iconNames from '../../../constants/iconNames';
 
+import PrimaryButton from '../../../vendor/react-store/components/Action/Button';
 import { getCategoricalPaint } from './utils';
 import styles from './styles.scss';
 
@@ -132,17 +134,25 @@ class Municipality extends React.PureComponent {
         }
 
         return (
-            <div className={styles.programs}>
-                <div className={styles.header}>
-                    <span>Program</span>
-                    <span>Budget</span>
-                    <span>Partners</span>
-                </div>
-                <List
-                    data={municipality.programs}
-                    keyExtractor={Municipality.programKeyExtractor}
-                    modifier={this.renderMunicipalityProgram}
-                />
+            <div>
+                <div className={styles.programs}>
+                    <div className={styles.header}>
+                        <span>Program</span>
+                        <span>Budget</span>
+                        <span>Partners</span>
+                    </div>
+                    <List
+                        data={municipality.programs}
+                        keyExtractor={Municipality.programKeyExtractor}
+                        modifier={this.renderMunicipalityProgram}
+                    />
+                    </div>
+                    <div className={styles.info}>
+                        Click on
+                        <span className={iconNames.informationCircle} />
+                        to open information pane for more details.
+
+                    </div>
             </div>
         );
     }

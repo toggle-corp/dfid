@@ -1,13 +1,13 @@
 const mapStyles = {
     provinces: {
-        stroke: '#444',
+        stroke: '#fff',
         strokeWidth: 1.5,
 
-        selectedStroke: '#b30000',
+        selectedStroke: '#444',
         selectedStrokeWidth: 2.5,
 
         color: '#1c9099',
-        indicatorColor: '#fc8d59',
+        indicatorColor: '#1c9099',
         opacity: 0.6,
 
         hoverColor: '#d0d1e6',
@@ -15,11 +15,11 @@ const mapStyles = {
     },
 
     municipalities: {
-        stroke: '#795548',
+        stroke: '#5b5a5a',
         strokeWidth: 1,
         strokeOpacity: 0.3,
 
-        selectedStroke: '#b30000',
+        selectedStroke: '#444',
         selectedStrokeWidth: 1.5,
         selectedStrokeOpacity: 1,
 
