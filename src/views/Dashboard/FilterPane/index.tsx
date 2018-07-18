@@ -283,21 +283,19 @@ export class FilterPane extends React.PureComponent<Props, State>{
 
         const isFilterEmpty = isObjectEmpty(faramValues);
 
-        const inputClassNames = [
-            styles.input,
-        ];
-        if (disabled) {
-            inputClassNames.push(styles.disabled);
-        }
-        const inputClassName = inputClassNames.join(' ');
-
         const programmeSelected = !!(faramValues.programmesId || []).length;
-        const backgrounLayerSelected = !!faramValues.rasterMapLayerId;
+        const backgroundLayerSelected = !!faramValues.rasterMapLayerId;
         const indicatorSelected = !!faramValues.indicatorId;
 
-        const disableProgrammeAndSector = backgrounLayerSelected || indicatorSelected;
-        const disableBackgroundLayer = programmeSelected || indicatorSelected;
-        const disableIndicator = backgrounLayerSelected || programmeSelected;
+        const disableProgrammeAndSector = backgroundLayerSelected || indicatorSelected || disabled;
+        const disableBackgroundLayer = programmeSelected || indicatorSelected || disabled;
+        const disableIndicator = backgroundLayerSelected || programmeSelected || disabled;
+
+        const inputClassName = `${styles.input} ${disabled ? styles.disabled : ''}`;
+
+        const psClassName = `${styles.input} ${disableProgrammeAndSector ? styles.disabled : ''}`;
+        const blClassName = `${styles.input} ${disableBackgroundLayer ? styles.disabled : ''}`;
+        const inClassName = `${styles.input} ${disableIndicator ? styles.disabled : ''}`;
 
         return (
             <Faram
@@ -357,7 +355,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingSectors &&
                             <SelectInputWithList
                                 label="Sectors"
-                                className={inputClassName}
+                                className={psClassName}
                                 options={sectors}
                                 faramElementName="sectorsId"
                                 keySelector={sectorKeyExtractor}
@@ -370,7 +368,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingProgrammes &&
                             <SelectInputWithList
                                 label="Programmes"
-                                className={inputClassName}
+                                className={psClassName}
                                 options={programmes}
                                 faramElementName="programmesId"
                                 keySelector={programmeKeyExtractor}
@@ -383,7 +381,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                     </div>
                     <div className={styles.layers}>
                         { !loadingIndicators &&
-                            <div className={inputClassName} >
+                            <div className={inClassName} >
                                 <SelectInput
                                     label="Indicators"
                                     options={indicators}
@@ -398,7 +396,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         }
                         { !loadingLayers &&
                             <Fragment>
-                                <div className={inputClassName} >
+                                <div className={blClassName} >
                                     <SelectInput
                                         label="Background Layers"
                                         className={inputClassName}
@@ -428,6 +426,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         <AccentButton
                             iconName={iconNames.download}
                             onClick={this.props.onExport}
+                            disabled={disabled}
                         >
                             Export
                         </AccentButton>
