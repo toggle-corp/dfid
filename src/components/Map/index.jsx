@@ -2,11 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mapboxgl from 'mapbox-gl';
 
-import AccentButton from '../../vendor/react-store/components/Action/Button/AccentButton';
-import { iconNames } from '../../vendor/react-store/constants';
 import html2canvas from 'html2canvas';
 
 import styles from './styles.scss';
+
+
+export class MapApi {
+    setExportHandler = (exportHandler) => {
+        this.exportHandler = exportHandler;
+    }
+
+    export = () => {
+        if (this.exportHandler) {
+            this.exportHandler();
+        }
+    }
+}
 
 const nullComponent = () => null;
 
@@ -15,6 +26,7 @@ const propTypes = {
     bounds: PropTypes.arrayOf(PropTypes.number),
     childRenderer: PropTypes.func,
     panelsRenderer: PropTypes.func,
+    api: PropTypes.instanceOf(MapApi),
 };
 
 const defaultProps = {
@@ -22,6 +34,7 @@ const defaultProps = {
     bounds: undefined,
     childRenderer: nullComponent,
     panelsRenderer: nullComponent,
+    api: undefined,
 };
 
 export default class Map extends React.Component {
@@ -41,6 +54,9 @@ export default class Map extends React.Component {
 
     componentDidMount() {
         this.mounted = true;
+        if (this.props.api) {
+            this.props.api.setExportHandler(this.export);
+        }
 
         const { REACT_APP_MAPBOX_ACCESS_TOKEN: token } = process.env;
         // Add the mapbox map
@@ -114,6 +130,14 @@ export default class Map extends React.Component {
                 );
             }
         }
+        if (nextProps.api !== this.props.api) {
+            if (this.props.api) {
+                this.props.api.setExportHandler(undefined);
+            }
+            if (nextProps.api) {
+                nextProps.api.setExportHandler(this.export);
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -125,6 +149,10 @@ export default class Map extends React.Component {
             this.setState({ map: undefined }, () => {
                 map.remove();
             });
+        }
+
+        if (this.props.api) {
+            this.props.api.setExportHandler(this.export);
         }
     }
 
@@ -139,7 +167,7 @@ export default class Map extends React.Component {
         return classNames.join(' ');
     }
 
-    handleExportClick = () => {
+    export = () => {
         const { map } = this.state;
         if (!map) {
             return;
@@ -191,14 +219,6 @@ export default class Map extends React.Component {
                 {map && (
                     <React.Fragment>
                         <Child map={map} zoomLevel={this.state.zoomLevel} />
-                        <div className={styles.topLeftPanels}>
-                            <AccentButton
-                                onClick={this.handleExportClick}
-                                iconName={iconNames.download}
-                            >
-                                Export
-                            </AccentButton>
-                        </div>
                         <div className={styles.leftBottomPanels} ref={this.leftBottomPanels}>
                             <Panels map={map} zoomLevel={this.state.zoomLevel} />
                         </div>

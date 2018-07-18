@@ -54,6 +54,7 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
+import { MapApi } from '../../components/Map';
 import MapView from './MapView';
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -94,6 +95,8 @@ interface State {
 }
 
 export class Dashboard extends React.PureComponent<Props, State>{
+    mapApi: MapApi;
+
     static municipalityProgramKeyExtractor = (programme: MunicipalityProgramme) => (
         programme.program
     )
@@ -104,6 +107,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.state = {
             layersInfo: {},
         };
+        this.mapApi = new MapApi();
     }
 
     setLayersInfo = (settings: object) => {
@@ -126,6 +130,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
         if (municipality) {
             this.props.toggleDashboardMunicipility(municipality.id);
         }
+    }
+
+    handleExport = () => {
+        this.mapApi.export();
     }
 
     renderMaplayerTooltip = (properties: any) => {
@@ -171,6 +179,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 <FilterPane
                     className={styles.left}
                     disabled={loading}
+                    onExport={this.handleExport}
                     loadingProvinces={loadingProvinces}
                     loadingProgrammes={loadingProgrammes}
                     loadingSectors={loadingSectors}
@@ -179,7 +188,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 />
                 <div className={styles.right}>
                     {loadingGeoJson && <LoadingAnimation />}
-                    <MapView />
+                    <MapView mapApi={this.mapApi} />
                     <InformationPane
                         className={styles.informationPane}
                         loadingProvinceData={loadingProvinceData}

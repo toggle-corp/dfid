@@ -15,6 +15,7 @@ const iconNames: Readonly<{
     list: 'ion-android-list',
     grid: 'ion-android-apps',
     panels: 'ion-ios-browsers',
+    download: 'fa fa-download',
 };
 
 export default iconNames;

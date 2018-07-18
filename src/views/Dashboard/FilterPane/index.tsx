@@ -7,8 +7,10 @@ import SelectInput from '../../../vendor/react-store/components/Input/SelectInpu
 import DangerButton from '../../../vendor/react-store/components/Action/Button/DangerButton';
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
+import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
+import { iconNames } from '../../../constants';
 
 import {
     setDashboardFiltersAction,
@@ -46,6 +48,7 @@ interface OwnProps {
     className?: string;
     disabled: boolean;
     onFilterClear?(): void;
+    onExport(): void;
     // onChange when filters are applied
     onChange?(oldValues: DashboardFilterParams, values: DashboardFilterParams): void;
     loadingProvinces?: boolean;
@@ -408,6 +411,12 @@ export class FilterPane extends React.PureComponent<Props, State>{
                             </Fragment>
                         }
                     </div>
+                    <AccentButton
+                        iconName={iconNames.download}
+                        onClick={this.props.onExport}
+                    >
+                        Export
+                    </AccentButton>
                 </div>
             </Faram>
         );

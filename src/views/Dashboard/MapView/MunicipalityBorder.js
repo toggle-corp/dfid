@@ -34,7 +34,7 @@ class Municipality extends React.PureComponent {
             selectedMunicipalities,
         } = this.props;
 
-        if (!context.municipality) {
+        if (!context.municipality || !context.province) {
             return null;
         }
 
