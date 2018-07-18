@@ -291,6 +291,14 @@ export class FilterPane extends React.PureComponent<Props, State>{
         }
         const inputClassName = inputClassNames.join(' ');
 
+        const programmeSelected = !!(faramValues.programmesId || []).length;
+        const backgrounLayerSelected = !!faramValues.rasterMapLayerId;
+        const indicatorSelected = !!faramValues.indicatorId;
+
+        const disableProgrammeAndSector = backgrounLayerSelected || indicatorSelected;
+        const disableBackgroundLayer = programmeSelected || indicatorSelected;
+        const disableIndicator = backgrounLayerSelected || programmeSelected;
+
         return (
             <Faram
                 className={classNames.join(' ')}
@@ -356,6 +364,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 labelSelector={sectorLabelExtractor}
                                 showHintAndError={false}
                                 listProps={{ emptyComponent: renderSectorEmpty }}
+                                disabled={disableProgrammeAndSector}
                             />
                         }
                         { !loadingProgrammes &&
@@ -368,6 +377,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 labelSelector={programmeLabelExtractor}
                                 showHintAndError={false}
                                 listProps={{ emptyComponent: renderProgramEmpty }}
+                                disabled={disableProgrammeAndSector}
                             />
                         }
                     </div>
@@ -382,6 +392,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                     labelSelector={indicatorLabelExtractor}
                                     showHintAndError={false}
                                     listProps={{ emptyComponent: renderIndicatorEmpty }}
+                                    disabled={disableIndicator}
                                 />
                             </div>
                         }
@@ -396,6 +407,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                         keySelector={mapLayerKeyExtractor}
                                         labelSelector={mapLayerLabelExtractor}
                                         showHintAndError={false}
+                                        disabled={disableBackgroundLayer}
                                     />
                                 </div>
                                 <SelectInputWithList
@@ -411,13 +423,15 @@ export class FilterPane extends React.PureComponent<Props, State>{
                             </Fragment>
                         }
                     </div>
-                    <AccentButton
-                        iconName={iconNames.download}
-                        onClick={this.props.onExport}
-                    >
-                        Export
-                    </AccentButton>
-                </div>
+                    </div>
+                    <div className={styles.exportContainer}>
+                        <AccentButton
+                            iconName={iconNames.download}
+                            onClick={this.props.onExport}
+                        >
+                            Export
+                        </AccentButton>
+                    </div>
             </Faram>
         );
     }

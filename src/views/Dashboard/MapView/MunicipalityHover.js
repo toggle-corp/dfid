@@ -150,7 +150,7 @@ class Municipality extends React.PureComponent {
                     <div className={styles.info}>
                         Click on
                         <span className={iconNames.informationCircle} />
-                        to preview information pane for more details.
+                        to open information pane for more details.
 
                     </div>
             </div>

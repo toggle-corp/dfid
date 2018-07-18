@@ -7,7 +7,7 @@ const mapStyles = {
         selectedStrokeWidth: 2.5,
 
         color: '#1c9099',
-        indicatorColor: '#fc8d59',
+        indicatorColor: '#1c9099',
         opacity: 0.6,
 
         hoverColor: '#d0d1e6',
