@@ -10,7 +10,7 @@ import {
 
 import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
 import { getRgbFromHex, getHexFromString } from '../../../vendor/react-store/utils/common';
-import { iconNames } from '../../../vendor/react-store/constants';
+import { iconNames } from '../../../constants';
 
 import Legend from '../../../components/Map/Legend';
 import ScaleLegend from '../../../components/Map/ScaleLegend';

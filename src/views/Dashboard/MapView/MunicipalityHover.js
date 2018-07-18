@@ -79,6 +79,11 @@ class Municipality extends React.PureComponent {
 
     calculateTextLayout = ({ municipalities, textMarkers }) => {
         const layout = {};
+
+        if (municipalities.length <= 0) {
+            this.textLayout = {};
+            return;
+        }
         municipalities.forEach((municipality) => {
             const number = this.calculateTextMarkersText(municipality, textMarkers);
             layout[municipality.hlcitCode] = {
