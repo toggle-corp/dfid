@@ -11,6 +11,7 @@ import {
 import { GeoJSON } from '../../../redux/interface';
 import { FgRestBuilder } from '../../../vendor/react-store/utils/rest';
 import { getColorOnBgColor } from '../../../vendor/react-store/utils/common';
+import Message from '../../../vendor/react-store/components/View/Message';
 
 interface MapMouseEvent extends mapboxgl.MapMouseEvent {
     features: GeoJSON.Feature<mapboxgl.GeoJSONGeometry>;
@@ -38,6 +39,7 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
     layers: string[];
     sources: string[];
     mapElement: HTMLDivElement;
+    unsupportedBrowser: boolean;
 
     static defaultProps = defaultProps;
 
@@ -49,12 +51,19 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
         this.state = {
             map: undefined,
         };
+
+        this.mounted = false;
+        this.unsupportedBrowser = !mapboxgl.supported();
     }
 
     componentWillMount() {
     }
 
     componentDidMount() {
+        if (this.unsupportedBrowser) {
+            return;
+        }
+
         this.mounted = true;
 
         const { REACT_APP_MAPBOX_ACCESS_TOKEN: token } = process.env;
@@ -229,7 +238,17 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
 
     render() {
         const className = this.getClassName();
-        // const { map } = this.state;
+
+        if (this.unsupportedBrowser) {
+            return (
+                 <div className={className}>
+                    <Message>
+                        Your browser doesn't support Mapbox!
+                    </Message>
+                </div>
+            );
+        }
+
         return (
             <div
                 className={className}

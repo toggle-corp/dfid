@@ -4,6 +4,8 @@ import mapboxgl from 'mapbox-gl';
 
 import html2canvas from 'html2canvas';
 
+import Message from '../../vendor/react-store/components/View/Message';
+
 import styles from './styles.scss';
 
 
@@ -50,9 +52,15 @@ export default class Map extends React.Component {
             map: undefined,
             zoomLevel: 3,
         };
+
+        this.unsupportedBrowser = !mapboxgl.supported();
     }
 
     componentDidMount() {
+        if (this.unsupportedBrowser) {
+            return;
+        }
+
         this.mounted = true;
         if (this.props.api) {
             this.props.api.setExportHandler(this.export);
@@ -63,6 +71,7 @@ export default class Map extends React.Component {
         if (token) {
             mapboxgl.accessToken = token;
         }
+
         const map = new mapboxgl.Map({
             center: [84.1240, 28.3949], // longitude, latitude of nepal
             container: this.mapContainer.current,
@@ -170,6 +179,7 @@ export default class Map extends React.Component {
     export = () => {
         const { map } = this.state;
         if (!map) {
+            console.warn('Cannot export as there is no map');
             return;
         }
 
@@ -211,6 +221,19 @@ export default class Map extends React.Component {
         const Child = childRenderer;
         const Panels = panelsRenderer;
 
+        if (this.unsupportedBrowser) {
+            return (
+                 <div
+                    className={className}
+                    ref={this.mapContainer}
+                >
+                    <Message>
+                        Your browser doesn't support Mapbox!
+                    </Message>
+                </div>
+            );
+        }
+
         return (
              <div
                 className={className}
@@ -218,9 +241,18 @@ export default class Map extends React.Component {
             >
                 {map && (
                     <React.Fragment>
-                        <Child map={map} zoomLevel={this.state.zoomLevel} />
-                        <div className={styles.leftBottomPanels} ref={this.leftBottomPanels}>
-                            <Panels map={map} zoomLevel={this.state.zoomLevel} />
+                        <Child
+                            map={map}
+                            zoomLevel={this.state.zoomLevel}
+                        />
+                        <div
+                            className={styles.leftBottomPanels}
+                            ref={this.leftBottomPanels}
+                        >
+                            <Panels
+                                map={map}
+                                zoomLevel={this.state.zoomLevel}
+                            />
                         </div>
                     </React.Fragment>
                 )}
