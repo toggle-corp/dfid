@@ -100,6 +100,20 @@
                 }
             }
         }
+
+    }
+
+    .info {
+        border-top: $width-separator-thin solid $color-accent;
+        padding: 0 $spacing-medium;
+        font-size: $font-size-extra-small;
+
+        span {
+            padding: 0 $spacing-small;
+            color: $color-primary;
+            font-size: $font-size-small;
+        }
+
     }
 }
 
