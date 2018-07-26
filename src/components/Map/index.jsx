@@ -9,18 +9,6 @@ import Message from '../../vendor/react-store/components/View/Message';
 import styles from './styles.scss';
 
 
-export class MapApi {
-    setExportHandler = (exportHandler) => {
-        this.exportHandler = exportHandler;
-    }
-
-    export = () => {
-        if (this.exportHandler) {
-            this.exportHandler();
-        }
-    }
-}
-
 const nullComponent = () => null;
 
 const propTypes = {
@@ -28,7 +16,6 @@ const propTypes = {
     bounds: PropTypes.arrayOf(PropTypes.number),
     childRenderer: PropTypes.func,
     panelsRenderer: PropTypes.func,
-    api: PropTypes.instanceOf(MapApi),
 };
 
 const defaultProps = {
@@ -36,7 +23,6 @@ const defaultProps = {
     bounds: undefined,
     childRenderer: nullComponent,
     panelsRenderer: nullComponent,
-    api: undefined,
 };
 
 export default class Map extends React.Component {
@@ -54,6 +40,10 @@ export default class Map extends React.Component {
         };
 
         this.unsupportedBrowser = !mapboxgl.supported();
+
+        if (props.setExportFunction) {
+            props.setExportFunction(this.export);
+        }
     }
 
     componentDidMount() {
@@ -62,9 +52,6 @@ export default class Map extends React.Component {
         }
 
         this.mounted = true;
-        if (this.props.api) {
-            this.props.api.setExportHandler(this.export);
-        }
 
         const { REACT_APP_MAPBOX_ACCESS_TOKEN: token } = process.env;
         // Add the mapbox map
@@ -139,14 +126,6 @@ export default class Map extends React.Component {
                 );
             }
         }
-        if (nextProps.api !== this.props.api) {
-            if (this.props.api) {
-                this.props.api.setExportHandler(undefined);
-            }
-            if (nextProps.api) {
-                nextProps.api.setExportHandler(this.export);
-            }
-        }
     }
 
     componentWillUnmount() {
@@ -158,10 +137,6 @@ export default class Map extends React.Component {
             this.setState({ map: undefined }, () => {
                 map.remove();
             });
-        }
-
-        if (this.props.api) {
-            this.props.api.setExportHandler(this.export);
         }
     }
 
@@ -206,10 +181,12 @@ export default class Map extends React.Component {
                 x += canvas2.width + 6;
             });
 
-            const link = document.createElement('a');
-            link.download = 'map-export.png';
-            link.href = canvas3.toDataURL()
-            link.click();
+            canvas3.toBlob((blob) => {
+                const link = document.createElement('a');
+                link.download = 'map-export.png';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }, 'image/png');
         });
     }
 

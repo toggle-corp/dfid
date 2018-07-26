@@ -123,7 +123,7 @@ export default class MapView extends React.PureComponent {
                 bounds={nepalBounds}
                 childRenderer={this.renderMapChildren}
                 panelsRenderer={this.renderLegends}
-                api={this.props.mapApi}
+                setExportFunction={this.props.setExportFunction}
             />
         );
     }

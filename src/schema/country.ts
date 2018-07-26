@@ -92,6 +92,7 @@ const countrySchema: SchemaGroup = [];
             programs: { type: 'array.municipalityProgram' },
             totalProgramBudget: { type: 'number' },
             totalNoOfProgrammes: { type: 'number' },
+            totalNoOfPartners: { type: 'number' },
         },
     };
     countrySchema.push({ name, schema });

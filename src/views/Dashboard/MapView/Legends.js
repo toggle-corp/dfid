@@ -199,7 +199,7 @@ class Legends extends React.PureComponent {
     renderToggleTextMarkersButton = () => {
         return (
             <PrimaryButton
-                iconName={iconNames.panels}
+                iconName={iconNames.swapArrows}
                 className={styles.panelsButton}
                 onClick={this.props.onToggleTextMarkers}
                 title="Click to toggle between Partners and Programmes"

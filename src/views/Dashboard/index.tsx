@@ -54,7 +54,6 @@ import {
     SetRequestManagerLoadingAction,
 } from '../../redux/interface';
 
-import { MapApi } from '../../components/Map';
 import MapView from './MapView';
 import FilterPane from './FilterPane';
 import InformationPane from './InformationPane';
@@ -95,7 +94,7 @@ interface State {
 }
 
 export class Dashboard extends React.PureComponent<Props, State>{
-    mapApi: MapApi;
+    exportMap?: () => void;
 
     static municipalityProgramKeyExtractor = (programme: MunicipalityProgramme) => (
         programme.program
@@ -107,7 +106,6 @@ export class Dashboard extends React.PureComponent<Props, State>{
         this.state = {
             layersInfo: {},
         };
-        this.mapApi = new MapApi();
     }
 
     setLayersInfo = (settings: object) => {
@@ -117,6 +115,10 @@ export class Dashboard extends React.PureComponent<Props, State>{
             };
             return update(state, wrappedSettings);
         });
+    }
+
+    setExportMapFunction = (exportFunction: () => void) => {
+        this.exportMap = exportFunction;
     }
 
     handleProvinceClick = (key: string) => {
@@ -133,7 +135,9 @@ export class Dashboard extends React.PureComponent<Props, State>{
     }
 
     handleExport = () => {
-        this.mapApi.export();
+        if (this.exportMap) {
+            this.exportMap();
+        }
     }
 
     renderMaplayerTooltip = (properties: any) => {
@@ -188,7 +192,7 @@ export class Dashboard extends React.PureComponent<Props, State>{
                 />
                 <div className={styles.right}>
                     {loadingGeoJson && <LoadingAnimation />}
-                    <MapView mapApi={this.mapApi} />
+                    <MapView setExportFunction={this.setExportMapFunction} />
                     <InformationPane
                         className={styles.informationPane}
                         loadingProvinceData={loadingProvinceData}
