@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 
 import {
     dashboardIndicatorSelector,
+    dashboardMunicipalityIndicatorSelector,
     dashboardProgrammesSelector,
     dashboardMapLayersSelector,
+    municipalityIndicatorsDataSelector,
     municipalitiesSelector,
 } from '../../../redux';
 
@@ -29,7 +31,9 @@ const mapStateToProps = state => ({
     selectedIndicator: dashboardIndicatorSelector(state),
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedMapLayers: dashboardMapLayersSelector(state),
+    selectedMunicipalityIndicator: dashboardMunicipalityIndicatorSelector(state),
     municipalities: municipalitiesSelector(state),
+    municipalityIndicators: municipalityIndicatorsDataSelector(state),
 });
 
 const renderIndicatorSubTitle = (name, unit) => {
@@ -79,6 +83,42 @@ class Legends extends React.PureComponent {
                 minColor={minColor}
                 maxColor={maxColor}
                 title="Indicator"
+                subTitle={renderIndicatorSubTitle(name, unit)}
+            />
+        );
+    }
+
+    renderMunicipalityIndicatorLegend = () => {
+        const { selectedMunicipalityIndicator, municipalityIndicators } = this.props;
+        if (!selectedMunicipalityIndicator) {
+            return null;
+        }
+
+        const values = municipalityIndicators.map(i => i[selectedMunicipalityIndicator]);
+        const minValue = Math.min(...values);
+        const maxValue = Math.max(...values);
+
+        const calcOpacity = (value) => {
+            const fraction = (value - minValue) / (maxValue - minValue);
+            const offset = 0.25;
+            return fraction * (0.85 - offset) + offset;
+        };
+        const unit = '0';
+
+        const { r, g, b } = getRgbFromHex(mapStyles.provinces.indicatorColor);
+        const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
+        const maxColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(maxValue)})`;
+
+        return (
+            <ScaleLegend
+                className={styles.scaleLegend}
+                minValue={minValue}
+                maxValue={maxValue}
+                minLabel={renderIndicatorLabel(minValue, unit)}
+                maxLabel={renderIndicatorLabel(maxValue, unit)}
+                minColor={minColor}
+                maxColor={maxColor}
+                title="Municipality Indicator"
                 subTitle={renderIndicatorSubTitle(name, unit)}
             />
         );
@@ -173,6 +213,7 @@ class Legends extends React.PureComponent {
             <React.Fragment>
                 {this.renderMapLayersLegend()}
                 {this.renderIndicatorLegend()}
+                {this.renderMunicipalityIndicatorLegend()}
                 {this.renderProgramsLegend()}
             </React.Fragment>
         );
