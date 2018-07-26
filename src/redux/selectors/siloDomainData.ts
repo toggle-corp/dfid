@@ -23,6 +23,7 @@ import {
     programmesSelector,
     sectorsSelector,
     indicatorsDataSelector,
+    municipalityIndicatorsDataSelector,
     mapLayersSelector,
     municipalitiesSelector,
     exploreDataSelector,
@@ -92,6 +93,11 @@ export const dashboardIndicatorIdSelector = createSelector(
     filters => filters.indicatorId,
 );
 
+export const dashboardMunicipalityIndicatorIdSelector = createSelector(
+    dashboardFilterSelector,
+    filters => filters.municipalityIndicator,
+);
+
 export const dashboardMapLayersIdSelector = createSelector(
     dashboardFilterSelector,
     filters => filters.mapLayersId || emptyArray as number[],
@@ -157,6 +163,12 @@ export const dashboardIndicatorSelector = createSelector(
     dashboardIndicatorIdSelector,
     (indicatorsData, indicatorId) =>
         (indicatorsData && indicatorId) ? indicatorsData[indicatorId] : undefined,
+);
+
+export const dashboardMunicipalityIndicatorSelector = createSelector(
+    municipalityIndicatorsDataSelector,
+    dashboardMunicipalityIndicatorIdSelector,
+    (indicatorsData, indicatorId) => indicatorsData.find(d => String(d.id) === indicatorId),
 );
 
 export const dashboardMapLayersSelector = createSelector(

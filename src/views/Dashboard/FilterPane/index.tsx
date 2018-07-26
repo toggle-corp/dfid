@@ -10,7 +10,7 @@ import SuccessButton from '../../../vendor/react-store/components/Action/Button/
 import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
-import { iconNames } from '../../../constants';
+import { iconNames, defaultFilters } from '../../../constants';
 
 import {
     setDashboardFiltersAction,
@@ -146,6 +146,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 mapLayersId: [],
                 rasterMapLayerId: [],
                 municipalitiesId: [],
+                municipalityIndicator: [],
             },
         };
     }
@@ -381,9 +382,9 @@ export class FilterPane extends React.PureComponent<Props, State>{
                     </div>
                     <div className={styles.layers}>
                         { !loadingIndicators &&
-                            <div className={inClassName} >
+                            <div className={inputClassName} >
                                 <SelectInput
-                                    label="Indicators"
+                                    label="Province Indicators"
                                     options={indicators}
                                     faramElementName="indicatorId"
                                     keySelector={indicatorKeyExtractor}
@@ -394,6 +395,14 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 />
                             </div>
                         }
+                        <div className={inClassName}>
+                            <SelectInput
+                                label="Municipality Indicators"
+                                options={defaultFilters.municipalityIndicators}
+                                faramElementName="municipalityIndicator"
+                                showHintAndError={false}
+                            />
+                        </div>
                         { !loadingLayers &&
                             <Fragment>
                                 <div className={blClassName} >

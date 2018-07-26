@@ -27,6 +27,7 @@ const initialDomainDataState: DomainData = {
 
     indicators: [],
     indicatorsData: {},
+    municipalityIndicatorsData: [],
 
     mapLayers: [],
 };

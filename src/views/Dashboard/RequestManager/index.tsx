@@ -24,6 +24,7 @@ import {
     setSectorsAction,
     setIndicatorsAction,
     setIndicatorsDataAction,
+    setMunicipalityIndicatorsDataAction,
     setMapLayersAction,
     setGeoJsonsAction,
     setRequestManagerLoadingAction,
@@ -52,6 +53,7 @@ import {
     SetSectorsAction,
     SetIndicatorsAction,
     SetIndicatorsDataAction,
+    SetMunicipalityIndicatorsDataAction,
     SetMapLayersAction,
     SetRequestManagerLoadingAction,
     DashboardFilter,
@@ -71,6 +73,7 @@ import {
 import CountriesDataGetRequest from './requests/CountriesDataGetRequest';
 import IndicatorsGetRequest from './requests/IndicatorsGetRequest';
 import IndicatorsDataGetRequest from './requests/IndicatorsDataGetRequest';
+import MunicipalityIndicatorsDataGetRequest from './requests/MunicipalityIndicatorsDataGetRequest';
 import MapLayersGetRequest from './requests/MapLayersGetRequest';
 import ProgrammesDataGetRequest from './requests/ProgrammesDataGetRequest';
 import ProgrammesGetRequest from './requests/ProgrammesGetRequest';
@@ -109,6 +112,7 @@ interface PropsFromDispatch {
     setSectors(params: SetSectorsAction): void;
     setIndicators(params: SetIndicatorsAction): void;
     setIndicatorsData: (params: SetIndicatorsDataAction) => void;
+    setMunicipalityIndicatorsData: (params: SetMunicipalityIndicatorsDataAction) => void;
     setMapLayers(params: SetMapLayersAction): void;
     setGeoJsons: (params: SetGeoJsonsAction) => void;
     setDashboardLoadings(params: SetRequestManagerLoadingAction): void;
@@ -125,6 +129,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
     countryDataRequest: RestRequest;
     indicatorsRequest: RestRequest;
     indicatorsDataRequest: RestRequest;
+    municipalityIndicatorsDataRequest: RestRequest;
     mapLayersRequest: RestRequest;
     programmeDataRequest: RestRequest;
     programmeRequest: RestRequest;
@@ -164,6 +169,7 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.startRequestForSectors();
         this.startRequestForIndicators();
         this.startRequestForIndicatorsData();
+        this.startRequestForMunicipalityIndicatorsData();
         this.startRequestForMapLayers();
         this.startRequestForMunicipalities();
     }
@@ -195,6 +201,9 @@ export class RequestManager extends React.PureComponent<Props, State>{
         }
         if (this.indicatorsDataRequest) {
             this.indicatorsDataRequest.stop();
+        }
+        if (this.municipalityIndicatorsDataRequest) {
+            this.municipalityIndicatorsDataRequest.stop();
         }
         if (this.mapLayersRequest) {
             this.mapLayersRequest.stop();
@@ -309,6 +318,19 @@ export class RequestManager extends React.PureComponent<Props, State>{
         this.indicatorsDataRequest.start();
     }
 
+    startRequestForMunicipalityIndicatorsData = () => {
+        if (this.municipalityIndicatorsDataRequest) {
+            this.municipalityIndicatorsDataRequest.stop();
+        }
+        const municipalityIndicatorsDataRequest = new MunicipalityIndicatorsDataGetRequest({
+            setState: params => this.setState(params),
+            setMunicipalityIndicatorsData: this.props.setMunicipalityIndicatorsData,
+            setLoadings: this.props.setDashboardLoadings,
+        });
+        this.municipalityIndicatorsDataRequest = municipalityIndicatorsDataRequest.create();
+        this.municipalityIndicatorsDataRequest.start();
+    }
+
     startRequestForMapLayers = () => {
         if (this.mapLayersRequest) {
             this.mapLayersRequest.stop();
@@ -365,6 +387,8 @@ const mapDispatchToProps = (dispatch: Redux.Dispatch<RootState>) => ({
     setIndicators: (params: SetIndicatorsAction) => dispatch(setIndicatorsAction(params)),
     setIndicatorsData: (params: SetIndicatorsDataAction) =>
         dispatch(setIndicatorsDataAction(params)),
+    setMunicipalityIndicatorsData: (params: SetMunicipalityIndicatorsDataAction) =>
+        dispatch(setMunicipalityIndicatorsDataAction(params)),
     setMapLayers: (params: SetMapLayersAction) => dispatch(setMapLayersAction(params)),
     setGeoJsons: (params: SetGeoJsonsAction) => dispatch(setGeoJsonsAction(params)),
     setDashboardLoadings: (params: SetRequestManagerLoadingAction) =>

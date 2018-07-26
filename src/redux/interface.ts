@@ -48,6 +48,7 @@ export interface DomainData {
     municipalities: Municipality[];
     indicators: Indicator[];
     indicatorsData: Dictionary<IndicatorData>;
+    municipalityIndicatorsData: MunicipalityIndicatorData[];
     mapLayers: MapLayer[];
 }
 
@@ -212,6 +213,7 @@ export interface DashboardFilterParams {
     programmesId?: number[];
     sectorsId?: number[];
     indicatorId?: number;
+    municipalityIndicator?: string;
     mapLayersId?: number[];
     municipalitiesId?: number[];
     rasterMapLayerId?: number;
@@ -253,12 +255,25 @@ export interface IndicatorData {
     maxValue: number;
 }
 
+export interface MunicipalityIndicatorData {
+    id: number;
+    hlcitCode: string;
+    lgu_FGT_0: number;
+    maleLitRate: number;
+    femaleLitRate: number;
+    totalLitRate: number;
+}
+
 export interface SetIndicatorsAction {
     indicators: Indicator[];
 }
 
 export interface SetIndicatorsDataAction {
     indicatorsData: Dictionary<IndicatorData>;
+}
+
+export interface SetMunicipalityIndicatorsDataAction {
+    municipalityIndicatorsData: MunicipalityIndicatorData[];
 }
 
 
