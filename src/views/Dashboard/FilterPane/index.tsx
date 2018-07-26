@@ -287,16 +287,24 @@ export class FilterPane extends React.PureComponent<Props, State>{
         const programmeSelected = !!(faramValues.programmesId || []).length;
         const backgroundLayerSelected = !!faramValues.rasterMapLayerId;
         const indicatorSelected = !!faramValues.indicatorId;
+        const municipalityIndicatorSelected = !!faramValues.municipalityIndicator;
 
-        const disableProgrammeAndSector = backgroundLayerSelected || indicatorSelected || disabled;
-        const disableBackgroundLayer = programmeSelected || indicatorSelected || disabled;
-        const disableIndicator = backgroundLayerSelected || programmeSelected || disabled;
+        const disableProgrammeAndSector = backgroundLayerSelected || indicatorSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableBackgroundLayer = programmeSelected || indicatorSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableIndicator = backgroundLayerSelected || programmeSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableMunicipalityIndicator = backgroundLayerSelected || programmeSelected ||
+            indicatorSelected || disabled;
 
         const inputClassName = `${styles.input} ${disabled ? styles.disabled : ''}`;
 
         const psClassName = `${styles.input} ${disableProgrammeAndSector ? styles.disabled : ''}`;
         const blClassName = `${styles.input} ${disableBackgroundLayer ? styles.disabled : ''}`;
         const inClassName = `${styles.input} ${disableIndicator ? styles.disabled : ''}`;
+        const minClassName =
+            `${styles.input} ${disableMunicipalityIndicator ? styles.disabled : '' }`;
 
         return (
             <Faram
@@ -382,7 +390,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                     </div>
                     <div className={styles.layers}>
                         { !loadingIndicators &&
-                            <div className={inputClassName} >
+                            <div className={inClassName} >
                                 <SelectInput
                                     label="Province Indicators"
                                     options={indicators}
@@ -395,12 +403,13 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 />
                             </div>
                         }
-                        <div className={inClassName}>
+                        <div className={minClassName}>
                             <SelectInput
                                 label="Municipality Indicators"
                                 options={defaultFilters.municipalityIndicators}
                                 faramElementName="municipalityIndicator"
                                 showHintAndError={false}
+                                disabled={disableMunicipalityIndicator}
                             />
                         </div>
                         { !loadingLayers &&
