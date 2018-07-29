@@ -226,8 +226,8 @@ export default class MapLayer extends React.PureComponent {
             layout,
         } = props;
 
-        Object.entries(layout).forEach((layoutData) => {
-            map.setLayoutProperty(layerKey, layoutData[0], layoutData[1]);
+        Object.keys(layout).forEach((key) => {
+            map.setLayoutProperty(layerKey, key, layout[key]);
         });
     }
 
@@ -238,8 +238,8 @@ export default class MapLayer extends React.PureComponent {
             paint,
         } = props;
 
-        Object.entries(paint).forEach((paintData) => {
-            map.setPaintProperty(layerKey, paintData[0], paintData[1]);
+        Object.keys(paint).forEach((key) => {
+            map.setPaintProperty(layerKey, key, paint[key]);
         });
     }
 
