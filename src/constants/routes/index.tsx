@@ -25,11 +25,11 @@ export const routes: Map<RouteSetting> = {
         links: allLinks,
     },
 
-    explore: {
+    infographics: {
         order: 5,
         type: ROUTE.public,
-        path: '/explore',
-        title: 'Explore',
+        path: '/infographics',
+        title: 'Infographics',
         loader: () => import('../../views/Explore'),
         links: allLinks,
     },

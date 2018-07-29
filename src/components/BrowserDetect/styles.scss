@@ -1,0 +1,13 @@
+@import '../../stylesheets/base';
+
+.popup {
+    @include shadow-medium;
+    position: absolute;
+    left: 600px;
+    top: 600px;
+    z-index: 9999;
+    text-align: center;
+    padding: $spacing-medium;
+    background-color: $color-foreground;
+    border: $width-separator-thin solid $color-warning;
+}
