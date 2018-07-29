@@ -95,7 +95,7 @@ class Navbar extends React.PureComponent<Props, State> {
 
         const navLinks = [
             'dashboard',
-            'explore',
+            'infographics', // NOTE: this is the explore page src/Explore
             'glossary',
         ];
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { reverseRoute } from '../../../vendor/react-store/utils/common';
 import { pathNames } from '../../../constants';
@@ -28,7 +27,7 @@ export default class Footer extends React.PureComponent<{}> {
                         DFID Nepal
                     </div>
                     <div className={styles.info}>
-                        British Embassy 
+                        British Embassy
                     </div>
                     <div className={styles.info}>
                         PO Box 106
@@ -74,26 +73,6 @@ export default class Footer extends React.PureComponent<{}> {
                             +977 1 5000179
                         </div>
                     </div>
-                </div>
-                <div className={styles.links}>
-                    <Link
-                        className={styles.link}
-                        to={routeToDashboard}
-                    >
-                        Dashboard
-                    </Link>
-                    <Link
-                        className={styles.link}
-                        to={routeToExplore}
-                    >
-                        Explore
-                    </Link>
-                    <Link
-                        className={styles.link}
-                        to={routeToGlossary}
-                    >
-                        Glossary
-                    </Link>
                 </div>
             </div>
         </footer>

@@ -40,7 +40,6 @@ export class Overview extends React.PureComponent<Props, State> {
     render() {
         const {
             provincesCovered,
-            districtReached,
             municipalitiesCovered,
             totalProjects,
             totalSectors,
@@ -71,10 +70,6 @@ export class Overview extends React.PureComponent<Props, State> {
                     <Item
                         label="provinces"
                         value={renderNumeral(provincesCovered)}
-                    />
-                    <Item
-                        label="districts"
-                        value={renderNumeral(districtReached)}
                     />
                     <Item
                         label="municipalities"
