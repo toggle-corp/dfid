@@ -14,7 +14,7 @@ const iconNames: Readonly<{
     informationCircle: 'ion-information-circled',
     list: 'ion-android-list',
     grid: 'ion-android-apps',
-    panels: 'ion-ios-browsers',
+    swapArrows: 'ion-arrow-swap',
     download: 'fa fa-download',
 };
 

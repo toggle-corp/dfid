@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import {
     dashboardProgrammesSelector,
+    dashboardMunicipalityIndicatorSelector,
     dashboardIndicatorSelector,
     provincesSelector,
 } from '../../../redux';
@@ -15,6 +16,7 @@ const mapStateToProps = state => ({
     provinces: provincesSelector(state),
     selectedProgrammes: dashboardProgrammesSelector(state),
     selectedIndicator: dashboardIndicatorSelector(state),
+    selectedMunicipalityIndicator: dashboardMunicipalityIndicatorSelector(state),
 });
 
 class Province extends React.PureComponent {
@@ -24,14 +26,15 @@ class Province extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.selectedIndicator !== nextProps.selectedIndicator ||
-            this.props.selectedProgrammes !== nextProps.selectedProgrammes
+            this.props.selectedProgrammes !== nextProps.selectedProgrammes ||
+            this.props.selectedMunicipalityIndicator !== nextProps.selectedMunicipalityIndicator
         ) {
             this.calculatePaint(nextProps);
         }
     }
 
-    calculatePaint = ({ selectedIndicator, selectedProgrammes, provinces }) => {
-        if (selectedProgrammes.length > 0 && !selectedIndicator) {
+    calculatePaint = ({ selectedIndicator, selectedProgrammes, selectedMunicipalityIndicator, provinces }) => {
+        if ((selectedProgrammes.length > 0 || selectedMunicipalityIndicator) && !selectedIndicator) {
             this.paint = {
                 'fill-color': '#fff',
                 'fill-opacity': 0,

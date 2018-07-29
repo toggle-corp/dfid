@@ -10,7 +10,7 @@ import SuccessButton from '../../../vendor/react-store/components/Action/Button/
 import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
 import Faram from '../../../vendor/react-store/components/Input/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
-import { iconNames } from '../../../constants';
+import { iconNames, defaultFilters } from '../../../constants';
 
 import {
     setDashboardFiltersAction,
@@ -146,6 +146,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                 mapLayersId: [],
                 rasterMapLayerId: [],
                 municipalitiesId: [],
+                municipalityIndicator: [],
             },
         };
     }
@@ -286,16 +287,24 @@ export class FilterPane extends React.PureComponent<Props, State>{
         const programmeSelected = !!(faramValues.programmesId || []).length;
         const backgroundLayerSelected = !!faramValues.rasterMapLayerId;
         const indicatorSelected = !!faramValues.indicatorId;
+        const municipalityIndicatorSelected = !!faramValues.municipalityIndicator;
 
-        const disableProgrammeAndSector = backgroundLayerSelected || indicatorSelected || disabled;
-        const disableBackgroundLayer = programmeSelected || indicatorSelected || disabled;
-        const disableIndicator = backgroundLayerSelected || programmeSelected || disabled;
+        const disableProgrammeAndSector = backgroundLayerSelected || indicatorSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableBackgroundLayer = programmeSelected || indicatorSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableIndicator = backgroundLayerSelected || programmeSelected ||
+            municipalityIndicatorSelected || disabled;
+        const disableMunicipalityIndicator = backgroundLayerSelected || programmeSelected ||
+            indicatorSelected || disabled;
 
         const inputClassName = `${styles.input} ${disabled ? styles.disabled : ''}`;
 
         const psClassName = `${styles.input} ${disableProgrammeAndSector ? styles.disabled : ''}`;
         const blClassName = `${styles.input} ${disableBackgroundLayer ? styles.disabled : ''}`;
         const inClassName = `${styles.input} ${disableIndicator ? styles.disabled : ''}`;
+        const minClassName =
+            `${styles.input} ${disableMunicipalityIndicator ? styles.disabled : '' }`;
 
         return (
             <Faram
@@ -383,7 +392,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
                         { !loadingIndicators &&
                             <div className={inClassName} >
                                 <SelectInput
-                                    label="Indicators"
+                                    label="Province Indicators"
                                     options={indicators}
                                     faramElementName="indicatorId"
                                     keySelector={indicatorKeyExtractor}
@@ -394,6 +403,15 @@ export class FilterPane extends React.PureComponent<Props, State>{
                                 />
                             </div>
                         }
+                        <div className={minClassName}>
+                            <SelectInput
+                                label="Municipality Indicators"
+                                options={defaultFilters.municipalityIndicators}
+                                faramElementName="municipalityIndicator"
+                                showHintAndError={false}
+                                disabled={disableMunicipalityIndicator}
+                            />
+                        </div>
                         { !loadingLayers &&
                             <Fragment>
                                 <div className={blClassName} >

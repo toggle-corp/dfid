@@ -92,6 +92,11 @@ export const dashboardIndicatorIdSelector = createSelector(
     filters => filters.indicatorId,
 );
 
+export const dashboardMunicipalityIndicatorSelector = createSelector(
+    dashboardFilterSelector,
+    filters => filters.municipalityIndicator,
+);
+
 export const dashboardMapLayersIdSelector = createSelector(
     dashboardFilterSelector,
     filters => filters.mapLayersId || emptyArray as number[],

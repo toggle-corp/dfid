@@ -4,6 +4,7 @@ import {
     Dictionary,
     Indicator,
     IndicatorData,
+    MunicipalityIndicatorData,
     LandingOverviewData,
     GlossaryData,
     ExploreData,
@@ -98,6 +99,11 @@ export const indicatorsSelector = ({ domainData }: RootState): Indicator[] => (
 export const indicatorsDataSelector = ({ domainData }: RootState): Dictionary<IndicatorData> => (
     domainData.indicatorsData || emptyObject
 );
+
+export const municipalityIndicatorsDataSelector =
+    ({ domainData }: RootState): MunicipalityIndicatorData[] => (
+        domainData.municipalityIndicatorsData || emptyArray
+    );
 
 export const mapLayersSelector = ({ domainData }: RootState): MapLayer[] => (
     domainData.mapLayers || emptyArray

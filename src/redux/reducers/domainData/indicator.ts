@@ -6,6 +6,7 @@ import {
 
     SetIndicatorsAction,
     SetIndicatorsDataAction,
+    SetMunicipalityIndicatorsDataAction,
 } from '../../interface';
 
 // ACTION-TYPE
@@ -13,6 +14,7 @@ import {
 export const enum INDICATOR_ACTION {
     setIndicators = 'domainData/INDICATOR/SET_INDICATORS',
     setIndicatorsData = 'domainData/INDICATOR/SET_INDICATORS_DATA',
+    setMunicipalityIndicatorsData = 'domainData/INDICATOR/SET_MUNICIPALITY_INDICATORS_DATA',
 }
 
 // ACTION-CREATOR
@@ -29,6 +31,13 @@ export const setIndicatorsDataAction = (
 ) => ({
     indicatorsData,
     type: INDICATOR_ACTION.setIndicatorsData,
+});
+
+export const setMunicipalityIndicatorsDataAction = (
+    { municipalityIndicatorsData }: SetMunicipalityIndicatorsDataAction,
+) => ({
+    municipalityIndicatorsData,
+    type: INDICATOR_ACTION.setMunicipalityIndicatorsData,
 });
 
 // REDUCER
@@ -53,9 +62,21 @@ const setIndicatorsData = (state: DomainData, action: SetIndicatorsDataAction) =
     return update(state, settings);
 };
 
+const setMunicipalityIndicatorsData =
+    (state: DomainData, action: SetMunicipalityIndicatorsDataAction) => {
+        const { municipalityIndicatorsData } = action;
+        const settings = {
+            municipalityIndicatorsData: {
+                $set: municipalityIndicatorsData,
+            },
+        };
+        return update(state, settings);
+    };
+
 const reducer: ReducerGroup<DomainData> = {
     [INDICATOR_ACTION.setIndicators]: setIndicators,
     [INDICATOR_ACTION.setIndicatorsData]: setIndicatorsData,
+    [INDICATOR_ACTION.setMunicipalityIndicatorsData]: setMunicipalityIndicatorsData,
 };
 
 export default reducer;
