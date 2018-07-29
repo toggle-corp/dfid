@@ -6,11 +6,13 @@
 }
 
 .compare-province-detail-info {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
-    overflow-y: auto;
 
     .scroll-wrapper {
-        overflow-x: auto;
+        flex-grow: 1;
+        overflow: auto;
 
         .table {
             :global {
@@ -58,6 +60,7 @@
 
     .charts {
         display: flex;
+        flex-shrink: 0;
 
         .chart-container {
             display: flex;

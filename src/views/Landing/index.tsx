@@ -58,6 +58,13 @@ interface State {
     loadingMunicipalities: boolean;
 }
 
+const horizontalChartMargin = {
+    top: 24,
+    right: 24,
+    bottom: 44,
+    left: 72,
+};
+
 const provinceDataLabelAccessor = (d: ProvinceInfo) => d.name;
 
 const totalSpendValueAccessor = (d: ProvinceInfo) => d.totalBudget;
@@ -186,6 +193,8 @@ export class Landing extends React.PureComponent<Props, State> {
                                 labelAccessor={provinceDataLabelAccessor}
                                 valueAccessor={totalSpendValueAccessor}
                                 valueLabelAccessor={totalSpendValueLabelAccessor}
+                                margins={horizontalChartMargin}
+                                tiltLabels
                             />
                         </div>
                         <div className={styles.chartContainer}>
@@ -198,6 +207,7 @@ export class Landing extends React.PureComponent<Props, State> {
                                 data={provincesInfo}
                                 labelAccessor={provinceDataLabelAccessor}
                                 valueAccessor={activeProjectValueAccessor}
+                                margins={horizontalChartMargin}
                             />
                         </div>
                     </div>

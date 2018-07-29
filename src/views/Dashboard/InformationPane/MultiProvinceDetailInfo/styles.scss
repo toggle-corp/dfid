@@ -8,4 +8,5 @@
 .province-list {
     display: flex;
     flex-direction: column;
+    overflow: auto;
 }

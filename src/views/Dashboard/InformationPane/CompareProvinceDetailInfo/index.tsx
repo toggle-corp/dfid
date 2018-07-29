@@ -41,6 +41,13 @@ type Props = OwnProps & PropsFromState;
 
 interface State {}
 
+const tiltLabelhorizontalChartMargin = {
+    top: 24,
+    right: 24,
+    bottom: 30,
+    left: 72,
+};
+
 const renderProgrammeName = (datum: ProgrammeName) => datum.programName;
 
 const keySelector = (data: ProgrammeName) => data.programID;
@@ -318,6 +325,8 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                             labelAccessor={provinceDataLabelAccessor}
                             valueAccessor={totalBudgetValueAccessor}
                             valueLabelAccessor={totalBudgetValueLabelAccessor}
+                            margins={tiltLabelhorizontalChartMargin}
+                            tiltLabels
                         />
                     </div>
                 </div>
