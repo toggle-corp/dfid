@@ -6,6 +6,22 @@ import { dashboardMapLayersSelector } from '../../../redux';
 import { getHexFromString } from '../../../vendor/react-store/utils/common';
 import MapLayer from '../../../components/Map/MapLayer';
 import GenericSource from './GenericSource';
+import { getSimpleCategoricalPaint } from './utils';
+
+export const healthFacilitiesIcons = {
+    'PHCC': '✚',
+    'Government hospital': 'G',
+    'SHP': '★',
+    'HP': 'U',
+    'Other HFs': 'X',
+    'Radiology/lab': 'R',
+    'Private clinics': 'C',
+    'Private hospital': 'P',
+    'Non-government hospital': 'O',
+    'Nursing home': 'N',
+    'Hospital': 'H',
+};
+
 
 const mapStateToProps = state => ({
     selectedMapLayers: dashboardMapLayersSelector(state),
@@ -36,6 +52,25 @@ class Layers extends React.PureComponent {
         };
     }
 
+    calculateHFProps = (layer) => {
+        const color = getHexFromString(layer.layerName);
+        return {
+            type: 'symbol',
+            layout: {
+                'icon-image': 'circle2',
+                'text-field': getSimpleCategoricalPaint('MAJROTYP', healthFacilitiesIcons),
+                'text-size': 11,
+                'icon-size': 0.03,
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true,
+                'icon-optional': true,
+            },
+            paint: {
+                'text-color': '#FFF',
+            },
+        };
+    }
+
     renderSource = (layer) => {
         const { map, setContext } = this.props;
         const sourceKey = `map-layer-${layer.id}`;
@@ -60,6 +95,18 @@ class Layers extends React.PureComponent {
             return null;
         }
 
+        if (layer.id === 26) {
+            return (
+                <MapLayer
+                    key={layerKey}
+                    sourceKey={sourceKey}
+                    layerKey={layerKey}
+                    map={map}
+                    {...this.calculateHFProps(layer)}
+                />
+            );
+        }
+
         return (
             <MapLayer
                 key={layerKey}
@@ -72,7 +119,11 @@ class Layers extends React.PureComponent {
     }
 
     render() {
-        const { selectedMapLayers } = this.props;
+        const { selectedMapLayers, context } = this.props;
+
+        if (!context.province || !context.municipality) {
+            return null;
+        }
 
         return (
             <React.Fragment>

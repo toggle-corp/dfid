@@ -78,26 +78,36 @@ export default class Map extends React.Component {
             // Since the map is loaded asynchronously, make sure
             // we are still mounted before doing setState
             if (this.mounted) {
-                map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e6/Lol_circle.png', (error, circle) => {
-                    const { bounds } = this.props;
-                    if (bounds) {
-                        map.fitBounds(
-                            [[
-                                bounds[0],
-                                bounds[1],
-                            ], [
-                                bounds[2],
-                                bounds[3],
-                            ]],
-                            { padding: 128 },
-                        );
-                    }
-                    map.addImage('circle', circle);
 
-                    if (this.mounted) {
-                        this.setState({ map });
+                map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/e6/Lol_circle.png', (error, circle) => {
+                    if (!error) {
+                        map.addImage('circle', circle);
                     }
                 });
+
+                map.loadImage('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Ski_trail_rating_symbol-green_circle.svg/600px-Ski_trail_rating_symbol-green_circle.svg.png', (error, circle) => {
+                    if (!error) {
+                        map.addImage('circle2', circle);
+                    }
+                });
+
+                const { bounds } = this.props;
+                if (bounds) {
+                    map.fitBounds(
+                        [[
+                            bounds[0],
+                            bounds[1],
+                        ], [
+                            bounds[2],
+                            bounds[3],
+                        ]],
+                        { padding: 128 },
+                    );
+                }
+
+                if (this.mounted) {
+                    this.setState({ map });
+                }
             }
         });
 

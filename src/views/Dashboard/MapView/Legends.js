@@ -25,6 +25,8 @@ import {
     renderNormalNumeral,
 } from '../../../components/Renderer';
 
+import { healthFacilitiesIcons } from './Layers';
+
 const emptyList = [];
 
 const mapStateToProps = state => ({
@@ -173,10 +175,23 @@ class Legends extends React.PureComponent {
             return null;
         }
 
-        let legendItems = selectedMapLayers.map(l => ({
+        let legendItems = selectedMapLayers.filter(l => l.id !== 26).map(l => ({
             label: l.layerName,
             color: getHexFromString(l.layerName),
         }));
+
+        const healthFacilities = selectedMapLayers.find(l => l.id === 26);
+        if (healthFacilities) {
+            Object.keys(healthFacilitiesIcons).forEach((key) => {
+                legendItems.push({
+                    label: `${healthFacilities.layerName} - ${key}`,
+                    color: '#339933',
+                    innerText: healthFacilitiesIcons[key],
+                    textColor: '#fff',
+                    size: 16,
+                });
+            });
+        }
 
         if (zoomLevel >= 7.2) {
             legendItems.push({

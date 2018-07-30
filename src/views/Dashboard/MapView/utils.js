@@ -13,3 +13,12 @@ export const getCategoricalPaint = (property, style, key, isInt = false, default
 
     return paint;
 };
+
+export const getSimpleCategoricalPaint = (property, style) => {
+    const paint = {
+        property,
+        type: 'categorical',
+        stops: mapToList(style, (v, k) => [k, v]),
+    };
+    return paint;
+};
