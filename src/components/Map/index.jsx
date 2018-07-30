@@ -72,6 +72,7 @@ export default class Map extends React.Component {
             // failIfMajorPerformanceCaveat: true,
             // maxBounds: [[76.477634, 25.361567], [92.338761, 31.891382]],
         });
+        map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
         map.on('load', () => {
             // Since the map is loaded asynchronously, make sure
