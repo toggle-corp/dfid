@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import LoadingAnimation from '../../../vendor/react-store/components/View/LoadingAnimation';
+
 import {
     urlForCountryGeoJson,
     urlForMunicipalitiesGeoJson,
@@ -117,14 +119,24 @@ export default class MapView extends React.PureComponent {
     )
 
     render() {
+        const { context } = this.state;
+
+        let loading = false;
+        if (!context.province || !context.municipality) {
+            loading = true;
+        }
+
         return (
-            <Map
-                className={styles.map}
-                bounds={nepalBounds}
-                childRenderer={this.renderMapChildren}
-                panelsRenderer={this.renderLegends}
-                setExportFunction={this.props.setExportFunction}
-            />
+            <div className={styles.mapContainer}>
+                { loading && <LoadingAnimation />}
+                <Map
+                    className={styles.map}
+                    bounds={nepalBounds}
+                    childRenderer={this.renderMapChildren}
+                    panelsRenderer={this.renderLegends}
+                    setExportFunction={this.props.setExportFunction}
+                />
+            </div>
         );
     }
 }
