@@ -7,27 +7,27 @@ import { getHexFromString } from '../../../vendor/react-store/utils/common';
 import MapLayer from '../../../components/Map/MapLayer';
 import GenericSource from './GenericSource';
 import { getSimpleCategoricalPaint } from './utils';
-
-export const healthFacilitiesIcons = {
-    'PHCC': '✚',
-    'Government hospital': 'G',
-    'SHP': '★',
-    'HP': 'U',
-    'Other HFs': 'X',
-    'Radiology/lab': 'R',
-    'Private clinics': 'C',
-    'Private hospital': 'P',
-    'Non-government hospital': 'O',
-    'Nursing home': 'N',
-    'Hospital': 'H',
-};
-
+import icons from './icons';
+import layerTypes from './layerTypes';
 
 const mapStateToProps = state => ({
     selectedMapLayers: dashboardMapLayersSelector(state),
 });
 
 class Layers extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        const { map } = props;
+
+        icons.forEach((icon, index) => {
+            const img = new Image(8, 8);
+            img.onload = () => {
+                map.addImage(`map-icon-${index}`, img);
+            };
+            img.src = icon;
+        });
+    }
+
     calculateProps = (layer) => {
         const color = getHexFromString(layer.layerName);
 
@@ -35,9 +35,10 @@ class Layers extends React.PureComponent {
             return {
                 type: 'circle',
                 paint: {
+                    'circle-radius': layerTypes[layer.id] ? 7 : 5,
                     'circle-color': color,
                     'circle-stroke-color': '#404040',
-                    'circle-stroke-width': 1,
+                    'circle-stroke-width': layerTypes[layer.id] ? 0 : 1,
                 },
             };
         }
@@ -52,21 +53,19 @@ class Layers extends React.PureComponent {
         };
     }
 
-    calculateHFProps = (layer) => {
+    calculateIconLayerProps = (layer) => {
         const color = getHexFromString(layer.layerName);
+        const icons = layerTypes[layer.id].reduce((acc, type, index) => {
+            acc[type] = `map-icon-${index}`;
+            return acc;
+        }, {});
+
         return {
             type: 'symbol',
             layout: {
-                'icon-image': 'circle2',
-                'text-field': getSimpleCategoricalPaint('MAJROTYP', healthFacilitiesIcons),
-                'text-size': 11,
-                'icon-size': 0.03,
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': true,
-                'icon-optional': true,
+                'icon-image': getSimpleCategoricalPaint('MAJROTYP', icons),
             },
             paint: {
-                'text-color': '#FFF',
             },
         };
     }
@@ -86,6 +85,26 @@ class Layers extends React.PureComponent {
         );
     }
 
+    renderLayerIcons = (layer) => {
+        const { map, context } = this.props;
+        const sourceKey = `map-layer-${layer.id}`;
+        const layerKey = `${sourceKey}-layer-icons`;
+
+        if (!context[sourceKey] || !layerTypes[layer.id]) {
+            return null;
+        }
+
+        return (
+            <MapLayer
+                key={layerKey}
+                sourceKey={sourceKey}
+                layerKey={layerKey}
+                map={map}
+                {...this.calculateIconLayerProps(layer)}
+            />
+        );
+    }
+
     renderLayer = (layer) => {
         const { map, context } = this.props;
         const sourceKey = `map-layer-${layer.id}`;
@@ -93,18 +112,6 @@ class Layers extends React.PureComponent {
 
         if (!context[sourceKey]) {
             return null;
-        }
-
-        if (layer.id === 26) {
-            return (
-                <MapLayer
-                    key={layerKey}
-                    sourceKey={sourceKey}
-                    layerKey={layerKey}
-                    map={map}
-                    {...this.calculateHFProps(layer)}
-                />
-            );
         }
 
         return (
@@ -128,6 +135,7 @@ class Layers extends React.PureComponent {
         return (
             <React.Fragment>
                 {selectedMapLayers.map(this.renderLayer)}
+                {selectedMapLayers.map(this.renderLayerIcons)}
                 {selectedMapLayers.map(this.renderSource)}
             </React.Fragment>
         );

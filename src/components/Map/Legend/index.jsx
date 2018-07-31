@@ -7,7 +7,7 @@ const propTypes = {
     legendItems: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string,
         color: PropTypes.color,
-        innerText: PropTypes.string,
+        innerText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
         textColor: PropTypes.string,
         size: PropTypes.number,
         rightComponent: PropTypes.func,
