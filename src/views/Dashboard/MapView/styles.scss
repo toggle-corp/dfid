@@ -1,8 +1,15 @@
 @import '../../../stylesheets/base';
 
-.map {
+
+.map-container {
+    position: relative;
     width: 100%;
     height: 100%;
+
+    .map {
+        width: 100%;
+        height: 100%;
+    }
 }
 
 .scale-legend {
@@ -25,6 +32,7 @@
         font-size: $font-size-large;
     }
 }
+
 .province-tooltip {
     @include shadow-small;
     display: flex;
@@ -33,6 +41,7 @@
     transition: $duration-transition-medium all ease-in-out;
     background-color: $color-foreground;
     padding: $spacing-extra-small $spacing-small;
+    animation: fade-in $duration-transition-medium forwards ease-in;
     pointer-events: none;
 
     .label {
@@ -76,6 +85,19 @@
         color: $color-text-placeholder;
     }
 
+    .info {
+        border-top: $width-separator-thin solid $color-accent;
+        padding: 0 $spacing-medium;
+        font-size: $font-size-extra-small;
+
+        span {
+            padding: 0 $spacing-small;
+            color: $color-primary;
+            font-size: $font-size-small;
+        }
+
+    }
+
     .programs {
         display: table;
 
@@ -104,19 +126,6 @@
                     text-align: right;
                 }
             }
-        }
-
-    }
-
-    .info {
-        border-top: $width-separator-thin solid $color-accent;
-        padding: 0 $spacing-medium;
-        font-size: $font-size-extra-small;
-
-        span {
-            padding: 0 $spacing-small;
-            color: $color-primary;
-            font-size: $font-size-small;
         }
 
     }

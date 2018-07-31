@@ -65,8 +65,10 @@ class Municipality extends React.PureComponent {
             });
 
             this.paint = {
-                'fill-color': getCategoricalPaint('HLCIT_CODE', style, 'color', false, mapStyles.provinces.color),
-                'fill-opacity': getCategoricalPaint('HLCIT_CODE', style, 'opacity', false, 1),
+                'fill-color': getCategoricalPaint('HLCIT_CODE', style, 'color', false,
+                    '#fff'),
+                'fill-opacity': getCategoricalPaint('HLCIT_CODE', style, 'opacity', false,
+                    1),
             };
             return;
         }

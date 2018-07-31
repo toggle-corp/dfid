@@ -7,7 +7,8 @@ const propTypes = {
     legendItems: PropTypes.arrayOf(PropTypes.shape({
         label: PropTypes.string,
         color: PropTypes.color,
-        innerText: PropTypes.string,
+        innerText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+        textColor: PropTypes.string,
         size: PropTypes.number,
         rightComponent: PropTypes.func,
     })),
@@ -52,7 +53,7 @@ export default class Legend extends React.PureComponent {
                             backgroundColor: item.color || 'rgba(0, 0, 0, 0.5)',
                             width: item.size || 10,
                             height: item.size || 10,
-                            fontSize: (item.size || 10) - 2,
+                            color: item.textColor || '#000',
                         }}
                     >
                         {item.innerText}
