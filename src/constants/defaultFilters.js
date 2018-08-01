@@ -1,9 +1,9 @@
 const defaultFilters = {
     municipalityIndicators: [
-        { key: 'lgu_FGT_0', label: 'Poverty' },
-        { key: 'maleLitRate', label: 'Male Literacy Rate' },
-        { key: 'femaleLitRate', label: 'Female Literacy Rate' },
-        { key: 'totalLitRate', label: 'Total Literacy Rate' },
+        { key: 'lgu_FGT_0', label: 'Poverty', unit: 'in percent' },
+        { key: 'maleLitRate', label: 'Male Literacy Rate', unit: 'in percent' },
+        { key: 'femaleLitRate', label: 'Female Literacy Rate', unit: 'in percent' },
+        { key: 'totalLitRate', label: 'Total Literacy Rate', unit: 'in percent' },
     ],
 };
 

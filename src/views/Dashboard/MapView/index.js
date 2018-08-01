@@ -36,6 +36,7 @@ export default class MapView extends React.PureComponent {
         this.contextData = {};
         this.state = {
             context: {},
+            showTextMarkers: true,
             textMarkers: 'programs',
         };
     }
@@ -51,6 +52,12 @@ export default class MapView extends React.PureComponent {
                 textMarkers: 'programs',
             });
         }
+    }
+
+    toggleTextMarkersVisibility = () => {
+        this.setState({
+            showTextMarkers: !this.state.showTextMarkers,
+        });
     }
 
     setContext = (value) => {
@@ -78,6 +85,7 @@ export default class MapView extends React.PureComponent {
                     map={map}
                     context={this.state.context}
                     textMarkers={this.state.textMarkers}
+                    showTextMarkers={this.state.showTextMarkers}
                 />
                 <Layers
                     map={map}
@@ -113,7 +121,9 @@ export default class MapView extends React.PureComponent {
     renderLegends = (props) => (
         <Legends
             onToggleTextMarkers={this.toggleTextMarkers}
+            onToggleTextMarkersVisibility={this.toggleTextMarkersVisibility}
             textMarkers={this.state.textMarkers}
+            showTextMarkers={this.state.showTextMarkers}
             {...props}
         />
     )

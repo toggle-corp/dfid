@@ -79,7 +79,22 @@ export default class BrowserDetect extends React.PureComponent<Props, State> {
         return (
             <div className={styles.popup}>
                 <p>
-                    Looks like you are using {name} .Use Chrome for a better experience
+                    Hello <span>{name}</span> user!
+                </p>
+                <p>
+                    For the best experience,
+                    we recommend viewing the dashboard on <span>Google Chrome</span>,
+                    which you can download here:
+                </p>
+                <p>
+                    <a href="https://www.google.com/chrome/">
+                        https://www.google.com/chrome/
+                    </a>
+                </p>
+                <p>
+                    If you don't already have it.
+                    You may continue to use <span>{name}</span>,
+                    however some parts of the dashboard may not work properly.
                 </p>
                 <WarningButton
                     onClick={this.setIgnoreWarning}

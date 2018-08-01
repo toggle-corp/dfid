@@ -11,7 +11,7 @@ import MultiProgrammeDetailInfo from './MultiProgrammeDetailInfo';
 import CompareProgrammeDetailInfo from './CompareProgrammeDetailInfo';
 import MultiProvinceDetailInfo from './MultiProvinceDetailInfo';
 import CompareProvinceDetailInfo from './CompareProvinceDetailInfo';
-import MultiSectorDetailInfo from './MultiSectorDetailInfo';
+// import MultiSectorDetailInfo from './MultiSectorDetailInfo';
 import MultiMunicipalityDetailInfo from './MultiMunicipalityDetailInfo';
 import CompareMunicipalityDetailInfo from './CompareMunicipalityDetailInfo';
 
@@ -57,14 +57,14 @@ interface State {}
 interface Routes {
     province: string;
     programme: string;
-    sector: string;
+    // sector: string;
     municipality: string;
 }
 
 interface Views {
     province: object;
     programme: object;
-    sector: object;
+    // sector: object;
     municipality: object;
 }
 
@@ -77,9 +77,9 @@ export class InformationPane extends React.PureComponent<Props, State>{
 
         this.routes = {
             province: 'Province',
-            sector: 'Sector',
-            programme: 'Programme',
             municipality: 'Municipality',
+            // sector: 'Sector',
+            programme: 'Programme',
         };
 
         this.views = {
@@ -91,6 +91,14 @@ export class InformationPane extends React.PureComponent<Props, State>{
                 ),
             },
 
+            municipality: {
+                component: () => (
+                    this.props.showCompare ?
+                    <CompareMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
+                    : <MultiMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
+                ),
+            },
+
             programme: {
                 component: () => (
                     this.props.showCompare ?
@@ -99,19 +107,13 @@ export class InformationPane extends React.PureComponent<Props, State>{
                 ),
             },
 
+            /*
             sector: {
                 component: () => (
                     <MultiSectorDetailInfo loading={this.props.loadingSectorData} />
                 ),
             },
-
-            municipality: {
-                component: () => (
-                    this.props.showCompare ?
-                    <CompareMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
-                    : <MultiMunicipalityDetailInfo loading={this.props.loadingMunicipalities} />
-                ),
-            },
+            */
         };
     }
 
