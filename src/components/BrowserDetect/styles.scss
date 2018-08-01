@@ -3,11 +3,26 @@
 .popup {
     @include shadow-medium;
     position: absolute;
-    left: 600px;
-    top: 600px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 9999;
-    text-align: center;
-    padding: $spacing-medium;
-    background-color: $color-foreground;
     border: $width-separator-thin solid $color-warning;
+    background-color: $color-foreground;
+    padding: $spacing-large $spacing-extra-large;
+    text-align: center;
+
+    p {
+        line-height: 1;
+        font-size: $font-size-large;
+
+        > span {
+            text-transform: capitalize;
+        }
+
+        a {
+            text-transform: lowercase;
+            color: $color-primary;
+        }
+    }
 }

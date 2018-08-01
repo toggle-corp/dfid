@@ -19,7 +19,6 @@ import { CloakSettings } from '../../constants/routes/interface';
 import logo from '../../resources/img/logo.png';
 
 import NavMenu from './NavMenu';
-import BrowserDetect from '../BrowserDetect';
 // import NavDrop from './NavDrop';
 import * as styles from './styles.scss';
 
@@ -158,7 +157,6 @@ class Navbar extends React.PureComponent<Props, State> {
                     className={styles.userMenu}
                 />
                 */}
-                <BrowserDetect />
             </nav>
         );
     }

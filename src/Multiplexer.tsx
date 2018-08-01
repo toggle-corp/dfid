@@ -13,6 +13,7 @@ import PrivateRoute from './vendor/react-store/components/General/PrivateRoute';
 import ExclusivelyPublicRoute from './vendor/react-store/components/General/ExclusivelyPublicRoute';
 import Toast from './vendor/react-store/components/View/Toast';
 
+import BrowserDetect from './components/BrowserDetect';
 import { RootState, Notification } from './redux/interface';
 import {
     authenticatedSelector,
@@ -107,6 +108,7 @@ class Multiplexer extends React.PureComponent<Props, {}> {
                         {routesOrder.map(routeId => this.renderRoute(routeId))}
                     </Switch>
                 </div>
+                <BrowserDetect />
             </Fragment>
         );
     }

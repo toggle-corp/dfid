@@ -97,9 +97,10 @@ class Legends extends React.PureComponent {
             return null;
         }
 
-        const name = defaultFilters.municipalityIndicators
-            .find(i => i.key === selectedMunicipalityIndicator)
-            .label;
+        const indicator = defaultFilters.municipalityIndicators
+            .find(i => i.key === selectedMunicipalityIndicator);
+        const { label: name, unit } = indicator;
+
         const values = municipalityIndicators.map(i => i[selectedMunicipalityIndicator]);
         const minValue = Math.min(...values);
         const maxValue = Math.max(...values);
@@ -109,7 +110,6 @@ class Legends extends React.PureComponent {
             const offset = 0.25;
             return fraction * (0.85 - offset) + offset;
         };
-        const unit = '0';
 
         const { r, g, b } = getRgbFromHex(mapStyles.provinces.indicatorColor);
         const minColor = `rgba(${r}, ${g}, ${b}, ${calcOpacity(minValue)})`;
