@@ -61,7 +61,8 @@ class Municipality extends React.PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.municipalities !== nextProps.municipalities ||
-            this.props.textMarkers !== nextProps.textMarkers
+            this.props.textMarkers !== nextProps.textMarkers ||
+            this.props.showTextMarkers !== nextProps.showTextMarkers
         ) {
             this.calculateTextLayout(nextProps);
         }
@@ -79,13 +80,22 @@ class Municipality extends React.PureComponent {
         return municipality.totalNoOfPartners;
     }
 
-    calculateTextLayout = ({ municipalities, textMarkers }) => {
+    calculateTextLayout = ({ municipalities, textMarkers, showTextMarkers }) => {
         const layout = {};
 
         if (municipalities.length <= 0) {
             this.textLayout = {};
             return;
         }
+
+        if (!showTextMarkers) {
+            this.textLayout = {
+                'text-size': 0,
+                'icon-size': 0,
+            };
+            return;
+        }
+
         municipalities.forEach((municipality) => {
             const number = this.calculateTextMarkersText(municipality, textMarkers);
             layout[municipality.hlcitCode] = {

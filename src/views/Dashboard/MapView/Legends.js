@@ -12,7 +12,7 @@ import {
 
 import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
 import { getRgbFromHex, getHexFromString } from '../../../vendor/react-store/utils/common';
-import { iconNames } from '../../../constants';
+import { iconNames, defaultFilters } from '../../../constants';
 
 import Legend from '../../../components/Map/Legend';
 import ScaleLegend from '../../../components/Map/ScaleLegend';
@@ -85,7 +85,7 @@ class Legends extends React.PureComponent {
                 maxLabel={renderIndicatorLabel(maxValue, unit)}
                 minColor={minColor}
                 maxColor={maxColor}
-                title="Indicator"
+                title="Province Indicator"
                 subTitle={renderIndicatorSubTitle(name, unit)}
             />
         );
@@ -97,6 +97,9 @@ class Legends extends React.PureComponent {
             return null;
         }
 
+        const name = defaultFilters.municipalityIndicators
+            .find(i => i.key === selectedMunicipalityIndicator)
+            .label;
         const values = municipalityIndicators.map(i => i[selectedMunicipalityIndicator]);
         const minValue = Math.min(...values);
         const maxValue = Math.max(...values);
@@ -171,7 +174,12 @@ class Legends extends React.PureComponent {
     }
 
     renderMapLayersLegend = () => {
-        const { selectedMapLayers, zoomLevel, textMarkers } = this.props;
+        const {
+            selectedMapLayers,
+            zoomLevel,
+            textMarkers,
+        } = this.props;
+
         if (selectedMapLayers.length === 0 && zoomLevel < 7.2) {
             return null;
         }
@@ -214,13 +222,20 @@ class Legends extends React.PureComponent {
 
     renderToggleTextMarkersButton = () => {
         return (
-            <PrimaryButton
-                iconName={iconNames.swapArrows}
-                className={styles.panelsButton}
-                onClick={this.props.onToggleTextMarkers}
-                title="Click to toggle between Partners and Programmes"
-                transparent
-            />
+            <div className={styles.panelsButton}>
+                <PrimaryButton
+                    iconName={iconNames.swapArrows}
+                    onClick={this.props.onToggleTextMarkers}
+                    title="Click to toggle between Partners and Programmes"
+                    transparent
+                />
+                <PrimaryButton
+                    iconName={this.props.showTextMarkers ? iconNames.eye : iconNames.eyeDisabled}
+                    onClick={this.props.onToggleTextMarkersVisibility}
+                    title="Click to show / hide"
+                    transparent
+                />
+            </div>
         );
     }
 

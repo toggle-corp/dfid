@@ -16,6 +16,8 @@ const iconNames: Readonly<{
     grid: 'ion-android-apps',
     swapArrows: 'ion-arrow-swap',
     download: 'fa fa-download',
+    eye: 'ion-eye',
+    eyeDisabled: 'ion-eye-disabled',
 };
 
 export default iconNames;
