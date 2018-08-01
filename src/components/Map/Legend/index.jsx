@@ -44,7 +44,10 @@ export default class Legend extends React.PureComponent {
     }
 
     renderLegendItem = item => (
-        <div className={this.getItemClassName(item)} key={item.label}>
+        <div
+            className={this.getItemClassName(item)}
+            key={item.label}
+        >
             <div className={styles.leftChild}>
                 <div className={styles.iconContainer}>
                     <span

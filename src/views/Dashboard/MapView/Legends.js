@@ -227,6 +227,7 @@ class Legends extends React.PureComponent {
                     iconName={iconNames.swapArrows}
                     onClick={this.props.onToggleTextMarkers}
                     title="Click to toggle between Partners and Programmes"
+                    disabled={!this.props.showTextMarkers}
                     transparent
                 />
                 <PrimaryButton
