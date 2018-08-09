@@ -1,6 +1,7 @@
+const healthFacilities = 2;
+
 const layerTypes = {
-    // healthFacilities
-    26: [
+    [healthFacilities]: [
         'Other HFs',
         'Radiology/lab',
         'Private clinics',
