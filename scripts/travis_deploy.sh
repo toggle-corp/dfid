@@ -44,9 +44,16 @@ printf "\n\n::::::::: Deploying DFID to S3 :::::::::::\n"
 set -xe;
 echo "::::::  >> Generating React Builds"
     python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
-    docker run -t -v ${BUILD_DIR}:/code/build \
+
+    echo "
+REACT_APP_MAPBOX_ACCESS_TOKEN=${REACT_APP_MAPBOX_ACCESS_TOKEN}
+REACT_APP_MAPBOX_STYLE=${REACT_APP_MAPBOX_STYLE}
+    " > ${ROOT_DIR}/.env
+
+    docker run -t -v ${BUILD_DIR}:/code/build  --env-file=${ROOT_DIR}/.env \
         devtc/dfid:latest bash -c 'yarn install && CI=false yarn build'
-        # --env-file=${CLIENT_DIR}/.env
+
+    rm ${ROOT_DIR}/.env
 set +xe;
 
 echo "::::::  >> Removing Previous Builds Files [js, css] From S3 Bucket [$DFID_S3_BUCKET]"
