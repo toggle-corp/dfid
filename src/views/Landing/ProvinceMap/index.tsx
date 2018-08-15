@@ -3,6 +3,7 @@ import mapboxgl  from 'mapbox-gl';
 import * as topojson  from 'topojson-client';
 import turf from 'turf';
 import {
+    urlForCountryGeoJson,
     createParamsForProvinces,
 } from '../../../rest';
 
@@ -109,10 +110,8 @@ export default class ProvinceMap extends React.PureComponent<Props, States> {
     }
 
     createRequestForProvinceMap = () => {
-        const url = 'http://dfid.naxa.com.np/core/geojson/country/';
-
         const request = new FgRestBuilder()
-            .url(url)
+            .url(urlForCountryGeoJson)
             .params(createParamsForProvinces)
             .success((response: GeoJSON) => {
                 const geoJson = topojson.feature(

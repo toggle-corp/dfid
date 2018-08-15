@@ -4,6 +4,7 @@ import {
 } from '../config/rest';
 
 export const urlForCountryData = `${wsEndpoint}/country-data/`;
+export const urlForCountryGeoJson = `${wsEndpoint}/geojson/country/`;
 export const createParamsForCountryData = () => ({
     ...commonHeaderForGet,
 });

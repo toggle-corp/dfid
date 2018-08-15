@@ -46,11 +46,11 @@ echo "::::::  >> Generating React Builds"
     python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
     echo "
-REACT_APP_MAPBOX_ACCESS_TOKEN=${REACT_APP_MAPBOX_ACCESS_TOKEN}
-REACT_APP_MAPBOX_STYLE=${REACT_APP_MAPBOX_STYLE}
+    REACT_APP_MAPBOX_ACCESS_TOKEN=${REACT_APP_MAPBOX_ACCESS_TOKEN}
+    REACT_APP_MAPBOX_STYLE=${REACT_APP_MAPBOX_STYLE}
     " > ${ROOT_DIR}/.env
 
-    docker run -t -v ${BUILD_DIR}:/code/build  --env-file=${ROOT_DIR}/.env \
+    docker run -t -v ${BUILD_DIR}:/code/build --env-file=${ROOT_DIR}/.env \
         devtc/dfid:latest bash -c 'yarn install && CI=false yarn build'
 
     rm ${ROOT_DIR}/.env
