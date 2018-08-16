@@ -4,6 +4,8 @@ services:
     - docker
 
 before_install:
+    - sudo pip install --upgrade awscli
+    - sudo pip install --upgrade awsebcli
     - mkdir -p src/vendor
 
     - git clone https://github.com/toggle-corp/react-store.git src/vendor/react-store
@@ -25,9 +27,3 @@ script:
 after_success:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push devtc/dfid:latest
-
-deploy:
-  provider: surge
-  project: ./build/
-  domain: dfid.surge.sh
-  on: release

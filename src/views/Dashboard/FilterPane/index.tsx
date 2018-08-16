@@ -218,7 +218,7 @@ export class FilterPane extends React.PureComponent<Props, State>{
         });
     }
 
-    handleFaramSuccess = (faramValues: DashboardFilterParams) => {
+    handleFaramSuccess = (_:DashboardFilterParams, faramValues: DashboardFilterParams) => {
         this.props.setDashboardFilters({
             faramValues,
             filters: faramValues,
