@@ -22,8 +22,17 @@ import u from '../../../resources/mapIcons/u.png';
 import v from '../../../resources/mapIcons/v.png';
 import w from '../../../resources/mapIcons/w.png';
 
+import A from '../../../resources/mapIcons/A-01.png';
+import B from '../../../resources/mapIcons/B-01.png';
+import C from '../../../resources/mapIcons/C-01.png';
+import D from '../../../resources/mapIcons/D-01.png';
+
 
 const icons = [
-    a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w,
+    k, l, m, n, o, p, q, r, s, t, u, v, w, a, b, c, d, e, f, g, h, i, j, 
+];
+
+export const alphabets = [
+    A, B, C, D,
 ];
 export default icons;

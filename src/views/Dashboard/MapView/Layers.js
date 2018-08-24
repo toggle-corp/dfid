@@ -3,12 +3,11 @@ import { connect } from 'react-redux';
 
 import { dashboardMapLayersSelector } from '../../../redux';
 
-import { getHexFromString } from '../../../vendor/react-store/utils/common';
+import { getPastelColorFromString } from '../../../utils/common';
 import MapLayer from '../../../components/Map/MapLayer';
 import GenericSource from './GenericSource';
 import { getSimpleCategoricalPaint } from './utils';
-import icons from './icons';
-import layerTypes from './layerTypes';
+import layerTypes, { icons, layerTypeKeys } from './layerTypes';
 
 const mapStateToProps = state => ({
     selectedMapLayers: dashboardMapLayersSelector(state),
@@ -19,17 +18,19 @@ class Layers extends React.PureComponent {
         super(props);
         const { map } = props;
 
-        icons.forEach((icon, index) => {
-            const img = new Image(8, 8);
-            img.onload = () => {
-                map.addImage(`map-icon-${index}`, img);
-            };
-            img.src = icon;
+        Object.keys(icons).forEach((layerType) => {
+            icons[layerType].forEach((icon, index) => {
+                const img = new Image(8, 8);
+                img.onload = () => {
+                    map.addImage(`map-icon-${layerType}-${index}`, img);
+                };
+                img.src = icon;
+            });
         });
     }
 
     calculateProps = (layer) => {
-        const color = getHexFromString(layer.layerName);
+        const color = getPastelColorFromString(layer.layerName);
 
         if (layer.type === 'Point') {
             return {
@@ -54,16 +55,17 @@ class Layers extends React.PureComponent {
     }
 
     calculateIconLayerProps = (layer) => {
-        const color = getHexFromString(layer.layerName);
+        const color = getPastelColorFromString(layer.layerName);
         const icons = layerTypes[layer.id].reduce((acc, type, index) => {
-            acc[type] = `map-icon-${index}`;
+            acc[type] = `map-icon-${layer.id}-${index}`;
             return acc;
         }, {});
+        const key = layerTypeKeys[layer.id];
 
         return {
             type: 'symbol',
             layout: {
-                'icon-image': getSimpleCategoricalPaint('MAJROTYP', icons),
+                'icon-image': getSimpleCategoricalPaint(key, icons),
             },
             paint: {
             },
