@@ -11,7 +11,8 @@ import {
 } from '../../../redux';
 
 import PrimaryButton from '../../../vendor/react-store/components/Action/Button/PrimaryButton';
-import { getRgbFromHex, getHexFromString } from '../../../vendor/react-store/utils/common';
+import { getRgbFromHex } from '../../../vendor/react-store/utils/common';
+import { getPastelColorFromString } from '../../../utils/common';
 import { iconNames, defaultFilters } from '../../../constants';
 
 import Legend from '../../../components/Map/Legend';
@@ -25,8 +26,7 @@ import {
     renderNormalNumeral,
 } from '../../../components/Renderer';
 
-import layerTypes, { layerTypeKeys } from './layerTypes';
-import icons from './icons';
+import layerTypes, { layerTypeKeys, icons } from './layerTypes';
 
 const emptyList = [];
 
@@ -186,17 +186,17 @@ class Legends extends React.PureComponent {
 
         let legendItems = selectedMapLayers.filter(l => !layerTypes[l.id]).map(l => ({
             label: l.layerName,
-            color: getHexFromString(l.layerName),
+            color: getPastelColorFromString(l.layerName),
         }));
 
         selectedMapLayers.filter(l => layerTypes[l.id]).forEach((l) => {
             layerTypes[l.id].forEach((key, index) => {
                 legendItems.push({
                     label: `${l.layerName} - ${key}`,
-                    color: getHexFromString(l.layerName),
+                    color: getPastelColorFromString(l.layerName),
                     size: 14,
                     innerText: (
-                        <img src={icons[index]} width="8px" height="8px" />
+                        <img src={icons[l.id][index]} width="8px" height="8px" />
                     ),
                 });
             });
