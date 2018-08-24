@@ -8,7 +8,7 @@ import DangerButton from '../../../vendor/react-store/components/Action/Button/D
 import WarningButton from '../../../vendor/react-store/components/Action/Button/WarningButton';
 import SuccessButton from '../../../vendor/react-store/components/Action/Button/SuccessButton';
 import AccentButton from '../../../vendor/react-store/components/Action/Button/AccentButton';
-import Faram from '../../../vendor/react-store/components/Input/Faram';
+import Faram from '../../../vendor/react-store/components/General/Faram';
 import { isObjectEmpty } from '../../../vendor/react-store/utils/common';
 import { iconNames, defaultFilters } from '../../../constants';
 
