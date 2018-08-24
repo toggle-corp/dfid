@@ -25,7 +25,7 @@ const myTransform = createTransform(
 );
 
 const storeConfig = {
-    blacklist: ['domainData', 'notify', 'siloDomainData'],
+    // blacklist: ['domainData', 'notify', 'siloDomainData'],
     key: 'dfid',
     storage: localforage,
     transforms: [myTransform],

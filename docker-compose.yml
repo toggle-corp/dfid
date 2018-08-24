@@ -9,6 +9,8 @@ services:
             - devtc/dfid:latest
         env_file:
             - .env
+        environment:
+            - REACT_APP_API_HTTPS=https
         command: ['/code/scripts/run_develop.sh']
         volumes:
             - .:/code
