@@ -8,7 +8,7 @@ import MapLayer from '../../../components/Map/MapLayer';
 import GenericSource from './GenericSource';
 import { getSimpleCategoricalPaint } from './utils';
 import icons from './icons';
-import layerTypes from './layerTypes';
+import layerTypes, { layerTypeKeys } from './layerTypes';
 
 const mapStateToProps = state => ({
     selectedMapLayers: dashboardMapLayersSelector(state),
@@ -59,11 +59,12 @@ class Layers extends React.PureComponent {
             acc[type] = `map-icon-${index}`;
             return acc;
         }, {});
+        const key = layerTypeKeys[layer.id];
 
         return {
             type: 'symbol',
             layout: {
-                'icon-image': getSimpleCategoricalPaint('MAJROTYP', icons),
+                'icon-image': getSimpleCategoricalPaint(key, icons),
             },
             paint: {
             },

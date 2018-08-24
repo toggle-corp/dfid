@@ -25,7 +25,7 @@ import {
     renderNormalNumeral,
 } from '../../../components/Renderer';
 
-import layerTypes from './layerTypes';
+import layerTypes, { layerTypeKeys } from './layerTypes';
 import icons from './icons';
 
 const emptyList = [];
