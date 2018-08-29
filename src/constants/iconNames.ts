@@ -18,6 +18,7 @@ const iconNames: Readonly<{
     download: 'fa fa-download',
     eye: 'ion-eye',
     eyeDisabled: 'ion-eye-disabled',
+    openLink: 'ion-android-open',
 };
 
 export default iconNames;

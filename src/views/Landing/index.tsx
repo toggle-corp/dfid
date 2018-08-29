@@ -190,9 +190,9 @@ export class Landing extends React.PureComponent<Props, State> {
                                 colorScheme={colorScheme}
                                 className={styles.chart}
                                 data={provincesInfo}
-                                labelAccessor={provinceDataLabelAccessor}
-                                valueAccessor={totalSpendValueAccessor}
-                                valueLabelAccessor={totalSpendValueLabelAccessor}
+                                labelSelector={provinceDataLabelAccessor}
+                                valueSelector={totalSpendValueAccessor}
+                                valueLabelSelector={totalSpendValueLabelAccessor}
                                 margins={horizontalChartMargin}
                                 tiltLabels
                             />
@@ -205,8 +205,8 @@ export class Landing extends React.PureComponent<Props, State> {
                                 colorScheme={colorScheme}
                                 className={styles.chart}
                                 data={provincesInfo}
-                                labelAccessor={provinceDataLabelAccessor}
-                                valueAccessor={activeProjectValueAccessor}
+                                labelSelector={provinceDataLabelAccessor}
+                                valueSelector={activeProjectValueAccessor}
                                 margins={horizontalChartMargin}
                             />
                         </div>

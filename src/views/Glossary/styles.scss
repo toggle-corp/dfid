@@ -1,20 +1,27 @@
 @import '../../stylesheets/base';
 
+$width-body-max: 1200px;
+
 .glossary {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    margin: auto;
+    padding: $spacing-medium;
+    // width: 100%;
+    // max-width: $width-body-max;
     height: 100%;
 
     .search {
+        display: flex;
         flex-shrink: 0;
-        margin: $spacing-medium 0;
-        padding: $spacing-small;
-        width: 20%;
+        justify-content: flex-end;
+        background-color: $color-foreground;
+        padding: $spacing-medium;
     }
 
     .table {
         display: flex;
         flex-grow: 1;
+        overflow-y: auto;
     }
 }
