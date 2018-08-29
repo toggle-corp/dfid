@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import Redux from 'redux';
 
 import { RestRequest } from '../../vendor/react-store/utils/rest';
-import Table, { Header } from '../../vendor/react-store/components/View/Table';
+import ListView from '../../vendor/react-store/components/View/List/ListView';
 import LoadingAnimation from '../../vendor/react-store/components/View/LoadingAnimation';
-import { compareNumber } from '../../vendor/react-store/utils/common';
 
 import {
     RootState,
@@ -20,6 +19,8 @@ import {
     setExploreDataAction,
     setSelectedExploreAction,
 } from '../../redux';
+
+import { iconNames } from '../../constants';
 
 import ExploreDataGetRequest from './requests/ExploreDataGetRequest';
 import Viewer from './Viewer';
@@ -46,7 +47,6 @@ interface State {
 
 export class Explore extends React.PureComponent<Props, State> {
     exploreDataRequest: RestRequest;
-    headers: Header<ExploreData>[];
 
     constructor(props: Props) {
         super(props);
@@ -54,36 +54,6 @@ export class Explore extends React.PureComponent<Props, State> {
         this.state = {
             loadingExploreData: true,
         };
-        this.headers = [
-            {
-                key: 'id',
-                label: 'S.N',
-                sortable: true,
-                comparator: (a, b) => compareNumber(a.id, b.id),
-                order: 1,
-            },
-            {
-                key: 'title',
-                label: 'Title',
-                order: 2,
-            },
-            {
-                key: 'pdf',
-                label: 'Document Link',
-                order: 3,
-                modifier: row => (
-                    <a
-                        href={row.pdf}
-                        target="blank"
-                        className={`${styles.link} link`}
-                    >
-                        {row.pdf}
-                    </a>
-                ),
-            },
-
-        ];
-
     }
     componentWillMount() {
         this.startRequestForExploreData();
@@ -107,38 +77,66 @@ export class Explore extends React.PureComponent<Props, State> {
         this.exploreDataRequest.start();
     }
 
-    handleTableClick = (rowKey: string) => {
+    handleTableClick = (rowKey: number) => {
         this.props.setSelectedExplore({
             exploreId: rowKey,
         });
     }
 
-    keyExtractor = (item: ExploreData) => item.id;
+    keyExtractor = (item: ExploreData) => String(item.id);
+
+    renderListItem = (key: string, datum: ExploreData) => {
+        const onClick = () => this.handleTableClick(datum.id);
+
+        const { selectedExploreData } = this.props;
+
+        const isSelected = selectedExploreData
+            ? selectedExploreData.id === datum.id
+            : false;
+
+        const classNames = [
+            styles.item,
+        ];
+        if (isSelected) {
+            classNames.push(styles.selected);
+        }
+
+        return (
+            <div
+                className={classNames.join(' ')}
+                key={key}
+            >
+                <button
+                    className={styles.button}
+                    onClick={onClick}
+                >
+                    {datum.title}
+                </button>
+                <a
+                    className={styles.link}
+                    href={datum.pdf}
+                    title={datum.pdf}
+                    target="blank"
+                >
+                    <span className={iconNames.openLink} />
+                </a>
+            </div>
+        );
+    }
 
     render() {
         const { loadingExploreData } = this.state;
-        const {
-            exploreData,
-            selectedExploreData,
-        } = this.props;
-
-        const activeExploreId = selectedExploreData ?
-            selectedExploreData.id : undefined;
+        const { exploreData } = this.props;
 
         return (
             <div className={styles.explore}>
                <div className={styles.content}>
-                   <h3>Infographics</h3>
-                <div className={styles.table}>
                     {loadingExploreData && <LoadingAnimation />}
-                    <Table
-                         data={exploreData}
-                         headers={this.headers}
-                         keyExtractor={this.keyExtractor}
-                         onBodyClick={this.handleTableClick}
-                         highlightRowKey={activeExploreId}
+                    <ListView
+                        data={exploreData}
+                        keyExtractor={this.keyExtractor}
+                        modifier={this.renderListItem}
                     />
-                    </div>
                 </div>
                 <div className={styles.viewer}>
                     <Viewer />

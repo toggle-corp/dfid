@@ -164,12 +164,12 @@ export class Glossary extends React.PureComponent<Props, State> {
         return (
             <div className={styles.glossary}>
                 <div className={styles.search}>
-                   <SearchInput
-                        label="Search"
+                    <SearchInput
+                        placeholder="Search"
                         showHintAndError={false}
                         value={this.state.searchValue}
                         onChange={this.handleSearch}
-                   />
+                    />
                 </div>
                 <div className={styles.table}>
                     {this.state.loadingGlossaryData && <LoadingAnimation />}

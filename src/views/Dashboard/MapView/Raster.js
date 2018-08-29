@@ -25,7 +25,7 @@ class Raster extends React.PureComponent {
             return null;
         }
 
-        const url = createUrlForTileLayer(mapLayer.layerServerUrl || '', {
+        const url = mapLayer.mapBoxUrl || createUrlForTileLayer(mapLayer.layerServerUrl || '', {
             format: 'image/png',
             version: '1.1.0',
             service: 'WMS',
@@ -41,7 +41,7 @@ class Raster extends React.PureComponent {
             <RasterLayer
                 layerKey="raster"
                 map={map}
-                tiles={[`${url}&bbox={bbox-epsg-3857}`]}
+                tiles={[url]}
                 tileSize={256}
             />
         );

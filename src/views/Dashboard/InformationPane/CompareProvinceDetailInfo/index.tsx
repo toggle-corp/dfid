@@ -297,8 +297,10 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                             colorScheme={colorScheme}
                             className={styles.chart}
                             data={selectedProvincesData}
-                            labelAccessor={provinceDataLabelAccessor}
-                            valueAccessor={activeProjectValueAccessor}
+                            labelSelector={provinceDataLabelAccessor}
+                            valueSelector={activeProjectValueAccessor}
+                            margins={tiltLabelhorizontalChartMargin}
+                            tiltLabels
                         />
                     </div>
                     <div className={styles.chartContainer}>
@@ -309,9 +311,11 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                             colorScheme={colorScheme}
                             className={styles.chart}
                             data={selectedProvincesData}
-                            labelAccessor={provinceDataLabelAccessor}
-                            valueAccessor={povertyRateValueAccessor}
-                            valueLabelAccessor={povertyRateValueLabelAccessor}
+                            labelSelector={provinceDataLabelAccessor}
+                            valueSelector={povertyRateValueAccessor}
+                            valueLabelSelector={povertyRateValueLabelAccessor}
+                            margins={tiltLabelhorizontalChartMargin}
+                            tiltLabels
                         />
                     </div>
                     <div className={styles.chartContainer}>
@@ -322,9 +326,9 @@ export class CompareProvinceDetailInfo extends React.PureComponent<Props, State>
                             colorScheme={colorScheme}
                             className={styles.chart}
                             data={selectedProvincesData}
-                            labelAccessor={provinceDataLabelAccessor}
-                            valueAccessor={totalBudgetValueAccessor}
-                            valueLabelAccessor={totalBudgetValueLabelAccessor}
+                            labelSelector={provinceDataLabelAccessor}
+                            valueSelector={totalBudgetValueAccessor}
+                            valueLabelSelector={totalBudgetValueLabelAccessor}
                             margins={tiltLabelhorizontalChartMargin}
                             tiltLabels
                         />

@@ -37,9 +37,19 @@ export default class MapLayersGetRequest implements Request<{}> {
             .afterLoad(() => this.props.setLoadings({ loadingLayers: false }))
             .success((response: MapLayer[]) => {
                 schema.validate(response, 'array.mapLayer');
-                this.props.setMapLayers({
-                    mapLayers: response,
-                });
+                const mapLayers = [
+                    ...response,
+                    {
+                        id: 9999,
+                        layerName: 'Population',
+                        mapBoxUrl: 'https://api.mapbox.com/styles/v1/dfidnepal/cjldwww6i7lh32spkez0ivsee/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGZpZG5lcGFsIiwiYSI6ImNqbGRybDI4bTBlY2Uzd21pNml6cXAxMXAifQ.O5CUa1psf0mrF8ubq7Fy-Q', // tslint:disable
+                        type: 'Raster',
+                        layerServerUrl: 'Population.NoFile',
+                        file: '',
+                        sectors: [],
+                    },
+                ];
+                this.props.setMapLayers({ mapLayers });
             })
             .build();
         return request;

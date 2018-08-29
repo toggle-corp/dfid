@@ -13,5 +13,5 @@ export const createParamsForMapLayers = () => ({
 });
 
 export const createUrlForTileLayer = (baseUrl: string, params: UrlParams) => (
-    `${baseUrl}ows?${p(params)}`
+    `${baseUrl}ows?${p(params)}&bbox={bbox-epsg-3857}`
 );

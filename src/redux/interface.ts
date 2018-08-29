@@ -283,6 +283,7 @@ export interface MapLayer {
     id: number;
     layerName: string;
     layerServerUrl?: string;
+    mapBoxUrl?: string;
     type: string;
     file: string;
     layerPath?: string;
