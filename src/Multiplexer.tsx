@@ -10,8 +10,10 @@ import { connect } from 'react-redux';
 
 import Navbar from './components/Navbar';
 import PrivateRoute from './vendor/react-store/components/General/PrivateRoute';
+import boundError from './vendor/react-store/components/General/BoundError';
 import ExclusivelyPublicRoute from './vendor/react-store/components/General/ExclusivelyPublicRoute';
 import Toast from './vendor/react-store/components/View/Toast';
+import ComponentError from './components/ComponentError';
 
 import BrowserDetect from './components/BrowserDetect';
 import { RootState, Notification } from './redux/interface';
@@ -57,7 +59,7 @@ class Multiplexer extends React.PureComponent<Props, {}> {
             case ROUTE.exclusivelyPublic:
                 return (
                     <ExclusivelyPublicRoute
-                        component={viewComponent}
+                        component={boundError(ComponentError)(viewComponent)}
                         key={routeId}
                         path={path}
                         exact={true}
@@ -69,7 +71,7 @@ class Multiplexer extends React.PureComponent<Props, {}> {
             case ROUTE.private:
                 return (
                     <PrivateRoute
-                        component={viewComponent}
+                        component={boundError(ComponentError)(viewComponent)}
                         key={routeId}
                         path={path}
                         exact={true}
@@ -81,7 +83,7 @@ class Multiplexer extends React.PureComponent<Props, {}> {
             case ROUTE.public:
                 return (
                     <Route
-                        component={viewComponent}
+                        component={boundError(ComponentError)(viewComponent)}
                         key={routeId}
                         path={path}
                         exact={true}
