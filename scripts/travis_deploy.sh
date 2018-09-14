@@ -50,8 +50,8 @@ echo "::::::  >> Generating React Builds"
     python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
     DFID_COMMIT_SHA=$(git --git-dir=${CLIENT_PATH}/.git rev-parse HEAD)
-    RAVL_COMMIT_SHA$(git --git-dir=${RAVL_PATH}/.git rev-parse HEAD)
-    REACT_STORE_COMMIT_SHA$(git --git-dir=${REACT_STORE_PATH}/.git rev-parse HEAD)
+    RAVL_COMMIT_SHA=$(git --git-dir=${RAVL_PATH}/.git rev-parse HEAD)
+    REACT_STORE_COMMIT_SHA=$(git --git-dir=${REACT_STORE_PATH}/.git rev-parse HEAD)
 
     echo "
     REACT_APP_MAPBOX_ACCESS_TOKEN=${REACT_APP_MAPBOX_ACCESS_TOKEN}
