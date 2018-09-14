@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/detect-browser": "^2.0.1",
+    "@types/raven-js": "^3.10.0",
     "d3-array": "^1.2.1",
     "d3-axis": "^1.0.8",
     "d3-interpolate": "^1.2.0",

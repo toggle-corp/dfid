@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 
 import { RootState } from './redux/interface';
 import { startTasksAction } from './redux/middlewares/taskManager';
+import { ravenInitialize } from './config/sentry';
 import Multiplexer from './Multiplexer';
 
 interface OwnProps {}
@@ -27,6 +28,7 @@ export class App extends React.PureComponent<Props, State> {
 
     componentWillMount() {
         this.props.startTasks();
+        ravenInitialize();
     }
 
     render() {

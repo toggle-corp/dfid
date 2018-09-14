@@ -30,7 +30,11 @@ fi
 
 BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # /code/scripts/
 ROOT_DIR=$(dirname "$BASE_DIR") # /code/
-BUILD_DIR=${ROOT_DIR}/build
+
+CLIENT_PATH=${ROOT_DIR}
+BUILD_DIR=${CLIENT_PATH}/build
+REACT_STORE_PATH=${CLIENT_PATH}/src/vendor/react-store
+RAVL_PATH=${CLIENT_PATH}/src/vendor/ravl
 
 echo "::::: Configuring AWS :::::"
 aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
@@ -45,15 +49,24 @@ set -xe;
 echo "::::::  >> Generating React Builds"
     python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
+    DFID_COMMIT_SHA=$(git --git-dir=${CLIENT_PATH}/.git rev-parse HEAD)
+    RAVL_COMMIT_SHA$(git --git-dir=${RAVL_PATH}/.git rev-parse HEAD)
+    REACT_STORE_COMMIT_SHA$(git --git-dir=${REACT_STORE_PATH}/.git rev-parse HEAD)
+
     echo "
     REACT_APP_MAPBOX_ACCESS_TOKEN=${REACT_APP_MAPBOX_ACCESS_TOKEN}
     REACT_APP_MAPBOX_STYLE=${REACT_APP_MAPBOX_STYLE}
-    " > ${ROOT_DIR}/.env
 
-    docker run -t -v ${BUILD_DIR}:/code/build --env-file=${ROOT_DIR}/.env \
+    REACT_APP_DFID_COMMIT_SHA=${DFID_COMMIT_SHA}
+    REACT_APP_REACT_STORE_COMMIT_SHA=${RAVL_COMMIT_SHA}
+    REACT_APP_RAVL_COMMIT_SHA=${REACT_STORE_COMMIT_SHA}
+
+    " > ${CLIENT_PATH}/.env
+
+    docker run -t -v ${BUILD_DIR}:/code/build --env-file=${CLIENT_PATH}/.env \
         devtc/dfid:latest bash -c 'yarn install && CI=false yarn build'
 
-    rm ${ROOT_DIR}/.env
+    rm ${CLIENT_PATH}/.env
 set +xe;
 
 echo "::::::  >> Removing Previous Builds Files [js, css] From S3 Bucket [$DFID_S3_BUCKET]"

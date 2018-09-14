@@ -1,8 +1,15 @@
 import React from 'react';
+
+import boundError from '../../vendor/react-store/components/General/BoundError';
+
 import ViewManager from '../../components/ViewManager';
+import ComponentError from '../../components/ComponentError';
 import { mapObjectToArray, mapObjectToObject, Map } from '../../utils/map';
 import { allLinks } from './links';
 import { RouteSetting, ROUTE, CloakSettings } from './interface';
+
+// tslint:disable-next-line variable-name
+const BoundedViewManager = boundError(ComponentError)(ViewManager);
 
 // NOTE: only change values in routes
 export const routes: Map<RouteSetting> = {
@@ -65,7 +72,7 @@ export const routesOrder: string[] = mapObjectToArray<RouteSetting, { key: strin
 export const views = mapObjectToObject<RouteSetting, (props: object) => JSX.Element>(
     routes,
     (route, name) => (props: object) => (
-        <ViewManager
+        <BoundedViewManager
             {...props}
             load={route.loader}
             name={name}
